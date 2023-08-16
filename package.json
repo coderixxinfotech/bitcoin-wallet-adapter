@@ -2,14 +2,24 @@
   "name": "bitcoin-wallet-adapter",
   "version": "1.0.0",
   "description": "Bitcoin wallet adapter using MUI components",
+  "repository": "https://github.com/coderixxinfotech/bitcoin-wallet-adapter",
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "cd example && yarn dev"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "CrypticMeta - Coderixx",
+  "license": "MIT",
   "sideEffects": false,
+  "keywords": [
+    "bitcoin",
+    "wallet",
+    "crypto",
+    "adapter",
+    "mui",
+    "react"
+  ],
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
