@@ -6,10 +6,7 @@ export interface WalletDetails {
   connected: boolean;
   derivationPath?: string;
 }
-export interface WalletState {
-  walletDetails: WalletDetails | null;
-  lastWallet: string;
-}
+
 
 export interface AuthOptionsArgs {
   manifestPath?: string;
@@ -18,4 +15,9 @@ export interface AuthOptionsArgs {
     name?: string;
     icon?: string;
   };
+}
+
+export interface IInstalledWallets {
+  label: string;
+  logo: string;
 }

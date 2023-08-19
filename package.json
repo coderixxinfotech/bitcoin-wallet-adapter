@@ -5,9 +5,11 @@
   "repository": "https://github.com/coderixxinfotech/bitcoin-wallet-adapter",
   "main": "dist/index.js",
   "scripts": {
+    "build:css": "postcss src/styles.css -o dist/styles.css",
+    "build:assets": "copyfiles -u 1 src/assets/* dist",
+    "build": "tsc && yarn build:css && yarn build:assets",
     "test": "jest",
-    "build": "tsc",
-    "dev": "cd example && yarn dev"
+    "dev": "cd example && yarn && yarn dev"
   },
   "author": "CrypticMeta - Coderixx",
   "license": "MIT",
@@ -30,10 +32,14 @@
     "@stacks/connect-react": "^22.1.1",
     "@stacks/network": "^6.5.5",
     "@stacks/rpc-client": "^0.8.18",
+    "autoprefixer": "^10.4.15",
+    "postcss": "^8.4.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.10.1",
     "react-redux": "^8.1.2",
     "redux-thunk": "^2.4.2",
+    "sats-connect": "^0.5.0",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.1.6"
   },
@@ -42,8 +48,10 @@
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
     "@types/jest": "^29.5.3",
+    "copyfiles": "^2.4.1",
     "jest": "^29.6.2",
     "jest-environment-jsdom": "^29.6.2",
+    "postcss-cli": "^10.1.0",
     "react-test-renderer": "^18.2.0",
     "ts-jest": "^29.1.1"
   }
