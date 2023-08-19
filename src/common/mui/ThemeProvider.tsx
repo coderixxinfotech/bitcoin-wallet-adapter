@@ -10,25 +10,6 @@ type ThemeWrapperProps = {
 const themeOptions: ThemeOptions = {
   palette: {
     mode: "dark",
-    primary: {
-      main: "#ffffff",
-      contrastText: "#84848a",
-      dark: "#9102F0",
-      light: "#cca4e6",
-    },
-    secondary: {
-      main: "#9102F0",
-      contrastText: "ffffff",
-      dark: "#24023b",
-      light: "#c987f5",
-    },
-    background: {
-      default: "#090417",
-      paper: "#0A041D",
-    },
-    text: {
-      secondary: "#84848a",
-    },
   },
 };
 

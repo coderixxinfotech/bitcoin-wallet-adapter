@@ -70,38 +70,39 @@ const WalletModal: React.FC<WalletModalProps> = ({
           <div className="modalBody">
             <FormControl fullWidth>
               <RadioGroup
-                
                 aria-labelledby="demo-controlled-radio-buttons-group"
                 name="controlled-radio-buttons-group"
                 value={lastWallet}
-                onChange={async (e) => {
-                  const item = e.target.value;
-                  if (item === "Hiro") {
-                    doOpenAuth();
-                    setWallet(e);
-                  } else if (item === "Xverse") {
-                    await getAddress(getAddressOptions);
-                  } else if (item === "Unisat") {
-                    await getUnisatAddress();
-                  }
-                }}
               >
                 {wallets.map((item: IInstalledWallets, idx: number) => (
-                  <div key={item.label + idx} className="w-full flex justify-between items-center">
-                    <div className="flex items-center ">
-                      <img src={item.logo}  />{" "}
+                  <label
+                    key={item.label + idx}
+                    className="w-full flex justify-between items-center cursor-pointer hover:border-1 pl-4 rounded-xl hover:bg-accent bg-opacity-50 border-accent mb-3"
+                  >
+                    <div className="flex items-center">
+                      <img
+                        className="w-[30px] mr-2"
+                        src={item.logo}
+                        alt={`${item.label} logo`}
+                      />{" "}
                       <span>{item.label + " wallet"}</span>{" "}
-                      {/* Name rendering */}
                     </div>
-                    <FormControlLabel
-                      label=""
+                    <Radio
                       value={item.label}
-                      control={<Radio />}
-                      color="inherit"
-                      labelPlacement="end" // Position the label after the control (optional)
                       checked={lastWallet === item.label}
+                      onChange={async (e) => {
+                        const selectedItem = e.target.value;
+                        if (selectedItem === "Hiro") {
+                          doOpenAuth();
+                          setWallet(e);
+                        } else if (selectedItem === "Xverse") {
+                          await getAddress(getAddressOptions);
+                        } else if (selectedItem === "Unisat") {
+                          await getUnisatAddress();
+                        }
+                      }}
                     />
-                  </div>
+                  </label>
                 ))}
               </RadioGroup>
             </FormControl>

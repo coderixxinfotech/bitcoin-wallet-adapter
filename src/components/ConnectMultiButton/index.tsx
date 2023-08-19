@@ -73,14 +73,14 @@ function ConnectMultiWallet() {
     if (typeof window.unisat !== "undefined") {
       checkWallets.push({
         label: "Unisat",
-        logo: "../../assets/btc-unisat-logo.png",
+        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-unisat-logo.png",
       });
     }
 
     if (window?.StacksProvider?.psbtRequest) {
       checkWallets.push({
         label: "Hiro",
-        logo: "../../assets/btc-unisat-logo.png",
+        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-hiro-logo.jpeg",
       });
     }
 
@@ -89,7 +89,7 @@ function ConnectMultiWallet() {
     ) {
       checkWallets.push({
         label: "Xverse",
-        logo: "../../assets/btc-unisat-logo.png",
+        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-xverse-logo.png",
       });
     }
 
