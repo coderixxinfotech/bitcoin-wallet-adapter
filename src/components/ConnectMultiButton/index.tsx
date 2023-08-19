@@ -19,6 +19,7 @@ import WalletButton from "./WalletButton";
 import WalletModal from "./WalletModal";
 import { getBTCPriceInDollars } from "../../utils";
 import { setBTCPrice } from "../../stores/reducers/generalReducer";
+import {IInstalledWallets } from "../../types"
 interface CustomWindow extends Window {
   unisat?: any;
   BitcoinProvider?: any;
@@ -38,7 +39,7 @@ function ConnectMultiWallet() {
   const lastWallet = useSelector(
     (state: RootState) => state.general.lastWallet
   );
-  const [wallets, setWallets] = useState<string[]>([]);
+  const [wallets, setWallets] = useState<IInstalledWallets[]>([]);
 
   //redux wallet management
   const updateWalletDetails = useCallback(
@@ -70,17 +71,26 @@ function ConnectMultiWallet() {
   function getInstalledWalletName() {
     const checkWallets = [];
     if (typeof window.unisat !== "undefined") {
-      checkWallets.push("Unisat");
+      checkWallets.push({
+        label: "Unisat",
+        logo: "../../assets/btc-unisat-logo.png",
+      });
     }
 
     if (window?.StacksProvider?.psbtRequest) {
-      checkWallets.push("Hiro");
+      checkWallets.push({
+        label: "Hiro",
+        logo: "../../assets/btc-unisat-logo.png",
+      });
     }
 
     if (
       window?.BitcoinProvider?.signTransaction?.toString()?.includes("Psbt")
     ) {
-      checkWallets.push("Xverse");
+      checkWallets.push({
+        label: "Xverse",
+        logo: "../../assets/btc-unisat-logo.png",
+      });
     }
 
     setWallets(checkWallets);
@@ -273,7 +283,7 @@ function ConnectMultiWallet() {
 
   return (
     <>
-      <div className="bg-black hidden  lg:flex justify-end ">
+      <div className="">
         <WalletButton
           wallets={wallets}
           lastWallet={lastWallet}

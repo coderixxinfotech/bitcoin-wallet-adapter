@@ -1,4 +1,3 @@
-'use client'
 import React, { ButtonHTMLAttributes } from "react";
 import { IconType } from "react-icons";
 import { FaSpinner } from "react-icons/fa";
@@ -55,7 +54,7 @@ const CustomButton = ({
 
   if (link && href) {
     return (
-      <a href={href} >
+      <a href={href}>
         <button
           className={`${buttonClasses} ${
             !disabled && hoverClasses

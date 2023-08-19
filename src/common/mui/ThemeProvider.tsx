@@ -11,24 +11,23 @@ const themeOptions: ThemeOptions = {
   palette: {
     mode: "dark",
     primary: {
-      main: "#FFA500", // Orange
-      contrastText: "#ffffff",
-      dark: "#C47400", // Darker Orange
-      light: "#FFC266", // Lighter Orange
+      main: "#ffffff",
+      contrastText: "#84848a",
+      dark: "#9102F0",
+      light: "#cca4e6",
     },
     secondary: {
-      main: "#000000", // Black
-      contrastText: "#ffffff",
-      dark: "#333333", // Darker Grey
-      light: "#666666", // Lighter Grey
+      main: "#9102F0",
+      contrastText: "ffffff",
+      dark: "#24023b",
+      light: "#c987f5",
     },
     background: {
-      default: "#0A041D",
-      paper: "#000000", // Black
+      default: "#090417",
+      paper: "#0A041D",
     },
     text: {
-      primary: "#FFA500", // Orange
-      secondary: "#ffffff", // White
+      secondary: "#84848a",
     },
   },
 };

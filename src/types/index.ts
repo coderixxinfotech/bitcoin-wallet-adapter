@@ -16,3 +16,8 @@ export interface AuthOptionsArgs {
     icon?: string;
   };
 }
+
+export interface IInstalledWallets {
+  label: string;
+  logo: string;
+}
