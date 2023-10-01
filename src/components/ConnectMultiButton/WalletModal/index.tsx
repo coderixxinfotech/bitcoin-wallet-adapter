@@ -40,7 +40,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
       aria-describedby="modal-modal-description"
     >
       <div className="bg-black bg-opacity-75 h-screen w-full center">
-        <div className="bg-secondary p-6 min-w-6/12 lg:min-w-auto relative border xl:border-4 border-accent rounded-xl">
+        <div className="bg-secondary p-6 min-w-[50%] lg:min-w-[30%] relative border xl:border-4 border-accent rounded-xl">
           <div className="absolute right-5 top-5">
             <div
               className="rounded-full bg-gray-700 hover:bg-red-500 bg-opacity-50 text-gray-300 p-2 cursor-pointer"

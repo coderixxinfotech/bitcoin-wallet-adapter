@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Notification {
+export interface Notification {
   id: number;
   message: string;
   open: boolean;
   severity: "success" | "error" | "warning" | "info";
 }
 
-interface NotificationsState {
+export interface NotificationsState {
   notifications: Notification[];
 }
 

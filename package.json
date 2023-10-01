@@ -4,9 +4,11 @@
   "description": "Bitcoin wallet adapter using MUI components",
   "repository": "https://github.com/coderixxinfotech/bitcoin-wallet-adapter",
   "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "build:css": "postcss src/styles.css -o dist/styles.css",
     "build:assets": "copyfiles -u 1 src/assets/* dist",
+    "prebuild": "rimraf dist",
     "build": "tsc && yarn build:css && yarn build:assets",
     "test": "jest",
     "dev": "cd example && yarn && yarn dev"
@@ -53,6 +55,7 @@
     "jest-environment-jsdom": "^29.6.2",
     "postcss-cli": "^10.1.0",
     "react-test-renderer": "^18.2.0",
+    "rimraf": "^5.0.5",
     "ts-jest": "^29.1.1"
   }
 }
