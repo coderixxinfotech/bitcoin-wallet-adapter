@@ -48,7 +48,7 @@ export function useAuth(customAuthOptions?: AuthOptionsArgs) {
       userSession: any;
       authResponse: any;
     }) => {
-      console.log({ userSession, authResponse });
+      // console.log({ userSession, authResponse });
       const userData = userSession.loadUserData();
       setAppPrivateKey(userSession.loadUserData().appPrivateKey);
       setAuthResponse(authResponse);

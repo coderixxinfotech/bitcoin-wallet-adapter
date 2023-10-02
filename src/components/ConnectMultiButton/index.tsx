@@ -126,7 +126,7 @@ function ConnectMultiWallet() {
     const lastWallet = localStorage.getItem("lastWallet");
     if (lastWallet) {
       updateLastWallet(lastWallet);
-      console.log("wallet present");
+      // console.log("wallet present");
       // If the last wallet is Hiro and user data is not present, reset selected wallet
       if (lastWallet === "Hiro" && !state?.userData) {
         updateLastWallet("");
@@ -189,7 +189,7 @@ function ConnectMultiWallet() {
   const menuOpen = Boolean(anchorEl);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("opening menu...");
+    // console.log("opening menu...");
     setAnchorEl(event.currentTarget);
   };
   const handleMenuClose = () => {
@@ -217,6 +217,7 @@ function ConnectMultiWallet() {
       } as BitcoinNetwork,
     },
     onFinish: (response: any) => {
+      // console.log(response, 'xverse wallet connect')
       // If the last wallet is Hiro and user data is present, set the wallet details
       const cardinal = response.addresses.filter(
         (a: any) => a.purpose === "payment"
@@ -232,7 +233,7 @@ function ConnectMultiWallet() {
       )[0].publicKey;
       localStorage.setItem(
         "wallet-detail",
-        JSON.stringify({ cardinal, cardinalPubkey, ordinal, ordinalPubkey })
+        JSON.stringify({ cardinal, cardinalPubkey, ordinal, ordinalPubkey, connected: true })
       );
       updateWalletDetails({
         cardinal,
