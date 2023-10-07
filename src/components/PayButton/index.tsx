@@ -10,11 +10,9 @@ import { sendBtcTransaction } from "sats-connect";
 function PayButton({
   amount,
   receipient,
-  sender,
 }: {
   amount: number;
   receipient: string;
-  sender: string;
 }) {
   const dispatch = useDispatch();
   const walletDetails = useSelector(
@@ -51,7 +49,7 @@ function PayButton({
                 amountSats: amount,
               },
             ],
-            senderAddress: sender,
+            senderAddress: walletDetails.cardinal,
           },
           onFinish: (response: any) => {
             return response;

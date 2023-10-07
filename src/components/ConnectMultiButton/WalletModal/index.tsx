@@ -8,7 +8,7 @@ interface WalletModalProps {
   handleClose: () => void;
   wallets: IInstalledWallets[];
   lastWallet: string;
-  setWallet: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  setWallet: (wallet: string) => void;
   doOpenAuth: () => void;
   getAddress: (options: any) => Promise<void>;
   getAddressOptions: any;
@@ -34,7 +34,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
       aria-describedby="modal-modal-description"
     >
       <div className="bg-black bg-opacity-75 h-screen w-full bwa_center">
-        <div className="bg-bwa_secondary p-6 min-w-[50%] lg:min-w-[30%] relative border xl:border-4 border-bwa_accent rounded-xl">
+        <div className="bg-bwa_secondary p-6 min-w-[50%]  relative shadow-xl rounded-xl">
           <div className="absolute right-5 top-5">
             <div
               className="rounded-full bg-gray-700 hover:bg-red-500 bg-opacity-50 text-gray-300 p-2 cursor-pointer"
@@ -43,63 +43,43 @@ const WalletModal: React.FC<WalletModalProps> = ({
               <RxCross1 />
             </div>
           </div>
-          <p className="bwa_modalHeading">Connect a wallet to continue</p>
-          {wallets.length > 0 &&
-            wallets.some((wallet: IInstalledWallets) =>
-              wallet.label.includes("Leather")
-            ) &&
-            wallets.some((wallet: IInstalledWallets) =>
-              wallet.label.includes("Xverse")
-            ) && (
-              <div>
-                <hr className="bwa_line" />
-                <p className="text-xs">
-                  It is recommended to use any one out of Leather and Xverse
-                  wallets
-                </p>
-                <hr className="bwa_line" />
-              </div>
-            )}
+          <p className="bwa_modalHeading text-bwa_accent">
+            Connect your wallet
+          </p>
 
           <div className="modalBody">
-            <FormControl fullWidth>
-              <RadioGroup
-                aria-labelledby="demo-controlled-radio-buttons-group"
-                name="controlled-radio-buttons-group"
-                value={lastWallet}
-              >
-                {wallets.map((item: IInstalledWallets, idx: number) => (
-                  <label
-                    key={item.label + idx}
-                    className="w-full flex justify-between items-center cursor-pointer hover:border-1 pl-4 rounded-xl hover:bg-bwa_accent bg-opacity-50 border-bwa_accent mb-3"
-                  >
-                    <div className="flex items-center">
+            <div className="flex flex-wrap items-center justify-around">
+              {wallets.map((item: IInstalledWallets, idx: number) => (
+                <div
+                  onClick={async (e) => {
+                    const selectedItem = item.label;
+                    if (selectedItem === "Leather") {
+                      doOpenAuth();
+                      setWallet(item.label);
+                    } else if (selectedItem === "Xverse") {
+                      await getAddress(getAddressOptions);
+                    } else if (selectedItem === "Unisat") {
+                      await getUnisatAddress();
+                    }
+                  }}
+                  key={item.label + idx}
+                  className="w-full md:w-5/12 cursor-pointer border border-transparent p-4 rounded-xl mb-4 transition-all hover:border-bwa_accent bg-opacity-50 "
+                >
+                  <div className="  bwa_center p-3">
+                    <div className="bwa_center">
                       <img
-                        className="w-[30px] mr-2"
+                        className="w-[50px]"
                         src={item.logo}
                         alt={`${item.label} logo`}
-                      />{" "}
-                      <span>{item.label + " wallet"}</span>{" "}
+                      />
                     </div>
-                    <Radio
-                      value={item.label}
-                      checked={lastWallet === item.label}
-                      onChange={async (e) => {
-                        const selectedItem = e.target.value;
-                        if (selectedItem === "Leather") {
-                          doOpenAuth();
-                          setWallet(e);
-                        } else if (selectedItem === "Xverse") {
-                          await getAddress(getAddressOptions);
-                        } else if (selectedItem === "Unisat") {
-                          await getUnisatAddress();
-                        }
-                      }}
-                    />
-                  </label>
-                ))}
-              </RadioGroup>
-            </FormControl>
+                    <h5 className="text-white font-bold capitalize text-xl pl-3 text-center">
+                      {item.label + " wallet"}
+                    </h5>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

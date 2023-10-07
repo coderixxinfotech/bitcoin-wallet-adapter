@@ -7,9 +7,13 @@ A robust solution to connect and interact with Bitcoin wallets. The package prov
 Use the package manager of your choice to install `bitcoin-wallet-adapter`.
 
 ```bash
-npm install bitcoin-wallet-adapter
+
+npm  install  bitcoin-wallet-adapter
+
 # or
-yarn add bitcoin-wallet-adapter
+
+yarn  add  bitcoin-wallet-adapter
+
 ```
 
 ## Components
@@ -28,6 +32,19 @@ import { WalletProvider } from "bitcoin-wallet-adapter";
 </WalletProvider>;
 ```
 
+#### Props
+
+`customAuthOptions (AuthOptionsArgs | optional)`
+
+Configuration or set of options related to authentication. It's recommended you provide these.
+
+`AuthOptionsArgs` Interface
+
+- `redirectTo (string | optional)`: URL to which the user will be redirected after authentication.
+- `appDetails (object | optional)`: Contains details about the app
+  - `name (string | optional)`: Name of the app
+  - `icon (string | optional)`: URL or path to the app's icon
+
 ### `ConnectMultiButton`
 
 A component to render a multi-connect button for various wallet connections.
@@ -38,6 +55,26 @@ A component to render a multi-connect button for various wallet connections.
 import { ConnectMultiButton } from "bitcoin-wallet-adapter";
 
 <ConnectMultiButton />;
+```
+
+### PayButton
+
+A component to pay BTC from connected wallet to a given address
+
+#### props
+
+- `amount (number)`: Number of Sats to Transfer
+- `receipent (string)`: BTC Address that will receive the sats
+
+#### Usage
+
+```javascript
+import { PayButton } from "bitcoin-wallet-adapter";
+
+<PayButton
+  amount={5000}
+  receipent={"bc1qrwtu9ec4sl6txnxqhvgmuavm72gv32jsaz2mks"}
+/>;
 ```
 
 ### `Notification`
@@ -63,7 +100,7 @@ A hook to fetch wallet addresses.
 ```javascript
 import { useWalletAddress } from "bitcoin-wallet-adapter";
 
-const { walletDetails } = useWalletAddress();
+const walletDetails = useWalletAddress();
 ```
 
 ## Styling

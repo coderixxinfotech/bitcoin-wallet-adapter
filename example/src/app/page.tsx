@@ -20,7 +20,6 @@ export default function Home() {
             <PayButton
               amount={5000}
               receipient={"bc1qrwtu9ec4sl6txnxqhvgmuavm72gv32jsaz2mks"}
-              sender={cardinal_address}
             />
           </div>
         )}

@@ -109,9 +109,9 @@ function ConnectMultiWallet() {
 
   // Callback function to handle setting selected wallet
   const setWallet = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      updateLastWallet(e.target.value);
-      localStorage.setItem("lastWallet", e.target.value);
+    (wallet:string) => {
+      updateLastWallet(wallet);
+      localStorage.setItem("lastWallet", wallet);
       handleClose();
     },
     [updateLastWallet]
