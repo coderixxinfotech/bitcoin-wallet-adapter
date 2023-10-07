@@ -1,20 +1,30 @@
-import type { Config } from 'tailwindcss'
+const customColors = {
+  primary: {
+    DEFAULT: "#04020f",
+    dark: "#1f1d3e",
+  },
+  secondary: {
+    DEFAULT: "#0A041D",
+    dark: "#a8a4a4",
+  },
+  accent: {
+    DEFAULT: "#9102F0",
+  },
+  accent_dark: "#3d0263",
+  light_gray: "#84848a",
+  black: "#0c0d0c",
+};
 
-const config: Config = {
-  content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+module.exports = {
+  mode: "jit",
+  purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
   theme: {
     extend: {
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-      },
+      colors: customColors,
     },
   },
+  variants: {
+    extend: {},
+  },
   plugins: [],
-}
-export default config
+};

@@ -4,7 +4,7 @@ import React, { ReactNode } from "react";
 //mui
 import ThemeWrapper from "./mui/ThemeProvider";
 
-//hiro
+//Leather Wallet
 import { Connect } from "@stacks/connect-react";
 import { useAuth } from "../common/stacks/use-auth";
 import { AppContext } from "../common/stacks/context";

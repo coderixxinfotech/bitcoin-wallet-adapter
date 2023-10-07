@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Modal,
-  FormControl,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-} from "@mui/material";
+import { Modal, FormControl, RadioGroup, Radio } from "@mui/material";
 import { RxCross1 } from "react-icons/rx";
 import { IInstalledWallets } from "../../../types";
 
@@ -39,8 +33,8 @@ const WalletModal: React.FC<WalletModalProps> = ({
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
-      <div className="bg-black bg-opacity-75 h-screen w-full center">
-        <div className="bg-secondary p-6 min-w-[50%] lg:min-w-[30%] relative border xl:border-4 border-accent rounded-xl">
+      <div className="bg-black bg-opacity-75 h-screen w-full bwa_center">
+        <div className="bg-bwa_secondary p-6 min-w-[50%] lg:min-w-[30%] relative border xl:border-4 border-bwa_accent rounded-xl">
           <div className="absolute right-5 top-5">
             <div
               className="rounded-full bg-gray-700 hover:bg-red-500 bg-opacity-50 text-gray-300 p-2 cursor-pointer"
@@ -49,21 +43,21 @@ const WalletModal: React.FC<WalletModalProps> = ({
               <RxCross1 />
             </div>
           </div>
-          <p className="modalHeading">Connect a wallet to continue</p>
+          <p className="bwa_modalHeading">Connect a wallet to continue</p>
           {wallets.length > 0 &&
             wallets.some((wallet: IInstalledWallets) =>
-              wallet.label.includes("Hiro")
+              wallet.label.includes("Leather")
             ) &&
             wallets.some((wallet: IInstalledWallets) =>
               wallet.label.includes("Xverse")
             ) && (
               <div>
-                <hr className="line" />
+                <hr className="bwa_line" />
                 <p className="text-xs">
-                  It is recommended to use any one out of Hiro and Xverse
+                  It is recommended to use any one out of Leather and Xverse
                   wallets
                 </p>
-                <hr className="line" />
+                <hr className="bwa_line" />
               </div>
             )}
 
@@ -77,7 +71,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
                 {wallets.map((item: IInstalledWallets, idx: number) => (
                   <label
                     key={item.label + idx}
-                    className="w-full flex justify-between items-center cursor-pointer hover:border-1 pl-4 rounded-xl hover:bg-accent bg-opacity-50 border-accent mb-3"
+                    className="w-full flex justify-between items-center cursor-pointer hover:border-1 pl-4 rounded-xl hover:bg-bwa_accent bg-opacity-50 border-bwa_accent mb-3"
                   >
                     <div className="flex items-center">
                       <img
@@ -92,7 +86,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
                       checked={lastWallet === item.label}
                       onChange={async (e) => {
                         const selectedItem = e.target.value;
-                        if (selectedItem === "Hiro") {
+                        if (selectedItem === "Leather") {
                           doOpenAuth();
                           setWallet(e);
                         } else if (selectedItem === "Xverse") {

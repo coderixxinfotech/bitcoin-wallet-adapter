@@ -19,7 +19,7 @@ import WalletButton from "./WalletButton";
 import WalletModal from "./WalletModal";
 import { getBTCPriceInDollars } from "../../utils";
 import { setBTCPrice } from "../../stores/reducers/generalReducer";
-import {IInstalledWallets } from "../../types"
+import { IInstalledWallets } from "../../types";
 interface CustomWindow extends Window {
   unisat?: any;
   BitcoinProvider?: any;
@@ -63,7 +63,7 @@ function ConnectMultiWallet() {
     setOpen(false);
   };
 
-  //hiro-wallet
+  //leather-wallet
   const state = useContext(AppContext);
   const { doOpenAuth } = useConnect();
 
@@ -79,8 +79,8 @@ function ConnectMultiWallet() {
 
     if (window?.StacksProvider?.psbtRequest) {
       checkWallets.push({
-        label: "Hiro",
-        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-hiro-logo.jpeg",
+        label: "Leather",
+        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.svg",
       });
     }
 
@@ -127,14 +127,14 @@ function ConnectMultiWallet() {
     if (lastWallet) {
       updateLastWallet(lastWallet);
       // console.log("wallet present");
-      // If the last wallet is Hiro and user data is not present, reset selected wallet
-      if (lastWallet === "Hiro" && !state?.userData) {
+      // If the last wallet is Leather and user data is not present, reset selected wallet
+      if (lastWallet === "Leather" && !state?.userData) {
         updateLastWallet("");
         updateWalletDetails(null);
         localStorage.removeItem("lastWallet");
         localStorage.removeItem("wallet-detail");
-      } else if (lastWallet === "Hiro" && state?.userData) {
-        // If the last wallet is Hiro and user data is present, set the wallet details
+      } else if (lastWallet === "Leather" && state?.userData) {
+        // If the last wallet is Leather and user data is present, set the wallet details
         const cardinal = state.userData.profile.btcAddress.p2wpkh.mainnet;
         const ordinalPubkey = state.userData.profile.btcPublicKey.p2tr;
         const cardinalPubkey = state.userData.profile.btcPublicKey.p2wpkh;
@@ -178,7 +178,7 @@ function ConnectMultiWallet() {
         updateLastWallet(lastWallet);
         updateWalletDetails(walletDetail);
       } else {
-        // If the last wallet is not Hiro or xverse, set selected wallet to last wallet
+        // If the last wallet is not Leather or xverse, set selected wallet to last wallet
         updateLastWallet(lastWallet);
       }
     }
@@ -218,7 +218,7 @@ function ConnectMultiWallet() {
     },
     onFinish: (response: any) => {
       // console.log(response, 'xverse wallet connect')
-      // If the last wallet is Hiro and user data is present, set the wallet details
+      // If the last wallet is Leather and user data is present, set the wallet details
       const cardinal = response.addresses.filter(
         (a: any) => a.purpose === "payment"
       )[0].address;
@@ -233,7 +233,13 @@ function ConnectMultiWallet() {
       )[0].publicKey;
       localStorage.setItem(
         "wallet-detail",
-        JSON.stringify({ cardinal, cardinalPubkey, ordinal, ordinalPubkey, connected: true })
+        JSON.stringify({
+          cardinal,
+          cardinalPubkey,
+          ordinal,
+          ordinalPubkey,
+          connected: true,
+        })
       );
       updateWalletDetails({
         cardinal,

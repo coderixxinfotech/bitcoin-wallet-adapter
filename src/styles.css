@@ -1,20 +1,18 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
-
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 /* Center alignment utility class */
-.center {
+.bwa_center {
   @apply flex justify-center items-center;
 }
 
 /* Line separator utility class */
-.line {
-  @apply my-2 border-accent;
+.bwa_line {
+  @apply my-2 border-bwa_accent;
 }
 
 /* Modal heading styles */
-.modalHeading {
+.bwa_modalHeading {
   @apply text-xl capitalize font-bold text-center;
 }

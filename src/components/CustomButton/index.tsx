@@ -24,9 +24,9 @@ interface CustomButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const CustomButton = ({
   text = "Button",
   onClick = () => {},
-  bgColor = "bg-accent",
+  bgColor = "bg-bwa_accent",
   textColor = "text-white",
-  hoverBgColor = "bg-accent_dark",
+  hoverBgColor = "bg-bwa_accent_dark",
   hoverTextColor = "text-white",
   activeBgColor = "",
   activeTextColor = "",

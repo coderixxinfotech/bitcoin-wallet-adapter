@@ -1,11 +1,16 @@
 "use client";
-import { ConnectMultiButton, PayButton, Notification , useWalletAddress} from "bitcoin-wallet-adapter";
+import {
+  ConnectMultiButton,
+  PayButton,
+  Notification,
+  useWalletAddress,
+} from "bitcoin-wallet-adapter";
 
 export default function Home() {
-  const {cardinal_address, connected} = useWalletAddress();
+  const { cardinal_address, connected } = useWalletAddress();
   // console.log(connected, 'connected')
   return (
-    <main className="bg-gray-100 flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="bg-primary flex min-h-screen flex-col items-center justify-between p-24">
       <div>
         <div>
           <ConnectMultiButton />
@@ -15,7 +20,7 @@ export default function Home() {
             <PayButton
               amount={5000}
               receipient={"bc1qrwtu9ec4sl6txnxqhvgmuavm72gv32jsaz2mks"}
-              sender = {cardinal_address}
+              sender={cardinal_address}
             />
           </div>
         )}

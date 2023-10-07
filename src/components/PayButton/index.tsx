@@ -7,7 +7,15 @@ import { RootState } from "../../stores";
 import { addNotification } from "../../stores/reducers/notificationReducers";
 import { sendBtcTransaction } from "sats-connect";
 
-function PayButton({ amount, receipient, sender }: { amount: number; receipient: string, sender:string }) {
+function PayButton({
+  amount,
+  receipient,
+  sender,
+}: {
+  amount: number;
+  receipient: string;
+  sender: string;
+}) {
   const dispatch = useDispatch();
   const walletDetails = useSelector(
     (state: RootState) => state.general.walletDetails
@@ -23,7 +31,7 @@ function PayButton({ amount, receipient, sender }: { amount: number; receipient:
       if (!walletDetails?.connected) {
         throw Error("Wallet not connected");
       }
-      if (lastWallet === "Hiro") {
+      if (lastWallet === "Leather") {
         //@ts-ignore
         const resp = await window.btc?.request("sendTransfer", {
           address: receipient,
@@ -56,15 +64,11 @@ function PayButton({ amount, receipient, sender }: { amount: number; receipient:
         return await sendBtcTransaction(sendBtcOptions);
       } else if (lastWallet === "Unisat") {
         //@ts-ignore
-         let txid = await window.unisat.sendBitcoin(
-           receipient,
-           amount
-         );
-         
-         return txid;
-      }
-        else {
-         throw Error("Wallet Not Supported!");
+        let txid = await window.unisat.sendBitcoin(receipient, amount);
+
+        return txid;
+      } else {
+        throw Error("Wallet Not Supported!");
       }
     } catch (e: any) {
       console.log(e, "PAY ERROR");
@@ -85,9 +89,9 @@ function PayButton({ amount, receipient, sender }: { amount: number; receipient:
         icon={FaBtc}
         text={`Pay ${convertSatToBtc(amount)} BTC`}
         onClick={(e) => handleSubmit(e)}
-        hoverBgColor="hover:bg-accent_dark"
+        hoverBgColor="hover:bg-bwa_accent_dark"
         hoverTextColor="text-white"
-        bgColor="bg-accent"
+        bgColor="bg-bwa_accent"
         textColor="text-white"
         className="transition-all"
       />
