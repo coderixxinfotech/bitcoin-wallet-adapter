@@ -80,7 +80,7 @@ function ConnectMultiWallet() {
     if (window?.StacksProvider?.psbtRequest) {
       checkWallets.push({
         label: "Leather",
-        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.svg",
+        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.png",
       });
     }
 
