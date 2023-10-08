@@ -16,6 +16,7 @@ interface WalletButtonProps {
   disconnect: () => void;
   anchorEl: null | HTMLElement;
   menuOpen: boolean;
+  classname?: string;
 }
 
 const WalletButton: React.FC<WalletButtonProps> = ({
@@ -29,6 +30,7 @@ const WalletButton: React.FC<WalletButtonProps> = ({
   disconnect,
   anchorEl,
   menuOpen,
+  classname,
 }) => {
   return lastWallet && walletDetails ? (
     <>
@@ -36,20 +38,44 @@ const WalletButton: React.FC<WalletButtonProps> = ({
         icon={RiAccountCircleFill}
         text={`${shortenString(walletDetails.cardinal)}`}
         onClick={(e) => (menuOpen ? handleMenuClose() : handleMenuOpen(e))}
-        hoverBgColor="hover:bg-bwa_accent_dark"
-        hoverTextColor="text-white"
-        bgColor="bg-bwa_accent"
-        textColor="text-white"
-        className="transition-all"
+        className={classname}
       />
       <Menu
         id="connected-menu"
         anchorEl={anchorEl}
         open={menuOpen}
         onClose={handleMenuClose}
+        PaperProps={{
+          elevation: 0,
+          sx: {
+            overflow: "visible",
+            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+            mt: 1.5,
+            "& .MuiAvatar-root": {
+              width: 32,
+              height: 32,
+              ml: -0.5,
+              mr: 1,
+            },
+            "&:before": {
+              content: '""',
+              display: "block",
+              position: "absolute",
+              top: 0,
+              right: 14,
+              width: 10,
+              height: 10,
+              bgcolor: "background.paper",
+              transform: "translateY(-50%) rotate(45deg)",
+              zIndex: 0,
+            },
+          },
+        }}
         MenuListProps={{
           "aria-labelledby": "basic-button",
         }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <Divider />
         <MenuItem onClick={disconnect}>
@@ -64,11 +90,7 @@ const WalletButton: React.FC<WalletButtonProps> = ({
       icon={FaWallet}
       text="Connect Wallet"
       onClick={handleOpen}
-      hoverBgColor="hover:bg-bwa_accent_dark"
-      hoverTextColor="text-white"
-      bgColor="bg-bwa_accent"
-      textColor="text-white"
-      className="flex transition-all"
+      className={`${classname} flex transition-all`}
     />
   );
 };

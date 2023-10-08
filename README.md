@@ -8,11 +8,19 @@ Use the package manager of your choice to install `bitcoin-wallet-adapter`.
 
 ```bash
 
+
+
 npm  install  bitcoin-wallet-adapter
+
+
 
 # or
 
+
+
 yarn  add  bitcoin-wallet-adapter
+
+
 
 ```
 
@@ -27,7 +35,11 @@ A provider component that should be wrapped around your application to enable wa
 ```javascript
 import { WalletProvider } from "bitcoin-wallet-adapter";
 
-<WalletProvider>
+<WalletProvider
+  customAuthOptions={{
+    appDetails: { name: "My Example App" },
+  }}
+>
   <YourApp />
 </WalletProvider>;
 ```
@@ -41,9 +53,12 @@ Configuration or set of options related to authentication. It's recommended you 
 `AuthOptionsArgs` Interface
 
 - `redirectTo (string | optional)`: URL to which the user will be redirected after authentication.
+
 - `appDetails (object | optional)`: Contains details about the app
-  - `name (string | optional)`: Name of the app
-  - `icon (string | optional)`: URL or path to the app's icon
+
+- `name (string | optional)`: Name of the app
+
+- `icon (string | optional)`: URL or path to the app's icon
 
 ### `ConnectMultiButton`
 
@@ -54,8 +69,24 @@ A component to render a multi-connect button for various wallet connections.
 ```javascript
 import { ConnectMultiButton } from "bitcoin-wallet-adapter";
 
-<ConnectMultiButton />;
+<ConnectMultiButton
+  walletImageClass="w-[60px]"
+  walletLabelClass="pl-3 font-bold text-xl"
+  walletItemClass="border w-full md:w-6/12 cursor-pointer border-transparent rounded-xl mb-4 hover:border-green-500 transition-all"
+  headingClass="text-green-700 text-4xl pb-12 font-bold text-center"
+  buttonClassname="bg-green-300 hover:bg-green-400 rounded-xl flex items-center text-green-800 px-4 py-1 font-bold"
+/>;
 ```
+
+#### props
+
+- `buttonClassname (string | Optional)`: Overrides style on button
+
+- `headingClass (string | Optional)`: Overrides style on modal heading
+- `walletItemClass (string | Optional)`: Overrides style on wallets div
+
+- `walletImageClass (string | Optional)`: Overrides style on the wallet images
+- `walletLabelClass (string | Optional)`: Overrides style on the wallet labels
 
 ### PayButton
 
@@ -64,7 +95,9 @@ A component to pay BTC from connected wallet to a given address
 #### props
 
 - `amount (number)`: Number of Sats to Transfer
+
 - `receipent (string)`: BTC Address that will receive the sats
+- `buttonClassname (string | Optional)`: Overrides button styling
 
 #### Usage
 
@@ -101,14 +134,6 @@ A hook to fetch wallet addresses.
 import { useWalletAddress } from "bitcoin-wallet-adapter";
 
 const walletDetails = useWalletAddress();
-```
-
-## Styling
-
-The package relies on Tailwind CSS for styling. Ensure that you've included Tailwind CSS in your project.
-
-```javascript
-import "tailwindcss/tailwind.css";
 ```
 
 ## Contributing

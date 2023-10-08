@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, FormControl, RadioGroup, Radio } from "@mui/material";
+import { Modal } from "@mui/material";
 import { RxCross1 } from "react-icons/rx";
 import { IInstalledWallets } from "../../../types";
 
@@ -13,6 +13,14 @@ interface WalletModalProps {
   getAddress: (options: any) => Promise<void>;
   getAddressOptions: any;
   getUnisatAddress: any;
+
+  modalContainerClass?: string;
+  modalContentClass?: string;
+  closeButtonClass?: string;
+  headingClass?: string;
+  walletItemClass?: string;
+  walletImageClass?: string;
+  walletLabelClass?: string;
 }
 
 const WalletModal: React.FC<WalletModalProps> = ({
@@ -25,6 +33,14 @@ const WalletModal: React.FC<WalletModalProps> = ({
   getAddress,
   getAddressOptions,
   getUnisatAddress,
+
+  modalContainerClass = "bg-black bg-opacity-75 h-screen w-full bwa_center",
+  modalContentClass = "bg-bwa_secondary p-6 min-w-[50%] relative shadow-xl rounded-xl",
+  closeButtonClass = "rounded-full bg-gray-700 hover:bg-red-500 bg-opacity-50 text-gray-300 p-2 cursor-pointer",
+  headingClass = "bwa_modalHeading text-bwa_accent",
+  walletItemClass = "w-full md:w-5/12 cursor-pointer border border-transparent p-4 rounded-xl mb-4 transition-all hover:border-bwa_accent bg-opacity-50",
+  walletImageClass = "w-[50px]",
+  walletLabelClass = "text-white font-bold capitalize text-xl pl-3 text-center",
 }) => {
   return (
     <Modal
@@ -33,19 +49,14 @@ const WalletModal: React.FC<WalletModalProps> = ({
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
-      <div className="bg-black bg-opacity-75 h-screen w-full bwa_center">
-        <div className="bg-bwa_secondary p-6 min-w-[50%]  relative shadow-xl rounded-xl">
+      <div className={modalContainerClass}>
+        <div className={modalContentClass}>
           <div className="absolute right-5 top-5">
-            <div
-              className="rounded-full bg-gray-700 hover:bg-red-500 bg-opacity-50 text-gray-300 p-2 cursor-pointer"
-              onClick={handleClose}
-            >
+            <div className={closeButtonClass} onClick={handleClose}>
               <RxCross1 />
             </div>
           </div>
-          <p className="bwa_modalHeading text-bwa_accent">
-            Connect your wallet
-          </p>
+          <p className={headingClass}>Connect your wallet</p>
 
           <div className="modalBody">
             <div className="flex flex-wrap items-center justify-around">
@@ -63,17 +74,17 @@ const WalletModal: React.FC<WalletModalProps> = ({
                     }
                   }}
                   key={item.label + idx}
-                  className="w-full md:w-5/12 cursor-pointer border border-transparent p-4 rounded-xl mb-4 transition-all hover:border-bwa_accent bg-opacity-50 "
+                  className={walletItemClass}
                 >
-                  <div className="  bwa_center p-3">
+                  <div className="bwa_center p-3">
                     <div className="bwa_center">
                       <img
-                        className="w-[50px]"
+                        className={walletImageClass}
                         src={item.logo}
                         alt={`${item.label} logo`}
                       />
                     </div>
-                    <h5 className="text-white font-bold capitalize text-xl pl-3 text-center">
+                    <h5 className={walletLabelClass}>
                       {item.label + " wallet"}
                     </h5>
                   </div>

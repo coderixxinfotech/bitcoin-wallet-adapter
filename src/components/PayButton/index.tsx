@@ -10,9 +10,11 @@ import { sendBtcTransaction } from "sats-connect";
 function PayButton({
   amount,
   receipient,
+  buttonClassname,
 }: {
   amount: number;
   receipient: string;
+  buttonClassname?: string;
 }) {
   const dispatch = useDispatch();
   const walletDetails = useSelector(
@@ -87,11 +89,7 @@ function PayButton({
         icon={FaBtc}
         text={`Pay ${convertSatToBtc(amount)} BTC`}
         onClick={(e) => handleSubmit(e)}
-        hoverBgColor="hover:bg-bwa_accent_dark"
-        hoverTextColor="text-white"
-        bgColor="bg-bwa_accent"
-        textColor="text-white"
-        className="transition-all"
+        className={buttonClassname}
       />
     </div>
   );

@@ -2,7 +2,6 @@
 import { AppContext } from "../../common/stacks/context";
 import { useConnect } from "@stacks/connect-react";
 import React, { useState, useEffect, useCallback, useContext } from "react";
-
 //xverse
 import { AddressPurposes, BitcoinNetwork, getAddress } from "sats-connect";
 
@@ -30,7 +29,25 @@ declare const window: CustomWindow;
 
 const purposes: string[] = ["ordinals", "payment"];
 
-function ConnectMultiWallet() {
+function ConnectMultiWallet({
+  buttonClassname,
+  modalContainerClass,
+  modalContentClass,
+  closeButtonClass,
+  headingClass,
+  walletItemClass,
+  walletImageClass,
+  walletLabelClass,
+}: {
+  buttonClassname?: string;
+  modalContainerClass?: string;
+  modalContentClass?: string;
+  closeButtonClass?: string;
+  headingClass?: string;
+  walletItemClass?: string;
+  walletImageClass?: string;
+  walletLabelClass?: string;
+}) {
   //for notification
   const dispatch = useDispatch();
   const walletDetails = useSelector(
@@ -109,7 +126,7 @@ function ConnectMultiWallet() {
 
   // Callback function to handle setting selected wallet
   const setWallet = useCallback(
-    (wallet:string) => {
+    (wallet: string) => {
       updateLastWallet(wallet);
       localStorage.setItem("lastWallet", wallet);
       handleClose();
@@ -290,7 +307,7 @@ function ConnectMultiWallet() {
 
   return (
     <>
-      <div className="">
+      <div>
         <WalletButton
           wallets={wallets}
           lastWallet={lastWallet}
@@ -302,6 +319,7 @@ function ConnectMultiWallet() {
           anchorEl={anchorEl}
           disconnect={disconnect}
           menuOpen={menuOpen}
+          classname={buttonClassname}
         />
 
         <WalletModal
@@ -314,6 +332,13 @@ function ConnectMultiWallet() {
           getAddress={getAddress}
           getAddressOptions={getAddressOptions}
           getUnisatAddress={getUnisatAddress}
+          modalContainerClass={modalContainerClass}
+          modalContentClass={modalContentClass}
+          closeButtonClass={closeButtonClass}
+          headingClass={headingClass}
+          walletItemClass={walletItemClass}
+          walletImageClass={walletImageClass}
+          walletLabelClass={walletLabelClass}
         />
       </div>
     </>

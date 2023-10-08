@@ -4,37 +4,18 @@ import { FaSpinner } from "react-icons/fa";
 
 interface CustomButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   text?: string;
-  bgColor?: string;
-  textColor?: string;
-  hoverBgColor?: string;
-  hoverTextColor?: string;
-  activeBgColor?: string;
-  activeTextColor?: string;
-  disabledBgColor?: string;
-  disabledTextColor?: string;
   border?: string;
-  borderColor?: string;
-  hoverBorder?: string;
   icon?: IconType | null;
   link?: boolean;
   href?: string;
   loading?: boolean;
+  className?: string;
 }
 
 const CustomButton = ({
   text = "Button",
   onClick = () => {},
-  bgColor = "bg-bwa_accent",
-  textColor = "text-white",
-  hoverBgColor = "bg-bwa_accent_dark",
-  hoverTextColor = "text-white",
-  activeBgColor = "",
-  activeTextColor = "",
-  disabledBgColor = "bg-gray-500",
-  disabledTextColor = "text-gray-400",
-  border = "border-none",
-  borderColor = "",
-  hoverBorder = "",
+  border = "",
   disabled = false,
   className = "",
   icon: Icon = null,
@@ -43,22 +24,14 @@ const CustomButton = ({
   href,
   ...props
 }: CustomButtonProps) => {
-  const buttonClasses = `flex items-center justify-center px-4 py-2 rounded-md shadow-sm
-    ${bgColor} ${textColor}
-    ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-    ${className} ${border} ${borderColor} ${hoverBorder}`;
-
-  const hoverClasses = `${hoverBgColor} ${hoverTextColor}`;
-  const activeClasses = `${activeBgColor} ${activeTextColor}`;
-  const disabledClasses = `${disabledBgColor} ${disabledTextColor}`;
+  const defaultClasses = `bg-yellow-700 hover:bg-yellow-800`;
+  const buttonClasses = `flex items-center justify-center px-4 py-2 rounded-md transition-all shadow-sm ${defaultClasses} ${className} ${border}`;
 
   if (link && href) {
     return (
       <a href={href}>
         <button
-          className={`${buttonClasses} ${
-            !disabled && hoverClasses
-          } ${activeClasses} ${disabled ? disabledClasses : ""}`}
+          className={!className ? buttonClasses : className}
           {...(disabled ? { "aria-disabled": true, tabIndex: -1 } : {})}
           {...props}
         >
@@ -72,9 +45,7 @@ const CustomButton = ({
   return (
     <button
       onClick={onClick}
-      className={`${buttonClasses} ${
-        !disabled && hoverClasses
-      } ${activeClasses} ${disabled ? disabledClasses : ""}`}
+      className={!className ? buttonClasses : className}
       disabled={disabled}
       {...(disabled ? { "aria-disabled": true, tabIndex: -1 } : {})}
       {...props}
