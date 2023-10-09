@@ -4,15 +4,15 @@
 
 /* Center alignment utility class */
 .bwa_center {
-  @apply flex justify-center items-center;
+  @apply bwa-flex bwa-justify-center bwa-items-center;
 }
 
 /* Line separator utility class */
 .bwa_line {
-  @apply my-2 border-bwa_accent;
+  @apply bwa-my-2 bwa-border-bwa_accent;
 }
 
 /* Modal heading styles */
 .bwa_modalHeading {
-  @apply text-2xl xl:text-4xl 2xl:text-6xl pb-8 capitalize font-bold text-center;
+  @apply bwa-text-2xl xl:bwa-text-4xl 2xl:bwa-text-6xl bwa-pb-8 bwa-capitalize bwa-font-bold bwa-text-center;
 }

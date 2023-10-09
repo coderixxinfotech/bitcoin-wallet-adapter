@@ -34,13 +34,13 @@ const WalletModal: React.FC<WalletModalProps> = ({
   getAddressOptions,
   getUnisatAddress,
 
-  modalContainerClass = "bg-black bg-opacity-75 h-screen w-full bwa_center",
-  modalContentClass = "bg-bwa_secondary p-6 min-w-[50%] relative shadow-xl rounded-xl",
-  closeButtonClass = "rounded-full bg-gray-700 hover:bg-red-500 bg-opacity-50 text-gray-300 p-2 cursor-pointer",
-  headingClass = "bwa_modalHeading text-bwa_accent",
-  walletItemClass = "w-full md:w-5/12 cursor-pointer border border-transparent p-4 rounded-xl mb-4 transition-all hover:border-bwa_accent bg-opacity-50",
-  walletImageClass = "w-[50px]",
-  walletLabelClass = "text-white font-bold capitalize text-xl pl-3 text-center",
+  modalContainerClass = "bwa-bg-black bwa-bg-opacity-75 bwa-h-screen bwa-w-full bwa_center",
+  modalContentClass = "bwa-bg-bwa_secondary bwa-p-6 bwa-min-w-[50%] bwa-relative bwa-shadow-xl bwa-rounded-xl",
+  closeButtonClass = "bwa-rounded-full bwa-bg-gray-700 hover:bwa-bg-red-500 bwa-bg-opacity-50 bwa-text-gray-300 bwa-p-2 bwa-cursor-pointer",
+  headingClass = "bwa_modalHeading bwa-text-bwa_accent",
+  walletItemClass = "bwa-w-full md:bwa-w-5/12 bwa-cursor-pointer bwa-border bwa-border-transparent bwa-p-4 bwa-rounded-xl bwa-mb-4 bwa-transition-all hover:bwa-border-bwa_accent bwa-bg-opacity-50",
+  walletImageClass = "bwa-w-[50px]",
+  walletLabelClass = "bwa-text-white bwa-font-bold bwa-capitalize bwa-text-xl bwa-pl-3 bwa-text-center",
 }) => {
   return (
     <Modal
@@ -51,7 +51,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
     >
       <div className={modalContainerClass}>
         <div className={modalContentClass}>
-          <div className="absolute right-5 top-5">
+          <div className="bwa-absolute bwa-right-5 bwa-top-5">
             <div className={closeButtonClass} onClick={handleClose}>
               <RxCross1 />
             </div>
@@ -59,7 +59,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
           <p className={headingClass}>Connect your wallet</p>
 
           <div className="modalBody">
-            <div className="flex flex-wrap items-center justify-around">
+            <div className="bwa-flex bwa-flex-wrap bwa-items-center bwa-justify-around">
               {wallets.map((item: IInstalledWallets, idx: number) => (
                 <div
                   onClick={async (e) => {
@@ -76,7 +76,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
                   key={item.label + idx}
                   className={walletItemClass}
                 >
-                  <div className="bwa_center p-3">
+                  <div className="bwa_center bwa-p-3">
                     <div className="bwa_center">
                       <img
                         className={walletImageClass}

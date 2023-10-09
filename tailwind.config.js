@@ -17,6 +17,7 @@ const customColors = {
 
 module.exports = {
   mode: "jit",
+  prefix: "bwa-",
   purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
   theme: {
     extend: {

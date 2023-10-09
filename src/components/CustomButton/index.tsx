@@ -24,8 +24,8 @@ const CustomButton = ({
   href,
   ...props
 }: CustomButtonProps) => {
-  const defaultClasses = `bg-yellow-700 hover:bg-yellow-800`;
-  const buttonClasses = `flex items-center justify-center px-4 py-2 rounded-md transition-all shadow-sm ${defaultClasses} ${className} ${border}`;
+  const defaultClasses = `bwa-bg-yellow-700 hover:bwa-bg-yellow-800`;
+  const buttonClasses = `bwa-flex bwa-items-center bwa-justify-center bwa-px-4 bwa-py-2 bwa-rounded-md bwa-transition-all bwa-shadow-sm ${defaultClasses} ${className} ${border}`;
 
   if (link && href) {
     return (
@@ -35,7 +35,7 @@ const CustomButton = ({
           {...(disabled ? { "aria-disabled": true, tabIndex: -1 } : {})}
           {...props}
         >
-          {Icon && <Icon className="mr-2" />}
+          {Icon && <Icon className="bwa-mr-2" />}
           {text}
         </button>
       </a>
@@ -51,10 +51,10 @@ const CustomButton = ({
       {...props}
     >
       {loading ? (
-        <FaSpinner className="mr-2 animate-spin" />
+        <FaSpinner className="bwa-mr-2 bwa-animate-spin" />
       ) : (
         <>
-          {Icon && <Icon className="mr-2" />}
+          {Icon && <Icon className="bwa-mr-2" />}
           {text}
         </>
       )}
