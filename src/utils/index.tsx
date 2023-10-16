@@ -22,11 +22,11 @@ export async function getBTCPriceInDollars() {
   }
 }
 
-export function shortenString(str: string): string {
+export function shortenString(str: string, length = 4): string {
   if (str.length <= 8) {
     return str;
   }
-  const start = str.slice(0, 4);
-  const end = str.slice(-4);
+  const start = str.slice(0, length);
+  const end = str.slice(-length);
   return `${start}...${end}`;
 }

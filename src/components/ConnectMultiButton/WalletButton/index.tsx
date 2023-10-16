@@ -17,6 +17,7 @@ interface WalletButtonProps {
   anchorEl: null | HTMLElement;
   menuOpen: boolean;
   classname?: string;
+  additionalMenuItems?: React.ReactNode[];
 }
 
 const WalletButton: React.FC<WalletButtonProps> = ({
@@ -31,12 +32,13 @@ const WalletButton: React.FC<WalletButtonProps> = ({
   anchorEl,
   menuOpen,
   classname,
+  additionalMenuItems,
 }) => {
   return lastWallet && walletDetails ? (
     <>
       <CustomButton
         icon={RiAccountCircleFill}
-        text={`${shortenString(walletDetails.cardinal)}`}
+        text={`${shortenString(walletDetails.cardinal, 5)}`}
         onClick={(e) => (menuOpen ? handleMenuClose() : handleMenuOpen(e))}
         className={classname}
       />
@@ -77,10 +79,15 @@ const WalletButton: React.FC<WalletButtonProps> = ({
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <Divider />
-        <MenuItem onClick={disconnect}>
+        {additionalMenuItems?.map((Item, index) => (
+          <>
+            <MenuItem key={index}>{Item}</MenuItem>
+            <Divider />
+          </>
+        ))}
+        <MenuItem onClick={disconnect} className="bwa-flex">
           <FaPowerOff />
-          <p className="ml-2 text-xs">Disconnect</p>
+          <p className="bwa-ml-2 bwa-text-xs">Disconnect</p>
         </MenuItem>
       </Menu>
     </>
@@ -90,7 +97,7 @@ const WalletButton: React.FC<WalletButtonProps> = ({
       icon={FaWallet}
       text="Connect Wallet"
       onClick={handleOpen}
-      className={`${classname} flex transition-all`}
+      className={classname}
     />
   );
 };

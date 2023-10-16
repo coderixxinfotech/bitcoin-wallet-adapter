@@ -38,6 +38,7 @@ function ConnectMultiWallet({
   walletItemClass,
   walletImageClass,
   walletLabelClass,
+  additionalMenuItems,
 }: {
   buttonClassname?: string;
   modalContainerClass?: string;
@@ -47,6 +48,7 @@ function ConnectMultiWallet({
   walletItemClass?: string;
   walletImageClass?: string;
   walletLabelClass?: string;
+  additionalMenuItems?: React.ReactNode[];
 }) {
   //for notification
   const dispatch = useDispatch();
@@ -320,6 +322,7 @@ function ConnectMultiWallet({
           disconnect={disconnect}
           menuOpen={menuOpen}
           classname={buttonClassname}
+          additionalMenuItems={additionalMenuItems}
         />
 
         <WalletModal
