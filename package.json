@@ -1,6 +1,6 @@
 {
   "name": "bitcoin-wallet-adapter",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Bitcoin wallet adapter using MUI components",
   "repository": "https://github.com/coderixxinfotech/bitcoin-wallet-adapter",
   "main": "dist/index.js",
@@ -41,7 +41,7 @@
     "react-icons": "^4.10.1",
     "react-redux": "^8.1.2",
     "redux-thunk": "^2.4.2",
-    "sats-connect": "^0.5.0",
+    "sats-connect": "^1.1.1",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.1.6"
   },

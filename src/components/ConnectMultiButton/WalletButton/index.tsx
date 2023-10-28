@@ -80,15 +80,17 @@ const WalletButton: React.FC<WalletButtonProps> = ({
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         {additionalMenuItems?.map((Item, index) => (
-          <>
+          <div>
             <MenuItem key={index}>{Item}</MenuItem>
             <Divider />
-          </>
+          </div>
         ))}
-        <MenuItem onClick={disconnect} className="bwa-flex">
-          <FaPowerOff />
-          <p className="bwa-ml-2 bwa-text-xs">Disconnect</p>
-        </MenuItem>
+        <div>
+          <MenuItem onClick={disconnect} className="bwa-flex">
+            <FaPowerOff />
+            <p className="bwa-ml-2 bwa-text-xs">Disconnect</p>
+          </MenuItem>
+        </div>
       </Menu>
     </>
   ) : (

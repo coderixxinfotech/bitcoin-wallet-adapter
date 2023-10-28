@@ -3,7 +3,7 @@ import { AppContext } from "../../common/stacks/context";
 import { useConnect } from "@stacks/connect-react";
 import React, { useState, useEffect, useCallback, useContext } from "react";
 //xverse
-import { AddressPurposes, BitcoinNetwork, getAddress } from "sats-connect";
+import { AddressPurpose, BitcoinNetwork, getAddress } from "sats-connect";
 
 //reducer
 import { useDispatch, useSelector } from "react-redux";
@@ -229,7 +229,7 @@ function ConnectMultiWallet({
 
   const getAddressOptions = {
     payload: {
-      purposes: purposes.map((p) => p as AddressPurposes),
+      purposes: purposes.map((p) => p as AddressPurpose),
       message: "Address for receiving Ordinals and payments",
       network: {
         type: "Mainnet",

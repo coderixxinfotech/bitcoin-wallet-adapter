@@ -30,3 +30,25 @@ export function shortenString(str: string, length = 4): string {
   const end = str.slice(-length);
   return `${start}...${end}`;
 }
+
+export const hexToBase64 = (hexString: string) => {
+  const bytes = new Uint8Array(Math.ceil(hexString.length / 2));
+
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = parseInt(hexString.substr(i * 2, 2), 16);
+  }
+
+  const byteArray = Array.from(bytes);
+
+  return btoa(String.fromCharCode.apply(null, byteArray));
+};
+
+export const isHex = (str: string) => /^[0-9a-fA-F]+$/.test(str);
+
+export const isBase64 = (str: string) => {
+  try {
+    return btoa(atob(str)) === str;
+  } catch (err) {
+    return false;
+  }
+};
