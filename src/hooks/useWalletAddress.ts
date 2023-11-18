@@ -11,12 +11,14 @@ export const useWalletAddress = () => {
   const ordinal_pubkey = walletDetails?.ordinalPubkey;
   const cardinal_pubkey = walletDetails?.cardinalPubkey;
   const connected = walletDetails?.connected;
+  const wallet = walletDetails?.wallet;
 
   return {
     ordinal_address,
     cardinal_address,
     ordinal_pubkey,
     cardinal_pubkey,
-    connected
+    wallet,
+    connected,
   };
 };

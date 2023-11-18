@@ -4,6 +4,7 @@ export interface WalletDetails {
   ordinal: string;
   ordinalPubkey: string;
   connected: boolean;
+  wallet: string;
   derivationPath?: string;
 }
 

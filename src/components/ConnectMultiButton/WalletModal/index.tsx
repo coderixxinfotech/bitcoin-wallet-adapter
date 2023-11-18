@@ -36,9 +36,9 @@ const WalletModal: React.FC<WalletModalProps> = ({
 
   modalContainerClass = "bwa-bg-black bwa-bg-opacity-75 bwa-h-screen bwa-w-full bwa_center",
   modalContentClass = "bwa-bg-bwa_secondary bwa-p-6 bwa-min-w-[50%] bwa-relative bwa-shadow-xl bwa-rounded-xl",
-  closeButtonClass = "bwa-rounded-full bwa-bg-gray-700 hover:bwa-bg-red-500 bwa-bg-opacity-50 bwa-text-gray-300 bwa-p-2 bwa-cursor-pointer",
+  closeButtonClass = "bwa-rounded bwa_font-bold bwa-bg-gray-700 hover:bwa-bg-red-500 bwa-bg-opacity-50 bwa-text-gray-300 bwa-p-2 bwa-cursor-pointer",
   headingClass = "bwa_modalHeading bwa-text-bwa_accent",
-  walletItemClass = "bwa-w-full md:bwa-w-5/12 bwa-cursor-pointer bwa-border bwa-border-transparent bwa-p-4 bwa-rounded-xl bwa-mb-4 bwa-transition-all hover:bwa-border-bwa_accent bwa-bg-opacity-50",
+  walletItemClass = "bwa-w-full bwa-cursor-pointer bwa-border bwa-border-transparent bwa-p-4 bwa-rounded-xl bwa-transition-all",
   walletImageClass = "bwa-w-[50px]",
   walletLabelClass = "bwa-text-white bwa-font-bold bwa-capitalize bwa-text-xl bwa-pl-3 bwa-text-center",
 }) => {
@@ -57,6 +57,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
             </div>
           </div>
           <p className={headingClass}>Connect your wallet</p>
+          <hr className="bwa-w-5/12 bwa-bg-accent bwa-mb-8" />
 
           <div className="modalBody">
             <div className="bwa-flex bwa-flex-wrap bwa-items-center bwa-justify-around">
@@ -76,7 +77,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
                   key={item.label + idx}
                   className={walletItemClass}
                 >
-                  <div className="bwa_center bwa-p-3">
+                  <div className="bwa-flex bwa-items-center bwa-p-3">
                     <div className="bwa_center">
                       <img
                         className={walletImageClass}

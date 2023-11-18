@@ -12,7 +12,7 @@ import {
 } from "../common/stacks/stacks-utils";
 import { hexToBase64, isHex } from "../utils";
 
-export const useHiroSign = (
+export const useLeatherSign = (
   defaultOptions: Partial<PsbtRequestOptions> = {}
 ): CommonSignResponse => {
   const { signPsbt } = useConnect();

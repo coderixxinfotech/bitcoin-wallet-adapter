@@ -80,8 +80,8 @@ const WalletButton: React.FC<WalletButtonProps> = ({
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         {additionalMenuItems?.map((Item, index) => (
-          <div>
-            <MenuItem key={index}>{Item}</MenuItem>
+          <div key={index}>
+            <MenuItem>{Item}</MenuItem>
             <Divider />
           </div>
         ))}

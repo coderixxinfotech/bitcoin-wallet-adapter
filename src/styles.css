@@ -14,5 +14,5 @@
 
 /* Modal heading styles */
 .bwa_modalHeading {
-  @apply bwa-text-2xl xl:bwa-text-4xl 2xl:bwa-text-6xl bwa-pb-8 bwa-capitalize bwa-font-bold bwa-text-center;
+  @apply bwa-text-2xl xl:bwa-text-4xl 2xl:bwa-text-6xl bwa-capitalize bwa-font-bold;
 }

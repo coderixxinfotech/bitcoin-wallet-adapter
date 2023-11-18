@@ -160,10 +160,17 @@ function ConnectMultiWallet({
         const ordinal = state.userData.profile.btcAddress.p2tr.mainnet;
         localStorage.setItem(
           "wallet-detail",
-          JSON.stringify({ cardinal, ordinal, cardinalPubkey, ordinalPubkey })
+          JSON.stringify({
+            cardinal,
+            ordinal,
+            cardinalPubkey,
+            ordinalPubkey,
+            wallet: "Leather",
+          })
         );
 
         updateWalletDetails({
+          wallet: "Leather",
           cardinal,
           ordinal,
           cardinalPubkey,
@@ -258,9 +265,11 @@ function ConnectMultiWallet({
           ordinal,
           ordinalPubkey,
           connected: true,
+          wallet: "Xverse",
         })
       );
       updateWalletDetails({
+        wallet: "Xverse",
         cardinal,
         cardinalPubkey,
         ordinal,
@@ -292,6 +301,7 @@ function ConnectMultiWallet({
     const publicKey = await unisat.getPublicKey();
     if (accounts.length && publicKey) {
       const wd = {
+        wallet: "Unisat",
         ordinal: accounts[0],
         cardinal: accounts[0],
         ordinalPubkey: publicKey,
