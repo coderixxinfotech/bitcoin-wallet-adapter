@@ -10,7 +10,11 @@ Use the package manager of your choice to install `bitcoin-wallet-adapter`.
 
 
 
+
+
 npm  install  bitcoin-wallet-adapter
+
+
 
 
 
@@ -18,7 +22,11 @@ npm  install  bitcoin-wallet-adapter
 
 
 
+
+
 yarn  add  bitcoin-wallet-adapter
+
+
 
 
 
@@ -83,9 +91,11 @@ import { ConnectMultiButton } from "bitcoin-wallet-adapter";
 - `buttonClassname (string | Optional)`: Overrides style on button
 
 - `headingClass (string | Optional)`: Overrides style on modal heading
+
 - `walletItemClass (string | Optional)`: Overrides style on wallets div
 
 - `walletImageClass (string | Optional)`: Overrides style on the wallet images
+
 - `walletLabelClass (string | Optional)`: Overrides style on the wallet labels
 
 ### PayButton
@@ -97,6 +107,7 @@ A component to pay BTC from connected wallet to a given address
 - `amount (number)`: Number of Sats to Transfer
 
 - `receipent (string)`: BTC Address that will receive the sats
+
 - `buttonClassname (string | Optional)`: Overrides button styling
 
 #### Usage
@@ -134,6 +145,166 @@ A hook to fetch wallet addresses.
 import { useWalletAddress } from "bitcoin-wallet-adapter";
 
 const walletDetails = useWalletAddress();
+```
+
+### `useSignTx`
+
+A hook to facilitate the PSBT signing process for various wallets (Unisat, Xverse and Leather/Hiro).
+
+#### Usage
+
+##### Sell Psbt Sign
+
+```javascript
+import { useSignTx } from "bitcoin-wallet-adapter";
+
+const MyComponent = () => {
+  const { signTx, loading, result, error } = useSignTx();
+
+  const handleSellSign = async () => {
+    const signOptions = {
+      psbt: yourPsbtBase64,
+
+      network: "Mainnet",
+
+      action: "sell",
+
+      inputs: [
+        {
+          address: walletDetails.ordinal_address,
+
+          publickey: walletDetails.ordinal_pubkey,
+
+          sighash: 131,
+
+          index: [0],
+        },
+      ],
+    };
+
+    await signTx(signOptions);
+  };
+};
+```
+
+##### Dummy Psbt Sign
+
+```javascript
+
+
+const  handleDummySign = async () => {
+
+	const  signOptions = {
+
+		psbt:  yourPsbtBase64,
+
+		network:  "Mainnet",
+
+		action:  "dummy",
+
+		inputs: [
+
+					{
+
+					address:  walletDetails.cardinal_address,
+
+					publickey:  walletDetails.cardinal_pubkey,
+
+					sighash:  1,
+
+					index: [0],
+
+					},
+
+				]
+
+		};
+
+	  await  signTx(signOptions);
+
+	};
+};
+
+```
+
+##### Buy Psbt Sign
+
+```javascript
+
+const  handleBuySign = async () => {
+	const inputs = [];
+
+	new  Array(inputLength).fill(1).map((item:  number, idx:  number) => {
+	if (idx  !==  2)
+
+		inputs.push({
+
+		address:  walletDetails.cardinal_address,
+
+		publickey:  walletDetails.cardinal_pubkey,
+
+		sighash:  1,
+
+		index: [idx],
+
+		});
+
+	});
+
+	const  signOptions = {
+
+		psbt:  yourPsbtBase64,
+
+		network:  "Mainnet",
+
+		action:  "buy",
+
+		inputs
+
+		};
+
+	  await  signTx(signOptions);
+
+	};
+};
+```
+
+##### Usage of Result/Error Listener
+
+```
+useEffect(() => {
+
+	// Handling Wallet Sign Results/Errors
+
+	if (result) {
+
+		// Handle successful result from wallet sign
+
+		console.log("Sign Result:", result);
+
+		if (result) {
+
+			listOrdinal(result);
+
+		}
+	}
+
+
+
+	if (error) {
+
+		// Handle error from wallet sign
+
+		console.error(" Sign Error:", error);
+
+		// Turn off loading after handling results or errors
+
+		setLoading(false);
+		alert(error.message  ||  "wallet error occurred");
+
+	}
+
+}, [result, error]);
 ```
 
 ## Contributing

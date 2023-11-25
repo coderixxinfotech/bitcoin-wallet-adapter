@@ -6,12 +6,12 @@ export const useWalletAddress = () => {
     (state: RootState) => state.general.walletDetails
   );
 
-  const ordinal_address = walletDetails?.ordinal;
-  const cardinal_address = walletDetails?.cardinal;
-  const ordinal_pubkey = walletDetails?.ordinalPubkey;
-  const cardinal_pubkey = walletDetails?.cardinalPubkey;
-  const connected = walletDetails?.connected;
-  const wallet = walletDetails?.wallet;
+  const ordinal_address = walletDetails?.ordinal || null;
+  const cardinal_address = walletDetails?.cardinal || null;
+  const ordinal_pubkey = walletDetails?.ordinalPubkey || null;
+  const cardinal_pubkey = walletDetails?.cardinalPubkey || null;
+  const connected = walletDetails?.connected || false;
+  const wallet = walletDetails?.wallet || null;
 
   return {
     ordinal_address,
