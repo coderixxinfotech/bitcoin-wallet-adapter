@@ -15,6 +15,8 @@ import {
   useXverseSign,
   useUnisatSign,
   useLeatherSign,
+  useSignTx
+
 } from "./hooks";
 
 // Export Providers
@@ -24,4 +26,4 @@ export { WalletProvider };
 export { ConnectMultiButton, Notification, PayButton };
 
 // Export Hooks
-export { useWalletAddress, useXverseSign, useUnisatSign, useLeatherSign };
+export { useWalletAddress, useXverseSign, useUnisatSign, useLeatherSign, useSignTx };

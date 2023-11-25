@@ -60,7 +60,7 @@ export const useXverseSign = (): CommonSignResponse => {
           broadcast: false,
           inputsToSign: xverseInputs,
         },
-        onFinish: (response: any) => setResult(response),
+        onFinish: (response: any) => setResult(response.psbtBase64),
         onCancel: () => setError(new Error("Operation cancelled by user")),
       });
     } catch (e: any) {

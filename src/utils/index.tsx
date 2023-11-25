@@ -8,6 +8,13 @@ export function convertBtcToSat(priceInSat: number): number {
   return priceInSat * 1e8; // 1 BTC = 100,000,000 SAT
 }
 
+export function base64ToHex(str: string) {
+  return atob(str)
+    .split("")
+    .map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
+    .join("");
+}
+
 export async function getBTCPriceInDollars() {
   try {
     const response = await fetch(
