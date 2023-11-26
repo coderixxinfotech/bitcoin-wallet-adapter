@@ -1,8 +1,8 @@
 export declare const useWalletAddress: () => {
-    ordinal_address: string | null;
-    cardinal_address: string | null;
-    ordinal_pubkey: string | null;
-    cardinal_pubkey: string | null;
+    ordinal_address: string;
+    cardinal_address: string;
+    ordinal_pubkey: string;
+    cardinal_pubkey: string;
     wallet: string | null;
     connected: boolean;
-};
+} | null;

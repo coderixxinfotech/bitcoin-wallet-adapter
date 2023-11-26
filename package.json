@@ -41,6 +41,7 @@
     "react-icons": "^4.10.1",
     "react-redux": "^8.1.2",
     "redux-thunk": "^2.4.2",
+    "reselect": "^4.1.8",
     "sats-connect": "^1.1.1",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.1.6"

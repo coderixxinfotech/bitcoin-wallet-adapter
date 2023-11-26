@@ -26,15 +26,17 @@ const useSignTx = () => {
         setLoading(true);
         setError(null);
         setResult(null);
-        const options = {
-            psbt: walletDetails.wallet === "Xverse"
-                ? props.psbt
-                : (0, utils_1.base64ToHex)(props.psbt),
-            network: props.network,
-            action: props.action,
-            inputs: props.inputs,
-        };
         try {
+            if (!walletDetails)
+                throw Error("Wallet Not Connected");
+            const options = {
+                psbt: walletDetails.wallet === "Xverse"
+                    ? props.psbt
+                    : (0, utils_1.base64ToHex)(props.psbt),
+                network: props.network,
+                action: props.action,
+                inputs: props.inputs,
+            };
             if (walletDetails.wallet === "Leather") {
                 leatherSign(options);
             }
