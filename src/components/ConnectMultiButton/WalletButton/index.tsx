@@ -95,7 +95,7 @@ const WalletButton: React.FC<WalletButtonProps> = ({
     </>
   ) : (
     <CustomButton
-      disabled={wallets?.length === 0 ? true : false}
+      // disabled={wallets?.length === 0 ? true : false}
       icon={FaWallet}
       text="Connect Wallet"
       onClick={handleOpen}

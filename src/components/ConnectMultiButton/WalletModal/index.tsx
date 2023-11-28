@@ -60,38 +60,45 @@ const WalletModal: React.FC<WalletModalProps> = ({
           <hr className="bwa-w-5/12 bwa-bg-accent bwa-mb-8" />
 
           <div className="modalBody">
-            <div className="bwa-flex bwa-flex-wrap bwa-items-center bwa-justify-around">
-              {wallets.map((item: IInstalledWallets, idx: number) => (
-                <div
-                  onClick={async (e) => {
-                    const selectedItem = item.label;
-                    if (selectedItem === "Leather") {
-                      doOpenAuth();
-                      setWallet(item.label);
-                    } else if (selectedItem === "Xverse") {
-                      await getAddress(getAddressOptions);
-                    } else if (selectedItem === "Unisat") {
-                      await getUnisatAddress();
-                    }
-                  }}
-                  key={item.label + idx}
-                  className={walletItemClass}
-                >
-                  <div className="bwa-flex bwa-items-center bwa-p-3">
-                    <div className="bwa_center">
-                      <img
-                        className={walletImageClass}
-                        src={item.logo}
-                        alt={`${item.label} logo`}
-                      />
+            {wallets && wallets?.length > 0 ? (
+              <div className="bwa-flex bwa-flex-wrap bwa-items-center bwa-justify-around">
+                {wallets.map((item: IInstalledWallets, idx: number) => (
+                  <div
+                    onClick={async (e) => {
+                      const selectedItem = item.label;
+                      if (selectedItem === "Leather") {
+                        doOpenAuth();
+                        setWallet(item.label);
+                      } else if (selectedItem === "Xverse") {
+                        await getAddress(getAddressOptions);
+                      } else if (selectedItem === "Unisat") {
+                        await getUnisatAddress();
+                      }
+                    }}
+                    key={item.label + idx}
+                    className={walletItemClass}
+                  >
+                    <div className="bwa-flex bwa-items-center bwa-p-3">
+                      <div className="bwa_center">
+                        <img
+                          className={walletImageClass}
+                          src={item.logo}
+                          alt={`${item.label} logo`}
+                        />
+                      </div>
+                      <h5 className={walletLabelClass}>
+                        {item.label + " wallet"}
+                      </h5>
                     </div>
-                    <h5 className={walletLabelClass}>
-                      {item.label + " wallet"}
-                    </h5>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p>
+                No wallet Found. Try again after Installing Hiro / Xverse or
+                Unisat wallet
+              </p>
+            )}
           </div>
         </div>
       </div>

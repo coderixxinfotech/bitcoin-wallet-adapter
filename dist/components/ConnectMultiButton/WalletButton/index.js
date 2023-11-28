@@ -46,6 +46,10 @@ const WalletButton = ({ wallets, lastWallet, walletDetails, handleMenuOpen, hand
             react_1.default.createElement("div", null,
                 react_1.default.createElement(material_1.MenuItem, { onClick: disconnect, className: "bwa-flex" },
                     react_1.default.createElement(fa_1.FaPowerOff, null),
-                    react_1.default.createElement("p", { className: "bwa-ml-2 bwa-text-xs" }, "Disconnect")))))) : (react_1.default.createElement(CustomButton_1.default, { disabled: (wallets === null || wallets === void 0 ? void 0 : wallets.length) === 0 ? true : false, icon: fa_1.FaWallet, text: "Connect Wallet", onClick: handleOpen, className: classname }));
+                    react_1.default.createElement("p", { className: "bwa-ml-2 bwa-text-xs" }, "Disconnect")))))) : (react_1.default.createElement(CustomButton_1.default
+    // disabled={wallets?.length === 0 ? true : false}
+    , { 
+        // disabled={wallets?.length === 0 ? true : false}
+        icon: fa_1.FaWallet, text: "Connect Wallet", onClick: handleOpen, className: classname }));
 };
 exports.default = WalletButton;

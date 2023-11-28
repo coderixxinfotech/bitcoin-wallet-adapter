@@ -24,23 +24,22 @@ const WalletModal = ({ open, handleClose, wallets, lastWallet, setWallet, doOpen
                         react_1.default.createElement(rx_1.RxCross1, null))),
                 react_1.default.createElement("p", { className: headingClass }, "Connect your wallet"),
                 react_1.default.createElement("hr", { className: "bwa-w-5/12 bwa-bg-accent bwa-mb-8" }),
-                react_1.default.createElement("div", { className: "modalBody" },
-                    react_1.default.createElement("div", { className: "bwa-flex bwa-flex-wrap bwa-items-center bwa-justify-around" }, wallets.map((item, idx) => (react_1.default.createElement("div", { onClick: (e) => __awaiter(void 0, void 0, void 0, function* () {
-                            const selectedItem = item.label;
-                            if (selectedItem === "Leather") {
-                                doOpenAuth();
-                                setWallet(item.label);
-                            }
-                            else if (selectedItem === "Xverse") {
-                                yield getAddress(getAddressOptions);
-                            }
-                            else if (selectedItem === "Unisat") {
-                                yield getUnisatAddress();
-                            }
-                        }), key: item.label + idx, className: walletItemClass },
-                        react_1.default.createElement("div", { className: "bwa-flex bwa-items-center bwa-p-3" },
-                            react_1.default.createElement("div", { className: "bwa_center" },
-                                react_1.default.createElement("img", { className: walletImageClass, src: item.logo, alt: `${item.label} logo` })),
-                            react_1.default.createElement("h5", { className: walletLabelClass }, item.label + " wallet")))))))))));
+                react_1.default.createElement("div", { className: "modalBody" }, wallets && (wallets === null || wallets === void 0 ? void 0 : wallets.length) > 0 ? (react_1.default.createElement("div", { className: "bwa-flex bwa-flex-wrap bwa-items-center bwa-justify-around" }, wallets.map((item, idx) => (react_1.default.createElement("div", { onClick: (e) => __awaiter(void 0, void 0, void 0, function* () {
+                        const selectedItem = item.label;
+                        if (selectedItem === "Leather") {
+                            doOpenAuth();
+                            setWallet(item.label);
+                        }
+                        else if (selectedItem === "Xverse") {
+                            yield getAddress(getAddressOptions);
+                        }
+                        else if (selectedItem === "Unisat") {
+                            yield getUnisatAddress();
+                        }
+                    }), key: item.label + idx, className: walletItemClass },
+                    react_1.default.createElement("div", { className: "bwa-flex bwa-items-center bwa-p-3" },
+                        react_1.default.createElement("div", { className: "bwa_center" },
+                            react_1.default.createElement("img", { className: walletImageClass, src: item.logo, alt: `${item.label} logo` })),
+                        react_1.default.createElement("h5", { className: walletLabelClass }, item.label + " wallet"))))))) : (react_1.default.createElement("p", null, "No wallet Found. Try again after Installing Hiro / Xverse or Unisat wallet")))))));
 };
 exports.default = WalletModal;
