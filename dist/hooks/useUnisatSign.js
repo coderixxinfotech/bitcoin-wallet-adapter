@@ -24,11 +24,8 @@ const useUnisatSign = () => {
         }
         setLoading(true);
         try {
-            const unisatInputs = inputs.map(({ address, index, sighash }) => ({
-                address,
-                index,
-                sighashTypes: [sighash],
-            }));
+            const unisatInputs = inputs.map(({ address, index, sighash }) => (Object.assign({ address,
+                index }, (action == "sell" && { sighashTypes: [sighash] }))));
             const options = {
                 toSignInputs: unisatInputs,
                 autoFinalized: false,

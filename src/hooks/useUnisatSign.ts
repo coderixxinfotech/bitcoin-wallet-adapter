@@ -21,7 +21,7 @@ export const useUnisatSign = (): CommonSignResponse => {
       const unisatInputs = inputs.map(({ address, index, sighash }) => ({
         address,
         index,
-        sighashTypes: [sighash],
+        ...(action == "sell" && { sighashTypes: [sighash] }),
       }));
 
       const options = {
@@ -31,7 +31,6 @@ export const useUnisatSign = (): CommonSignResponse => {
 
       // @ts-ignore (Assuming unisat.signPsbt is defined elsewhere in your code)
       const signedPsbt = await window.unisat.signPsbt(psbt, options);
-
 
       setResult(hexToBase64(signedPsbt));
     } catch (e: any) {
