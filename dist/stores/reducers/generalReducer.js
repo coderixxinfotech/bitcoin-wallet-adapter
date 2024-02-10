@@ -9,9 +9,9 @@ const initialState = {
     btc_price_in_dollar: 0,
     mempool_url: "https://mempool.space",
     ord_url: "",
-    balance: 0,
-    in_mempool_balance: 0,
-    dummy_utxos: 0,
+    balance: null,
+    in_mempool_balance: null,
+    dummy_utxos: null,
 };
 const walletSlice = (0, toolkit_1.createSlice)({
     name: "wallet",

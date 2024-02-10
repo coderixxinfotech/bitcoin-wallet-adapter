@@ -101,12 +101,6 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
         getInstalledWalletName();
         getBTCPrice();
     }, [dispatch, getBTCPrice, open]);
-    // Callback function to handle setting selected wallet
-    const setWallet = (0, react_1.useCallback)((wallet) => {
-        updateLastWallet(wallet);
-        localStorage.setItem("lastWallet", wallet);
-        handleClose();
-    }, [updateLastWallet]);
     // Use effect hook to check if last wallet is in local storage and set selected wallet accordingly
     (0, react_1.useEffect)(() => {
         const localWD = localStorage.getItem("wallet-detail") || "";
@@ -167,7 +161,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     //disconnect
     const disconnect = (0, react_1.useCallback)(() => {
         localStorage.removeItem("lastWallet");
-        // localStorage.removeItem("blockstack-session");
+        localStorage.removeItem("walletBalance");
         localStorage.removeItem("wallet-detail");
         updateLastWallet("");
         updateWalletDetails(null);
@@ -264,6 +258,6 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement("div", null,
             react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, InnerMenu: InnerMenu, balance: balance }),
-            react_1.default.createElement(WalletModal_1.default, { open: open, handleClose: handleClose, wallets: wallets, lastWallet: lastWallet, setWallet: setWallet, getLeatherAddress: getLeatherAddress, getAddress: sats_connect_1.getAddress, getAddressOptions: getAddressOptions, getUnisatAddress: getUnisatAddress, modalContainerClass: modalContainerClass, modalContentClass: modalContentClass, closeButtonClass: closeButtonClass, headingClass: headingClass, walletItemClass: walletItemClass, walletImageClass: walletImageClass, walletLabelClass: walletLabelClass, icon: icon, iconClass: iconClass }))));
+            react_1.default.createElement(WalletModal_1.default, { open: open, handleClose: handleClose, wallets: wallets, getLeatherAddress: getLeatherAddress, getAddress: sats_connect_1.getAddress, getAddressOptions: getAddressOptions, getUnisatAddress: getUnisatAddress, modalContainerClass: modalContainerClass, modalContentClass: modalContentClass, closeButtonClass: closeButtonClass, headingClass: headingClass, walletItemClass: walletItemClass, walletImageClass: walletImageClass, walletLabelClass: walletLabelClass, icon: icon, iconClass: iconClass }))));
 }
 exports.default = ConnectMultiWallet;

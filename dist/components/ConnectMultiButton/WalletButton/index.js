@@ -14,7 +14,7 @@ const WalletButton = ({ wallets, lastWallet, walletDetails, handleMenuOpen, hand
         react_1.default.createElement(CustomButton_1.default, { icon: ri_1.RiAccountCircleFill, text: `${balance
                 ? `${(balance / 100000000).toFixed(3)} BTC`
                 : (0, utils_1.shortenString)(walletDetails.cardinal, 5)}`, onClick: (e) => (menuOpen ? handleMenuClose() : handleMenuOpen(e)), className: classname }),
-        InnerMenu ? (react_1.default.createElement(InnerMenu, { anchorEl: anchorEl, open: menuOpen, onClose: handleMenuClose })) : (react_1.default.createElement(material_1.Menu, { id: "connected-menu", anchorEl: anchorEl, open: menuOpen, onClose: handleMenuClose, PaperProps: {
+        InnerMenu ? (react_1.default.createElement(InnerMenu, { anchorEl: anchorEl, open: menuOpen, onClose: handleMenuClose, disconnect: disconnect })) : (react_1.default.createElement(material_1.Menu, { id: "connected-menu", anchorEl: anchorEl, open: menuOpen, onClose: handleMenuClose, PaperProps: {
                 elevation: 0,
                 sx: {
                     overflow: "visible",

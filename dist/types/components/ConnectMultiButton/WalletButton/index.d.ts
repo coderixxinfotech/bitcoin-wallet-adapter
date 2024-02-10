@@ -4,6 +4,7 @@ interface InnerMenuProps {
     anchorEl: HTMLElement | null;
     open: boolean;
     onClose: () => void;
+    disconnect: () => void;
 }
 type InnerMenuType = React.ComponentType<InnerMenuProps>;
 interface WalletButtonProps {
@@ -19,7 +20,7 @@ interface WalletButtonProps {
     menuOpen: boolean;
     classname?: string;
     InnerMenu?: InnerMenuType;
-    balance?: number;
+    balance?: number | null;
 }
 declare const WalletButton: React.FC<WalletButtonProps>;
 export default WalletButton;

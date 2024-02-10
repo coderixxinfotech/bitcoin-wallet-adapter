@@ -39,10 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importStar(require("react"));
 //mui
 const ThemeProvider_1 = __importDefault(require("./mui/ThemeProvider"));
-//Leather Wallet
-const connect_react_1 = require("@stacks/connect-react");
 const use_auth_1 = require("../common/stacks/use-auth");
-const context_1 = require("../common/stacks/context");
 // Redux
 const react_redux_1 = require("react-redux");
 const stores_1 = require("../stores");
@@ -54,12 +51,10 @@ function WalletProvider({ children, customAuthOptions, mempoolUrl, ord_url, apik
     const { authOptions, state } = (0, use_auth_1.useAuth)(customAuthOptions);
     return (react_1.default.createElement(ThemeProvider_1.default, null,
         react_1.default.createElement(react_redux_1.Provider, { store: stores_1.store },
-            react_1.default.createElement(connect_react_1.Connect, { authOptions: authOptions },
-                react_1.default.createElement(context_1.AppContext.Provider, { value: state },
-                    children,
-                    react_1.default.createElement(DispatchDefaultData, { mempool_url: mempoolUrl || "https://mempool.space/api", ord_url: ord_url, apikey: apikey }))))));
+            children,
+            react_1.default.createElement(DispatchDefaultData, { mempool_url: mempoolUrl || "https://mempool.space/api", ord_url: ord_url, apikey: apikey }))));
 }
-const DispatchDefaultData = ({ mempool_url, ord_url, apikey }) => {
+const DispatchDefaultData = ({ mempool_url, ord_url, apikey, }) => {
     const dispatch = (0, react_redux_1.useDispatch)();
     const wd = (0, hooks_1.useWalletAddress)();
     const fetchWalletBalance = (0, react_1.useCallback)(() => __awaiter(void 0, void 0, void 0, function* () {
@@ -67,7 +62,7 @@ const DispatchDefaultData = ({ mempool_url, ord_url, apikey }) => {
             if (!wd)
                 throw Error("Wallet not connected");
             let dummyUtxos = 0;
-            const cacheKey = `walletBalance-${wd.cardinal_address}`;
+            const cacheKey = `walletBalance`;
             const cachedData = localStorage.getItem(cacheKey);
             const now = new Date().getTime();
             let shouldFetchDummyUtxos = true; // Default to true if no cached data or cache is expired

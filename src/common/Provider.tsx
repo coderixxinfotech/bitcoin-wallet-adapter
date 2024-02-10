@@ -45,16 +45,12 @@ function WalletProvider({
   return (
     <ThemeWrapper>
       <Provider store={store}>
-        <Connect authOptions={authOptions}>
-          <AppContext.Provider value={state}>
-            {children}
-            <DispatchDefaultData
-              mempool_url={mempoolUrl || "https://mempool.space/api"}
-              ord_url={ord_url}
-              apikey={apikey}
-            />
-          </AppContext.Provider>
-        </Connect>
+        {children}
+        <DispatchDefaultData
+          mempool_url={mempoolUrl || "https://mempool.space/api"}
+          ord_url={ord_url}
+          apikey={apikey}
+        />
       </Provider>
     </ThemeWrapper>
   );
@@ -63,11 +59,11 @@ function WalletProvider({
 const DispatchDefaultData = ({
   mempool_url,
   ord_url,
-  apikey
+  apikey,
 }: {
   mempool_url: string;
   ord_url: string;
-  apikey?: string
+  apikey?: string;
 }) => {
   const dispatch = useDispatch();
   const wd = useWalletAddress();
@@ -76,7 +72,7 @@ const DispatchDefaultData = ({
     try {
       if (!wd) throw Error("Wallet not connected");
       let dummyUtxos = 0;
-      const cacheKey = `walletBalance-${wd.cardinal_address}`;
+      const cacheKey = `walletBalance`;
       const cachedData = localStorage.getItem(cacheKey);
       const now = new Date().getTime();
 

@@ -8,7 +8,6 @@ import {
 } from "../../../dist";
 import Link from "next/link";
 import { useEffect } from "react";
-import { IoLogoDiscord } from "react-icons/io5";
 import {
   FaDiscord,
   FaFaceFrown,
@@ -17,7 +16,6 @@ import {
   FaFaceSadCry,
   FaFaceSmile,
   FaFaceSmileWink,
-  FaSquareXTwitter,
   FaXTwitter,
 } from "react-icons/fa6";
 
@@ -82,7 +80,6 @@ export default function Home() {
                 ? "  font-bold bg-accent_dark "
                 : " font-light bg-accent"
             }`}
-            additionalMenuItems={additionalItems}
             headingClass="text-center text-white pt-2 pb-2 text-3xl capitalize font-bold mb-4"
             walletItemClass="w-full bg-accent_dark my-3 hover:border-accent border border-transparent cursor-pointer"
             walletLabelClass="text-lg text-white capitalize tracking-wider"
@@ -156,6 +153,7 @@ const Face = ({ balance }: { balance: number }) => {
 
 const InnerMenu = ({ anchorEl, open, onClose }: any) => {
   const walletDetails = useWalletAddress();
+  // const dispatch= useDispatch();
   console.log({ walletDetails });
   if (walletDetails)
     return (
@@ -244,7 +242,14 @@ const InnerMenu = ({ anchorEl, open, onClose }: any) => {
           </div>
           <div className="relative ">
             <div className="bg-primary rounded cursor-pointer styled-button-wrapper my-2">
-              <button className="red_transition p-2 w-full">Disconnect</button>
+              <button
+                className="red_transition p-2 w-full"
+                // onClick={walletDetails.disconnect(dispatch)} DISPATCH is NEEDED
+
+                onClick={() => walletDetails.disconnect()}
+              >
+                Disconnect
+              </button>
             </div>
           </div>
           <div className="socials flex space-x-3 text-xl relative">

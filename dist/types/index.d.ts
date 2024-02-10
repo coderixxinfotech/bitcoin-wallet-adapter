@@ -6,4 +6,4 @@ import PayButton from "./components/PayButton";
 import { useWalletAddress, useXverseSign, useUnisatSign, useLeatherSign, useSignTx } from "./hooks";
 export { WalletProvider };
 export { ConnectMultiButton, Notification, PayButton };
-export { useWalletAddress, useXverseSign, useUnisatSign, useLeatherSign, useSignTx };
+export { useWalletAddress, useXverseSign, useUnisatSign, useLeatherSign, useSignTx, };

@@ -4,20 +4,12 @@ import { IInstalledWallets, WalletDetails } from "../../../types";
 import { shortenString } from "../../../utils";
 import { RiAccountCircleFill } from "react-icons/ri";
 import { FaWallet, FaPowerOff } from "react-icons/fa";
-import {
-  FaFaceFrown,
-  FaFaceGrinStars,
-  FaFaceMeh,
-  FaFaceSadCry,
-  FaFaceSmile,
-  FaFaceSmileBeam,
-  FaFaceSmileWink,
-} from "react-icons/fa6";
-import { Menu, MenuItem, Popover } from "@mui/material";
+import { Menu, MenuItem } from "@mui/material";
 interface InnerMenuProps {
   anchorEl: HTMLElement | null;
   open: boolean;
   onClose: () => void;
+  disconnect: () => void;
 }
 
 type InnerMenuType = React.ComponentType<InnerMenuProps>;
@@ -35,7 +27,7 @@ interface WalletButtonProps {
   menuOpen: boolean;
   classname?: string;
   InnerMenu?: InnerMenuType;
-  balance?: number;
+  balance?: number | null;
 }
 
 const WalletButton: React.FC<WalletButtonProps> = ({
@@ -71,6 +63,7 @@ const WalletButton: React.FC<WalletButtonProps> = ({
           anchorEl={anchorEl}
           open={menuOpen}
           onClose={handleMenuClose}
+          disconnect={disconnect}
         />
       ) : (
         <Menu

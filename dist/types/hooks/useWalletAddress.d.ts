@@ -3,9 +3,9 @@ export declare const useWalletAddress: () => {
     cardinal_address: string;
     ordinal_pubkey: string;
     cardinal_pubkey: string;
-    balance: number;
-    mempool_balance: number;
-    dummy_utxos: number;
+    balance: number | null;
+    mempool_balance: number | null;
+    dummy_utxos: number | null;
     wallet: string | null;
     connected: boolean;
 } | null;

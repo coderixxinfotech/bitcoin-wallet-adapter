@@ -4,8 +4,6 @@ interface WalletModalProps {
     open: boolean;
     handleClose: () => void;
     wallets: IInstalledWallets[];
-    lastWallet: string;
-    setWallet: (wallet: string) => void;
     getLeatherAddress: () => void;
     getAddress: (options: any) => Promise<void>;
     getAddressOptions: any;

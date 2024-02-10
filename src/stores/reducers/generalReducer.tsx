@@ -7,9 +7,9 @@ export interface GeneralState {
   btc_price_in_dollar: number;
   mempool_url: string;
   ord_url: string;
-  balance: number;
-  in_mempool_balance: number;
-  dummy_utxos: number;
+  balance: number | null;
+  in_mempool_balance: number | null;
+  dummy_utxos: number | null;
 }
 
 const initialState: GeneralState = {
@@ -18,9 +18,9 @@ const initialState: GeneralState = {
   btc_price_in_dollar: 0,
   mempool_url: "https://mempool.space",
   ord_url: "",
-  balance: 0,
-  in_mempool_balance: 0,
-  dummy_utxos: 0,
+  balance: null,
+  in_mempool_balance: null,
+  dummy_utxos: null,
 };
 
 const walletSlice = createSlice({

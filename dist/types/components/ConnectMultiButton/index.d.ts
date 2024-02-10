@@ -3,6 +3,7 @@ interface InnerMenuProps {
     anchorEl: HTMLElement | null;
     open: boolean;
     onClose: () => void;
+    disconnect: () => void;
 }
 type InnerMenuType = React.ComponentType<InnerMenuProps>;
 declare function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, }: {

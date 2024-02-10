@@ -31,6 +31,7 @@ interface InnerMenuProps {
   anchorEl: HTMLElement | null;
   open: boolean;
   onClose: () => void;
+  disconnect: () => void;
 }
 
 // Type for the InnerMenu prop in the WalletButton component
@@ -136,16 +137,6 @@ function ConnectMultiWallet({
     getBTCPrice();
   }, [dispatch, getBTCPrice, open]);
 
-  // Callback function to handle setting selected wallet
-  const setWallet = useCallback(
-    (wallet: string) => {
-      updateLastWallet(wallet);
-      localStorage.setItem("lastWallet", wallet);
-      handleClose();
-    },
-    [updateLastWallet]
-  );
-
   // Use effect hook to check if last wallet is in local storage and set selected wallet accordingly
   useEffect(() => {
     const localWD = localStorage.getItem("wallet-detail") || "";
@@ -213,7 +204,7 @@ function ConnectMultiWallet({
   //disconnect
   const disconnect = useCallback(() => {
     localStorage.removeItem("lastWallet");
-    // localStorage.removeItem("blockstack-session");
+    localStorage.removeItem("walletBalance");
     localStorage.removeItem("wallet-detail");
     updateLastWallet("");
     updateWalletDetails(null);
@@ -349,8 +340,6 @@ function ConnectMultiWallet({
           open={open}
           handleClose={handleClose}
           wallets={wallets}
-          lastWallet={lastWallet}
-          setWallet={setWallet}
           getLeatherAddress={getLeatherAddress}
           getAddress={getAddress}
           getAddressOptions={getAddressOptions}
