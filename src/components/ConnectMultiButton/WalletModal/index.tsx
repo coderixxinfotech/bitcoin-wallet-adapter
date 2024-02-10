@@ -9,7 +9,7 @@ interface WalletModalProps {
   wallets: IInstalledWallets[];
   lastWallet: string;
   setWallet: (wallet: string) => void;
-  doOpenAuth: () => void;
+  getLeatherAddress: () => void;
   getAddress: (options: any) => Promise<void>;
   getAddressOptions: any;
   getUnisatAddress: any;
@@ -33,7 +33,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
   wallets,
   lastWallet,
   setWallet,
-  doOpenAuth,
+  getLeatherAddress,
   getAddress,
   getAddressOptions,
   getUnisatAddress,
@@ -80,8 +80,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
                     onClick={async (e) => {
                       const selectedItem = item.label;
                       if (selectedItem === "Leather") {
-                        doOpenAuth();
-                        setWallet(item.label);
+                        await getLeatherAddress();
                       } else if (selectedItem === "Xverse") {
                         await getAddress(getAddressOptions);
                       } else if (selectedItem === "Unisat") {

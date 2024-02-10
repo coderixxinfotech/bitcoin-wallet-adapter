@@ -6,7 +6,7 @@ interface WalletModalProps {
     wallets: IInstalledWallets[];
     lastWallet: string;
     setWallet: (wallet: string) => void;
-    doOpenAuth: () => void;
+    getLeatherAddress: () => void;
     getAddress: (options: any) => Promise<void>;
     getAddressOptions: any;
     getUnisatAddress: any;

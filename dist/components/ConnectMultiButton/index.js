@@ -36,8 +36,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const context_1 = require("../../common/stacks/context");
-const connect_react_1 = require("@stacks/connect-react");
 const react_1 = __importStar(require("react"));
 //xverse
 const sats_connect_1 = require("sats-connect");
@@ -70,9 +68,6 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     const handleClose = () => {
         setOpen(false);
     };
-    //leather-wallet
-    const state = (0, react_1.useContext)(context_1.AppContext);
-    const { doOpenAuth } = (0, connect_react_1.useConnect)();
     // Function to check which wallets are installed
     function getInstalledWalletName() {
         var _a, _b, _c;
@@ -83,12 +78,12 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-unisat-logo.png",
             });
         }
-        if (typeof window.btc !== "undefined") {
-            checkWallets.push({
-                label: "Leather",
-                logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.png",
-            });
-        }
+        // if (typeof window.btc !== "undefined") {
+        //   checkWallets.push({
+        //     label: "Leather",
+        //     logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.png",
+        //   });
+        // }
         if ((_c = (_b = (_a = window === null || window === void 0 ? void 0 : window.BitcoinProvider) === null || _a === void 0 ? void 0 : _a.signTransaction) === null || _b === void 0 ? void 0 : _b.toString()) === null || _c === void 0 ? void 0 : _c.includes("Psbt")) {
             checkWallets.push({
                 label: "Xverse",
@@ -122,34 +117,13 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
         if (lastWallet) {
             updateLastWallet(lastWallet);
             // console.log("wallet present");
-            // If the last wallet is Leather and user data is not present, reset selected wallet
-            if (lastWallet === "Leather" && !(state === null || state === void 0 ? void 0 : state.userData)) {
-                updateLastWallet("");
-                updateWalletDetails(null);
-                localStorage.removeItem("lastWallet");
-                localStorage.removeItem("wallet-detail");
-            }
-            else if (lastWallet === "Leather" && (state === null || state === void 0 ? void 0 : state.userData)) {
-                // If the last wallet is Leather and user data is present, set the wallet details
-                const cardinal = state.userData.profile.btcAddress.p2wpkh.mainnet;
-                const ordinalPubkey = state.userData.profile.btcPublicKey.p2tr;
-                const cardinalPubkey = state.userData.profile.btcPublicKey.p2wpkh;
-                const ordinal = state.userData.profile.btcAddress.p2tr.mainnet;
-                localStorage.setItem("wallet-detail", JSON.stringify({
-                    cardinal,
-                    ordinal,
-                    cardinalPubkey,
-                    ordinalPubkey,
-                    wallet: "Leather",
-                }));
-                updateWalletDetails({
-                    wallet: "Leather",
-                    cardinal,
-                    ordinal,
-                    cardinalPubkey,
-                    ordinalPubkey,
-                    connected: true,
-                });
+            // If the last wallet is Leather
+            if (lastWallet === "Leather" &&
+                (walletDetail === null || walletDetail === void 0 ? void 0 : walletDetail.cardinal) &&
+                (walletDetail === null || walletDetail === void 0 ? void 0 : walletDetail.ordinal)) {
+                // If the last wallet is leather and user data is present, set the wallet details
+                updateLastWallet(lastWallet);
+                updateWalletDetails(walletDetail);
             }
             else if (lastWallet === "Xverse" &&
                 walletDetail &&
@@ -179,7 +153,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 updateLastWallet(lastWallet);
             }
         }
-    }, [state.userData, updateLastWallet, updateWalletDetails]);
+    }, [updateLastWallet, updateWalletDetails]);
     //menu
     const [anchorEl, setAnchorEl] = react_1.default.useState(null);
     const menuOpen = Boolean(anchorEl);
@@ -267,9 +241,29 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
             handleClose();
         }
     });
+    const getLeatherAddress = () => __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        const userAddresses = yield ((_a = window.btc) === null || _a === void 0 ? void 0 : _a.request("getAddresses"));
+        console.log({ userAddresses });
+        if (userAddresses.result.addresses.length) {
+            const wd = {
+                wallet: "Leather",
+                ordinal: userAddresses.result.addresses[1].address,
+                cardinal: userAddresses.result.addresses[0].address,
+                ordinalPubkey: userAddresses.result.addresses[1].publicKey,
+                cardinalPubkey: userAddresses.result.addresses[0].publicKey,
+                connected: true,
+            };
+            localStorage.setItem("wallet-detail", JSON.stringify(wd));
+            updateWalletDetails(wd);
+            updateLastWallet("Leather");
+            localStorage.setItem("lastWallet", "Leather");
+            handleClose();
+        }
+    });
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement("div", null,
             react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, InnerMenu: InnerMenu, balance: balance }),
-            react_1.default.createElement(WalletModal_1.default, { open: open, handleClose: handleClose, wallets: wallets, lastWallet: lastWallet, setWallet: setWallet, doOpenAuth: doOpenAuth, getAddress: sats_connect_1.getAddress, getAddressOptions: getAddressOptions, getUnisatAddress: getUnisatAddress, modalContainerClass: modalContainerClass, modalContentClass: modalContentClass, closeButtonClass: closeButtonClass, headingClass: headingClass, walletItemClass: walletItemClass, walletImageClass: walletImageClass, walletLabelClass: walletLabelClass, icon: icon, iconClass: iconClass }))));
+            react_1.default.createElement(WalletModal_1.default, { open: open, handleClose: handleClose, wallets: wallets, lastWallet: lastWallet, setWallet: setWallet, getLeatherAddress: getLeatherAddress, getAddress: sats_connect_1.getAddress, getAddressOptions: getAddressOptions, getUnisatAddress: getUnisatAddress, modalContainerClass: modalContainerClass, modalContentClass: modalContentClass, closeButtonClass: closeButtonClass, headingClass: headingClass, walletItemClass: walletItemClass, walletImageClass: walletImageClass, walletLabelClass: walletLabelClass, icon: icon, iconClass: iconClass }))));
 }
 exports.default = ConnectMultiWallet;

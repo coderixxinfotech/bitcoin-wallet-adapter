@@ -1,6 +1,6 @@
 "use client";
 import "./globals.css";
-import { WalletProvider } from "bitcoin-wallet-adapter";
+import { WalletProvider } from "../../../dist";
 
 export default function RootLayout({
   children,

@@ -81,8 +81,9 @@ function useAuth(customAuthOptions) {
         onFinish,
         onCancel,
         appDetails: {
-            name: ((_a = customAuthOptions === null || customAuthOptions === void 0 ? void 0 : customAuthOptions.appDetails) === null || _a === void 0 ? void 0 : _a.name) || "Ordinal Novus",
-            icon: ((_b = customAuthOptions === null || customAuthOptions === void 0 ? void 0 : customAuthOptions.appDetails) === null || _b === void 0 ? void 0 : _b.icon) || "https://ordinalnovus.com/logo_default.png",
+            name: ((_a = customAuthOptions === null || customAuthOptions === void 0 ? void 0 : customAuthOptions.appDetails) === null || _a === void 0 ? void 0 : _a.name) || "OrdinalNovus",
+            icon: ((_b = customAuthOptions === null || customAuthOptions === void 0 ? void 0 : customAuthOptions.appDetails) === null || _b === void 0 ? void 0 : _b.icon) ||
+                "https://ordinalnovus.com/logo_default.png",
         },
     };
     return {
