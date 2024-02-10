@@ -29,6 +29,15 @@ declare const window: CustomWindow;
 
 const purposes: string[] = ["ordinals", "payment"];
 
+interface InnerMenuProps {
+  anchorEl: HTMLElement | null;
+  open: boolean;
+  onClose: () => void;
+}
+
+// Type for the InnerMenu prop in the WalletButton component
+type InnerMenuType = React.ComponentType<InnerMenuProps>;
+
 function ConnectMultiWallet({
   buttonClassname,
   modalContainerClass,
@@ -38,7 +47,9 @@ function ConnectMultiWallet({
   walletItemClass,
   walletImageClass,
   walletLabelClass,
-  additionalMenuItems,
+  InnerMenu,
+  icon,
+  iconClass,
 }: {
   buttonClassname?: string;
   modalContainerClass?: string;
@@ -48,7 +59,9 @@ function ConnectMultiWallet({
   walletItemClass?: string;
   walletImageClass?: string;
   walletLabelClass?: string;
-  additionalMenuItems?: React.ReactNode[];
+  InnerMenu?: InnerMenuType;
+  icon?: string;
+  iconClass?: string;
 }) {
   //for notification
   const dispatch = useDispatch();
@@ -58,6 +71,9 @@ function ConnectMultiWallet({
   const lastWallet = useSelector(
     (state: RootState) => state.general.lastWallet
   );
+
+  const balance = useSelector((state: RootState) => state.general.balance);
+
   const [wallets, setWallets] = useState<IInstalledWallets[]>([]);
 
   //redux wallet management
@@ -332,7 +348,8 @@ function ConnectMultiWallet({
           disconnect={disconnect}
           menuOpen={menuOpen}
           classname={buttonClassname}
-          additionalMenuItems={additionalMenuItems}
+          InnerMenu={InnerMenu}
+          balance={balance}
         />
 
         <WalletModal
@@ -352,6 +369,8 @@ function ConnectMultiWallet({
           walletItemClass={walletItemClass}
           walletImageClass={walletImageClass}
           walletLabelClass={walletLabelClass}
+          icon={icon}
+          iconClass={iconClass}
         />
       </div>
     </>

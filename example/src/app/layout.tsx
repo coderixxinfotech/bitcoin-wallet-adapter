@@ -1,18 +1,21 @@
-'use client'
-import './globals.css'
+"use client";
+import "./globals.css";
 import { WalletProvider } from "bitcoin-wallet-adapter";
-
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <WalletProvider customAuthOptions={{
-      appDetails: {
-      name: "Example"
-    }}}>
+    <WalletProvider
+      // mempoolUrl="https://mempool.space/api"
+      customAuthOptions={{
+        appDetails: {
+          name: "Example",
+        },
+      }}
+    >
       <html lang="en">
         <body>{children}</body>
       </html>

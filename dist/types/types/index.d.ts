@@ -7,6 +7,29 @@ export interface WalletDetails {
     wallet: string;
     derivationPath?: string;
 }
+export interface UTXO {
+    status: {
+        block_hash: string;
+        block_height: number;
+        block_time: number;
+        confirmed: boolean;
+    };
+    txid: string;
+    value: number;
+    vout: number;
+    tx: any;
+}
+export interface AddressTxsUtxo {
+    status: {
+        block_hash: string;
+        block_height: number;
+        block_time: number;
+        confirmed: boolean;
+    };
+    txid: string;
+    value: number;
+    vout: number;
+}
 export interface AuthOptionsArgs {
     manifestPath?: string;
     redirectTo?: string;

@@ -9,10 +9,12 @@ const utils_1 = require("../../../utils");
 const ri_1 = require("react-icons/ri");
 const fa_1 = require("react-icons/fa");
 const material_1 = require("@mui/material");
-const WalletButton = ({ wallets, lastWallet, walletDetails, handleMenuOpen, handleMenuClose, handleOpen, handleClose, disconnect, anchorEl, menuOpen, classname, additionalMenuItems, }) => {
-    return lastWallet && walletDetails ? (react_1.default.createElement(react_1.default.Fragment, null,
-        react_1.default.createElement(CustomButton_1.default, { icon: ri_1.RiAccountCircleFill, text: `${(0, utils_1.shortenString)(walletDetails.cardinal, 5)}`, onClick: (e) => (menuOpen ? handleMenuClose() : handleMenuOpen(e)), className: classname }),
-        react_1.default.createElement(material_1.Menu, { id: "connected-menu", anchorEl: anchorEl, open: menuOpen, onClose: handleMenuClose, PaperProps: {
+const WalletButton = ({ wallets, lastWallet, walletDetails, handleMenuOpen, handleMenuClose, handleOpen, handleClose, disconnect, anchorEl, menuOpen, classname, InnerMenu, balance, }) => {
+    return lastWallet && walletDetails ? (react_1.default.createElement("div", { className: "relative" },
+        react_1.default.createElement(CustomButton_1.default, { icon: ri_1.RiAccountCircleFill, text: `${balance
+                ? `${(balance / 100000000).toFixed(3)} BTC`
+                : (0, utils_1.shortenString)(walletDetails.cardinal, 5)}`, onClick: (e) => (menuOpen ? handleMenuClose() : handleMenuOpen(e)), className: classname }),
+        InnerMenu ? (react_1.default.createElement(InnerMenu, { anchorEl: anchorEl, open: menuOpen, onClose: handleMenuClose })) : (react_1.default.createElement(material_1.Menu, { id: "connected-menu", anchorEl: anchorEl, open: menuOpen, onClose: handleMenuClose, PaperProps: {
                 elevation: 0,
                 sx: {
                     overflow: "visible",
@@ -39,14 +41,11 @@ const WalletButton = ({ wallets, lastWallet, walletDetails, handleMenuOpen, hand
                 },
             }, MenuListProps: {
                 "aria-labelledby": "basic-button",
-            }, transformOrigin: { horizontal: "right", vertical: "top" }, anchorOrigin: { horizontal: "right", vertical: "bottom" } }, additionalMenuItems === null || additionalMenuItems === void 0 ? void 0 :
-            additionalMenuItems.map((Item, index) => (react_1.default.createElement("div", { key: index, onClick: handleMenuClose },
-                react_1.default.createElement(material_1.MenuItem, null, Item),
-                react_1.default.createElement(material_1.Divider, null)))),
+            }, transformOrigin: { horizontal: "right", vertical: "top" }, anchorOrigin: { horizontal: "right", vertical: "bottom" } },
             react_1.default.createElement("div", null,
                 react_1.default.createElement(material_1.MenuItem, { onClick: disconnect, className: "bwa-flex" },
                     react_1.default.createElement(fa_1.FaPowerOff, null),
-                    react_1.default.createElement("p", { className: "bwa-ml-2 bwa-text-xs" }, "Disconnect")))))) : (react_1.default.createElement(CustomButton_1.default
+                    react_1.default.createElement("p", { className: "bwa-ml-2 bwa-text-xs" }, "Disconnect"))))))) : (react_1.default.createElement(CustomButton_1.default
     // disabled={wallets?.length === 0 ? true : false}
     , { 
         // disabled={wallets?.length === 0 ? true : false}

@@ -1,5 +1,11 @@
 import React from "react";
-declare function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, additionalMenuItems, }: {
+interface InnerMenuProps {
+    anchorEl: HTMLElement | null;
+    open: boolean;
+    onClose: () => void;
+}
+type InnerMenuType = React.ComponentType<InnerMenuProps>;
+declare function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, }: {
     buttonClassname?: string;
     modalContainerClass?: string;
     modalContentClass?: string;
@@ -8,6 +14,8 @@ declare function ConnectMultiWallet({ buttonClassname, modalContainerClass, moda
     walletItemClass?: string;
     walletImageClass?: string;
     walletLabelClass?: string;
-    additionalMenuItems?: React.ReactNode[];
+    InnerMenu?: InnerMenuType;
+    icon?: string;
+    iconClass?: string;
 }): React.JSX.Element;
 export default ConnectMultiWallet;

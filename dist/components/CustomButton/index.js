@@ -27,7 +27,7 @@ const CustomButton = (_a) => {
                 text)));
     }
     return (react_1.default.createElement("button", Object.assign({ onClick: onClick, className: !className ? buttonClasses : className, disabled: disabled }, (disabled ? { "aria-disabled": true, tabIndex: -1 } : {}), props), loading ? (react_1.default.createElement(fa_1.FaSpinner, { className: "bwa-mr-2 bwa-animate-spin" })) : (react_1.default.createElement(react_1.default.Fragment, null,
-        Icon && react_1.default.createElement(Icon, { className: "bwa-mr-2" }),
-        text))));
+        text,
+        Icon && react_1.default.createElement(Icon, { className: "bwa-ml-2" })))));
 };
 exports.default = CustomButton;

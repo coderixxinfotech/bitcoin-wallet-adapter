@@ -5,8 +5,6 @@ import { AppConfig, UserSession } from "@stacks/auth";
 import { AuthOptions } from "@stacks/connect";
 import { AuthOptionsArgs } from "../../types";
 
-
-
 export function useAuth(customAuthOptions?: AuthOptionsArgs) {
   const [state, setState] = React.useState<AppState>(defaultState());
   const [authResponse, setAuthResponse] = React.useState("");
@@ -69,17 +67,19 @@ export function useAuth(customAuthOptions?: AuthOptionsArgs) {
     }
   }, [handleRedirectAuth, userSession, state]);
 
-   const authOptions: AuthOptions = {
-     manifestPath: customAuthOptions?.manifestPath || "/static/manifest.json",
-     redirectTo: customAuthOptions?.redirectTo || "/",
-     userSession,
-     onFinish,
-     onCancel,
-     appDetails:  {
-       name: customAuthOptions?.appDetails?.name || "Ordinal Novus",
-       icon: customAuthOptions?.appDetails?.icon ||  "https://ordinalnovus.com/logo_default.png",
-     },
-   };
+  const authOptions: AuthOptions = {
+    manifestPath: customAuthOptions?.manifestPath || "/static/manifest.json",
+    redirectTo: customAuthOptions?.redirectTo || "/",
+    userSession,
+    onFinish,
+    onCancel,
+    appDetails: {
+      name: customAuthOptions?.appDetails?.name || "OrdinalNovus",
+      icon:
+        customAuthOptions?.appDetails?.icon ||
+        "https://ordinalnovus.com/logo_default.png",
+    },
+  };
   return {
     authOptions,
     state,

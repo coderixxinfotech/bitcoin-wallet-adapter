@@ -50,11 +50,12 @@ const WalletModal_1 = __importDefault(require("./WalletModal"));
 const utils_1 = require("../../utils");
 const generalReducer_2 = require("../../stores/reducers/generalReducer");
 const purposes = ["ordinals", "payment"];
-function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, additionalMenuItems, }) {
+function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, }) {
     //for notification
     const dispatch = (0, react_redux_1.useDispatch)();
     const walletDetails = (0, react_redux_1.useSelector)((state) => state.general.walletDetails);
     const lastWallet = (0, react_redux_1.useSelector)((state) => state.general.lastWallet);
+    const balance = (0, react_redux_1.useSelector)((state) => state.general.balance);
     const [wallets, setWallets] = (0, react_1.useState)([]);
     //redux wallet management
     const updateWalletDetails = (0, react_1.useCallback)((newWalletDetails) => {
@@ -74,7 +75,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     const { doOpenAuth } = (0, connect_react_1.useConnect)();
     // Function to check which wallets are installed
     function getInstalledWalletName() {
-        var _a, _b, _c, _d;
+        var _a, _b, _c;
         const checkWallets = [];
         if (typeof window.unisat !== "undefined") {
             checkWallets.push({
@@ -82,13 +83,13 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-unisat-logo.png",
             });
         }
-        if ((_a = window === null || window === void 0 ? void 0 : window.StacksProvider) === null || _a === void 0 ? void 0 : _a.psbtRequest) {
+        if (typeof window.btc !== "undefined") {
             checkWallets.push({
                 label: "Leather",
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.png",
             });
         }
-        if ((_d = (_c = (_b = window === null || window === void 0 ? void 0 : window.BitcoinProvider) === null || _b === void 0 ? void 0 : _b.signTransaction) === null || _c === void 0 ? void 0 : _c.toString()) === null || _d === void 0 ? void 0 : _d.includes("Psbt")) {
+        if ((_c = (_b = (_a = window === null || window === void 0 ? void 0 : window.BitcoinProvider) === null || _a === void 0 ? void 0 : _a.signTransaction) === null || _b === void 0 ? void 0 : _b.toString()) === null || _c === void 0 ? void 0 : _c.includes("Psbt")) {
             checkWallets.push({
                 label: "Xverse",
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-xverse-logo.png",
@@ -268,7 +269,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     });
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement("div", null,
-            react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, additionalMenuItems: additionalMenuItems }),
-            react_1.default.createElement(WalletModal_1.default, { open: open, handleClose: handleClose, wallets: wallets, lastWallet: lastWallet, setWallet: setWallet, doOpenAuth: doOpenAuth, getAddress: sats_connect_1.getAddress, getAddressOptions: getAddressOptions, getUnisatAddress: getUnisatAddress, modalContainerClass: modalContainerClass, modalContentClass: modalContentClass, closeButtonClass: closeButtonClass, headingClass: headingClass, walletItemClass: walletItemClass, walletImageClass: walletImageClass, walletLabelClass: walletLabelClass }))));
+            react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, InnerMenu: InnerMenu, balance: balance }),
+            react_1.default.createElement(WalletModal_1.default, { open: open, handleClose: handleClose, wallets: wallets, lastWallet: lastWallet, setWallet: setWallet, doOpenAuth: doOpenAuth, getAddress: sats_connect_1.getAddress, getAddressOptions: getAddressOptions, getUnisatAddress: getUnisatAddress, modalContainerClass: modalContainerClass, modalContentClass: modalContentClass, closeButtonClass: closeButtonClass, headingClass: headingClass, walletItemClass: walletItemClass, walletImageClass: walletImageClass, walletLabelClass: walletLabelClass, icon: icon, iconClass: iconClass }))));
 }
 exports.default = ConnectMultiWallet;

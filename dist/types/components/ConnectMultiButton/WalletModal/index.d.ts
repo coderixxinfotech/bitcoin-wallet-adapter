@@ -17,6 +17,9 @@ interface WalletModalProps {
     walletItemClass?: string;
     walletImageClass?: string;
     walletLabelClass?: string;
+    icon?: string;
+    iconClass?: string;
+    iconContainerClass?: string;
 }
 declare const WalletModal: React.FC<WalletModalProps>;
 export default WalletModal;

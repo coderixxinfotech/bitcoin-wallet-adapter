@@ -1,5 +1,11 @@
 import React from "react";
 import { IInstalledWallets, WalletDetails } from "../../../types";
+interface InnerMenuProps {
+    anchorEl: HTMLElement | null;
+    open: boolean;
+    onClose: () => void;
+}
+type InnerMenuType = React.ComponentType<InnerMenuProps>;
 interface WalletButtonProps {
     wallets: IInstalledWallets[];
     lastWallet: string;
@@ -12,7 +18,8 @@ interface WalletButtonProps {
     anchorEl: null | HTMLElement;
     menuOpen: boolean;
     classname?: string;
-    additionalMenuItems?: React.ReactNode[];
+    InnerMenu?: InnerMenuType;
+    balance?: number;
 }
 declare const WalletButton: React.FC<WalletButtonProps>;
 export default WalletButton;

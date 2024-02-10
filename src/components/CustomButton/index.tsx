@@ -54,8 +54,8 @@ const CustomButton = ({
         <FaSpinner className="bwa-mr-2 bwa-animate-spin" />
       ) : (
         <>
-          {Icon && <Icon className="bwa-mr-2" />}
           {text}
+          {Icon && <Icon className="bwa-ml-2" />}
         </>
       )}
     </button>

@@ -1,17 +1,17 @@
 const customColors = {
   bwa_primary: {
-    DEFAULT: "#171616",
-    dark: "#402a18",
+    DEFAULT: "#04020f",
+    dark: "#1f1d3e",
   },
   bwa_secondary: {
-    DEFAULT: "#171616",
+    DEFAULT: "#0A041D",
     dark: "#a8a4a4",
   },
   bwa_accent: {
-    DEFAULT: "#FF9900",
+    DEFAULT: "#9102F0",
   },
-  bwa_accent_dark: "#855205",
-  bwa_light_gray: "#c0c0c0", // A bit lighter to enhance contrast
+  bwa_accent_dark: "#210236",
+  bwa_light_gray: "#84848a", // A bit lighter to enhance contrast
   bwa_black: "#0c0d0c",
 };
 

@@ -21,6 +21,10 @@ interface WalletModalProps {
   walletItemClass?: string;
   walletImageClass?: string;
   walletLabelClass?: string;
+
+  icon?: string;
+  iconClass?: string;
+  iconContainerClass?: string;
 }
 
 const WalletModal: React.FC<WalletModalProps> = ({
@@ -41,6 +45,10 @@ const WalletModal: React.FC<WalletModalProps> = ({
   walletItemClass = "bwa-w-full bwa-cursor-pointer bwa-border bwa-border-transparent bwa-p-4 bwa-rounded-xl bwa-transition-all",
   walletImageClass = "bwa-w-[50px]",
   walletLabelClass = "bwa-text-white bwa-font-bold bwa-capitalize bwa-text-xl bwa-pl-3 bwa-text-center",
+
+  icon = "https://ordinalnovus.com/logo_default.png",
+  iconClass = "bwa-w-[100px]",
+  iconContainerClass = "bwa-w-full bwa_center",
 }) => {
   return (
     <Modal
@@ -56,8 +64,13 @@ const WalletModal: React.FC<WalletModalProps> = ({
               <RxCross1 />
             </div>
           </div>
+          <div className="bwa-w-full">
+            <div className={iconContainerClass}>
+              <img src={icon} className={iconClass} />
+            </div>
+          </div>
           <p className={headingClass}>Connect your wallet</p>
-          <hr className="bwa-w-5/12 bwa-bg-accent bwa-mb-8" />
+          {/* <hr className="bwa-w-5/12 bwa-bg-accent bwa-mb-8" /> */}
 
           <div className="modalBody">
             {wallets && wallets?.length > 0 ? (
@@ -78,7 +91,10 @@ const WalletModal: React.FC<WalletModalProps> = ({
                     key={item.label + idx}
                     className={walletItemClass}
                   >
-                    <div className="bwa-flex bwa-items-center bwa-p-3">
+                    <div className="bwa-flex bwa-justify-between bwa-items-center bwa-p-3">
+                      <h5 className={walletLabelClass}>
+                        {item.label + " wallet"}
+                      </h5>
                       <div className="bwa_center">
                         <img
                           className={walletImageClass}
@@ -86,9 +102,6 @@ const WalletModal: React.FC<WalletModalProps> = ({
                           alt={`${item.label} logo`}
                         />
                       </div>
-                      <h5 className={walletLabelClass}>
-                        {item.label + " wallet"}
-                      </h5>
                     </div>
                   </div>
                 ))}

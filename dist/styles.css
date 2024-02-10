@@ -515,6 +515,9 @@ video {
 .bwa-w-5\/12 {
   width: 41.666667%;
 }
+.bwa-w-\[100px\] {
+  width: 100px;
+}
 .bwa-w-\[50px\] {
   width: 50px;
 }
@@ -545,6 +548,9 @@ video {
 .bwa-justify-center {
   justify-content: center;
 }
+.bwa-justify-between {
+  justify-content: space-between;
+}
 .bwa-justify-around {
   justify-content: space-around;
 }
@@ -569,7 +575,7 @@ video {
 }
 .bwa-bg-bwa_secondary {
   --tw-bg-opacity: 1;
-  background-color: rgb(23 22 22 / var(--tw-bg-opacity));
+  background-color: rgb(10 4 29 / var(--tw-bg-opacity));
 }
 .bwa-bg-gray-700 {
   --tw-bg-opacity: 1;
@@ -627,7 +633,7 @@ video {
 }
 .bwa-text-bwa_accent {
   --tw-text-opacity: 1;
-  color: rgb(255 153 0 / var(--tw-text-opacity));
+  color: rgb(145 2 240 / var(--tw-text-opacity));
 }
 .bwa-text-gray-300 {
   --tw-text-opacity: 1;
@@ -665,7 +671,7 @@ video {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
   --tw-border-opacity: 1;
-  border-color: rgb(255 153 0 / var(--tw-border-opacity));
+  border-color: rgb(145 2 240 / var(--tw-border-opacity));
 }
 
 /* Modal heading styles */
