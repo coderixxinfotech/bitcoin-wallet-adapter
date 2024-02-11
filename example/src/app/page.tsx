@@ -26,18 +26,6 @@ const XverseListingUnsignedPsbt = `cHNidP8BAFMCAAAAAY2eAJfNX305iLS3wcoAydSV3fLls
 export default function Home() {
   const { loading, result, error, sign } = useXverseSign();
   const walletDetails = useWalletAddress();
-  // console.log(connected, 'connected')
-  const additionalItems = [
-    <span onClick={() => console.log("Profile Clicked")}>
-      {/* <FaUser /> */}
-      <p className="bwa-ml-2 bwa-text-xs">Profile</p>
-    </span>,
-    <Link href="/settings" legacyBehavior>
-      <a>
-        <p className="bwa-text-xs">Settings</p>
-      </a>
-    </Link>,
-  ];
 
   const handleClick = async () => {
     try {
@@ -85,6 +73,8 @@ export default function Home() {
             walletLabelClass="text-lg text-white capitalize tracking-wider"
             walletImageClass="w-[30px]"
             InnerMenu={InnerMenu}
+            // icon="https://2254859395-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F41U87FfDFo2dIKYr0ZNX%2Ficon%2FeTdVHpsUrKNqnuPPi4Bo%2FSize128.svg?alt=media&token=61d284cf-2884-418f-9af3-2ab5cf94c7f4"
+            iconClass="w-[100px] pb-2"
           />
         </div>
         {walletDetails &&

@@ -7,29 +7,11 @@ A robust solution to connect and interact with Bitcoin wallets. The package prov
 Use the package manager of your choice to install `bitcoin-wallet-adapter`.
 
 ```bash
-
-
-
-
-
 npm  install  bitcoin-wallet-adapter
-
-
-
-
 
 # or
 
-
-
-
-
 yarn  add  bitcoin-wallet-adapter
-
-
-
-
-
 ```
 
 ## Components
@@ -43,30 +25,10 @@ A provider component that should be wrapped around your application to enable wa
 ```javascript
 import { WalletProvider } from "bitcoin-wallet-adapter";
 
-<WalletProvider
-  customAuthOptions={{
-    appDetails: { name: "My Example App" },
-  }}
->
+<WalletProvider>
   <YourApp />
 </WalletProvider>;
 ```
-
-#### Props
-
-`customAuthOptions (AuthOptionsArgs | optional)`
-
-Configuration or set of options related to authentication. It's recommended you provide these.
-
-`AuthOptionsArgs` Interface
-
-- `redirectTo (string | optional)`: URL to which the user will be redirected after authentication.
-
-- `appDetails (object | optional)`: Contains details about the app
-
-- `name (string | optional)`: Name of the app
-
-- `icon (string | optional)`: URL or path to the app's icon
 
 ### `ConnectMultiButton`
 
@@ -83,20 +45,24 @@ import { ConnectMultiButton } from "bitcoin-wallet-adapter";
   walletItemClass="border w-full md:w-6/12 cursor-pointer border-transparent rounded-xl mb-4 hover:border-green-500 transition-all"
   headingClass="text-green-700 text-4xl pb-12 font-bold text-center"
   buttonClassname="bg-green-300 hover:bg-green-400 rounded-xl flex items-center text-green-800 px-4 py-1 font-bold"
+  InnerMenu={InnerMenu} // component to show a menu when wallet is connected
+  icon=""
+  iconClass=""
+  balance={1000}
 />;
 ```
 
 #### props
 
 - `buttonClassname (string | Optional)`: Overrides style on button
-
 - `headingClass (string | Optional)`: Overrides style on modal heading
-
 - `walletItemClass (string | Optional)`: Overrides style on wallets div
-
 - `walletImageClass (string | Optional)`: Overrides style on the wallet images
-
 - `walletLabelClass (string | Optional)`: Overrides style on the wallet labels
+- `InnerMenu (React Component | Optional)`: Overrides default menu when wallet is connected
+- `icon (string | Optional)`: Overrides default image in modal
+- `iconClass (string | Optional)`: Overrides default image in modal classname
+- `balance (number | Optional)`: shows the balance innstead of wallet address when wallet is connected
 
 ### PayButton
 
@@ -105,9 +71,7 @@ A component to pay BTC from connected wallet to a given address
 #### props
 
 - `amount (number)`: Number of Sats to Transfer
-
 - `receipent (string)`: BTC Address that will receive the sats
-
 - `buttonClassname (string | Optional)`: Overrides button styling
 
 #### Usage
@@ -164,19 +128,13 @@ const MyComponent = () => {
   const handleSellSign = async () => {
     const signOptions = {
       psbt: yourPsbtBase64,
-
       network: "Mainnet",
-
       action: "sell",
-
       inputs: [
         {
           address: walletDetails.ordinal_address,
-
           publickey: walletDetails.ordinal_pubkey,
-
           sighash: 131,
-
           index: [0],
         },
       ],
@@ -195,29 +153,17 @@ const MyComponent = () => {
 const  handleDummySign = async () => {
 
 	const  signOptions = {
-
 		psbt:  yourPsbtBase64,
-
 		network:  "Mainnet",
-
 		action:  "dummy",
-
 		inputs: [
-
 					{
-
 					address:  walletDetails.cardinal_address,
-
 					publickey:  walletDetails.cardinal_pubkey,
-
 					sighash:  1,
-
 					index: [0],
-
 					},
-
 				]
-
 		};
 
 	  await  signTx(signOptions);
@@ -236,33 +182,21 @@ const  handleBuySign = async () => {
 
 	new  Array(inputLength).fill(1).map((item:  number, idx:  number) => {
 	if (idx  !==  2)
-
 		inputs.push({
-
 		address:  walletDetails.cardinal_address,
-
 		publickey:  walletDetails.cardinal_pubkey,
-
 		sighash:  1,
-
 		index: [idx],
-
 		});
 
 	});
 
 	const  signOptions = {
-
 		psbt:  yourPsbtBase64,
-
 		network:  "Mainnet",
-
 		action:  "buy",
-
 		inputs
-
 		};
-
 	  await  signTx(signOptions);
 
 	};
@@ -273,35 +207,23 @@ const  handleBuySign = async () => {
 
 ```
 useEffect(() => {
-
 	// Handling Wallet Sign Results/Errors
-
 	if (result) {
-
 		// Handle successful result from wallet sign
-
 		console.log("Sign Result:", result);
-
 		if (result) {
-
 			listOrdinal(result);
-
 		}
 	}
 
 
 
 	if (error) {
-
 		// Handle error from wallet sign
-
 		console.error(" Sign Error:", error);
-
 		// Turn off loading after handling results or errors
-
 		setLoading(false);
 		alert(error.message  ||  "wallet error occurred");
-
 	}
 
 }, [result, error]);
