@@ -36,7 +36,7 @@ function PayButton({ amount, receipient, buttonClassname, }) {
                     address: receipient,
                     amount,
                 }));
-                const txid = resp.result.txid;
+                const txid = resp === null || resp === void 0 ? void 0 : resp.id;
                 return txid;
             }
             else if (lastWallet === "Xverse") {

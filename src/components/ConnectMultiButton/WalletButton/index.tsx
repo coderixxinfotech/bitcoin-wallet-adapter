@@ -51,7 +51,7 @@ const WalletButton: React.FC<WalletButtonProps> = ({
         icon={RiAccountCircleFill}
         text={`${
           balance
-            ? `${(balance / 100_000_000).toFixed(3)} BTC`
+            ? `${(balance / 100_000_000).toFixed(5)} BTC`
             : shortenString(walletDetails.cardinal, 5)
         }`}
         onClick={(e) => (menuOpen ? handleMenuClose() : handleMenuOpen(e))}

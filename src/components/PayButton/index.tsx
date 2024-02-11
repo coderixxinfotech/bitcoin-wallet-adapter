@@ -37,7 +37,7 @@ function PayButton({
           address: receipient,
           amount,
         });
-        const txid = resp.result.txid;
+        const txid = resp?.id;
         return txid;
       } else if (lastWallet === "Xverse") {
         const sendBtcOptions = {

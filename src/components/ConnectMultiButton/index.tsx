@@ -17,8 +17,9 @@ import WalletModal from "./WalletModal";
 import { getBTCPriceInDollars } from "../../utils";
 import { setBTCPrice } from "../../stores/reducers/generalReducer";
 import { IInstalledWallets } from "../../types";
+
 interface CustomWindow extends Window {
-  btc?: any;
+  LeatherProvider?: any;
   unisat?: any;
   BitcoinProvider?: any;
 }
@@ -49,6 +50,7 @@ function ConnectMultiWallet({
   InnerMenu,
   icon,
   iconClass,
+  balance,
 }: {
   buttonClassname?: string;
   modalContainerClass?: string;
@@ -61,6 +63,7 @@ function ConnectMultiWallet({
   InnerMenu?: InnerMenuType;
   icon?: string;
   iconClass?: string;
+  balance?: number;
 }) {
   //for notification
   const dispatch = useDispatch();
@@ -70,8 +73,6 @@ function ConnectMultiWallet({
   const lastWallet = useSelector(
     (state: RootState) => state.general.lastWallet
   );
-
-  const balance = useSelector((state: RootState) => state.general.balance);
 
   const [wallets, setWallets] = useState<IInstalledWallets[]>([]);
 
@@ -107,12 +108,12 @@ function ConnectMultiWallet({
       });
     }
 
-    // if (typeof window.btc !== "undefined") {
-    //   checkWallets.push({
-    //     label: "Leather",
-    //     logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.png",
-    //   });
-    // }
+    if (typeof window.LeatherProvider !== "undefined") {
+      checkWallets.push({
+        label: "Leather",
+        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.png",
+      });
+    }
 
     if (
       window?.BitcoinProvider?.signTransaction?.toString()?.includes("Psbt")
@@ -297,15 +298,31 @@ function ConnectMultiWallet({
   };
 
   const getLeatherAddress = async () => {
-    const userAddresses = await window.btc?.request("getAddresses");
+    // Directly using the btc object from the window, ensure it's correctly typed or casted.
+    const btc = (window as any).LeatherProvider;
+
+    // Requesting addresses and awaiting the promise to resolve.
+    const response: any = await btc.request("getAddresses");
+
+    const userAddresses = response;
+
+    const addresses = userAddresses.result.addresses;
+
+    const ordinalsAddress = addresses.find(
+      (x: { type: string }) => x.type === "p2tr"
+    );
+    const paymentAddress = addresses.find(
+      (x: { type: string }) => x.type === "p2wpkh"
+    );
+
     console.log({ userAddresses });
     if (userAddresses.result.addresses.length) {
       const wd = {
         wallet: "Leather",
-        ordinal: userAddresses.result.addresses[1].address,
-        cardinal: userAddresses.result.addresses[0].address,
-        ordinalPubkey: userAddresses.result.addresses[1].publicKey,
-        cardinalPubkey: userAddresses.result.addresses[0].publicKey,
+        ordinal: ordinalsAddress.address,
+        cardinal: paymentAddress.address,
+        ordinalPubkey: ordinalsAddress.publicKey,
+        cardinalPubkey: paymentAddress.publicKey,
         connected: true,
       };
 

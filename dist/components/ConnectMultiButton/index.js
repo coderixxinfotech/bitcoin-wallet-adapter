@@ -48,12 +48,11 @@ const WalletModal_1 = __importDefault(require("./WalletModal"));
 const utils_1 = require("../../utils");
 const generalReducer_2 = require("../../stores/reducers/generalReducer");
 const purposes = ["ordinals", "payment"];
-function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, }) {
+function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, }) {
     //for notification
     const dispatch = (0, react_redux_1.useDispatch)();
     const walletDetails = (0, react_redux_1.useSelector)((state) => state.general.walletDetails);
     const lastWallet = (0, react_redux_1.useSelector)((state) => state.general.lastWallet);
-    const balance = (0, react_redux_1.useSelector)((state) => state.general.balance);
     const [wallets, setWallets] = (0, react_1.useState)([]);
     //redux wallet management
     const updateWalletDetails = (0, react_1.useCallback)((newWalletDetails) => {
@@ -78,12 +77,12 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-unisat-logo.png",
             });
         }
-        // if (typeof window.btc !== "undefined") {
-        //   checkWallets.push({
-        //     label: "Leather",
-        //     logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.png",
-        //   });
-        // }
+        if (typeof window.LeatherProvider !== "undefined") {
+            checkWallets.push({
+                label: "Leather",
+                logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.png",
+            });
+        }
         if ((_c = (_b = (_a = window === null || window === void 0 ? void 0 : window.BitcoinProvider) === null || _a === void 0 ? void 0 : _a.signTransaction) === null || _b === void 0 ? void 0 : _b.toString()) === null || _c === void 0 ? void 0 : _c.includes("Psbt")) {
             checkWallets.push({
                 label: "Xverse",
@@ -236,16 +235,22 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
         }
     });
     const getLeatherAddress = () => __awaiter(this, void 0, void 0, function* () {
-        var _a;
-        const userAddresses = yield ((_a = window.btc) === null || _a === void 0 ? void 0 : _a.request("getAddresses"));
+        // Directly using the btc object from the window, ensure it's correctly typed or casted.
+        const btc = window.LeatherProvider;
+        // Requesting addresses and awaiting the promise to resolve.
+        const response = yield btc.request("getAddresses");
+        const userAddresses = response;
+        const addresses = userAddresses.result.addresses;
+        const ordinalsAddress = addresses.find((x) => x.type === "p2tr");
+        const paymentAddress = addresses.find((x) => x.type === "p2wpkh");
         console.log({ userAddresses });
         if (userAddresses.result.addresses.length) {
             const wd = {
                 wallet: "Leather",
-                ordinal: userAddresses.result.addresses[1].address,
-                cardinal: userAddresses.result.addresses[0].address,
-                ordinalPubkey: userAddresses.result.addresses[1].publicKey,
-                cardinalPubkey: userAddresses.result.addresses[0].publicKey,
+                ordinal: ordinalsAddress.address,
+                cardinal: paymentAddress.address,
+                ordinalPubkey: ordinalsAddress.publicKey,
+                cardinalPubkey: paymentAddress.publicKey,
                 connected: true,
             };
             localStorage.setItem("wallet-detail", JSON.stringify(wd));
