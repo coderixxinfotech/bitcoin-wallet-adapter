@@ -8,14 +8,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <WalletProvider
-      // mempoolUrl="https://mempool.space/api"
-      customAuthOptions={{
-        appDetails: {
-          name: "Example",
-        },
-      }}
-    >
+    <WalletProvider>
       <html lang="en">
         <body>{children}</body>
       </html>

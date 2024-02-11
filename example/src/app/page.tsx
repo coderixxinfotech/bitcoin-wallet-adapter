@@ -151,9 +151,9 @@ const Face = ({ balance }: { balance: number }) => {
   }
 };
 
-const InnerMenu = ({ anchorEl, open, onClose }: any) => {
+const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
   const walletDetails = useWalletAddress();
-  // const dispatch= useDispatch();
+  const balance = 100000000;
   console.log({ walletDetails });
   if (walletDetails)
     return (
@@ -172,11 +172,13 @@ const InnerMenu = ({ anchorEl, open, onClose }: any) => {
       >
         <div className="p-6 bg-primary-dark min-w-[300px] max-w-[400px] relative">
           <div className="intro flex items-center pb-6">
-            <div className="mr-2 text-3xl">
-              <Face balance={walletDetails.balance} />
-            </div>
+            {balance && (
+              <div className="mr-2 text-3xl">
+                <Face balance={balance} />
+              </div>
+            )}
             <p className="uppercase font-bold text-sm">
-              {shortenString(walletDetails.cardinal_address, 5)}
+              {shortenString(walletDetails.cardinal_address, 4)}
             </p>
           </div>
           <div className="BTCWallet flex items-center pb-6 w-full">
@@ -198,11 +200,8 @@ const InnerMenu = ({ anchorEl, open, onClose }: any) => {
               </div>
               <div>
                 <p className="font-bold tracking-wider text-white">
-                  {(walletDetails.balance / 100_000_000).toFixed(3)} BTC
+                  {(balance / 100_000_000).toFixed(5)} BTC
                 </p>
-                {/* <p className="uppercase font-bold text-sm">
-                {shortenString(walletDetails.cardinal_address, 5)}
-              </p> */}
               </div>
             </div>
           </div>
@@ -235,7 +234,10 @@ const InnerMenu = ({ anchorEl, open, onClose }: any) => {
           </div>
           <div className="relative ">
             <div className="bg-primary rounded cursor-pointer styled-button-wrapper my-2">
-              <button className="accent_transition p-2 w-full">
+              <button
+                className="accent_transition p-2 w-full"
+                onClick={onClose}
+              >
                 Dashboard
               </button>
             </div>
@@ -244,9 +246,7 @@ const InnerMenu = ({ anchorEl, open, onClose }: any) => {
             <div className="bg-primary rounded cursor-pointer styled-button-wrapper my-2">
               <button
                 className="red_transition p-2 w-full"
-                // onClick={walletDetails.disconnect(dispatch)} DISPATCH is NEEDED
-
-                onClick={() => walletDetails.disconnect()}
+                onClick={() => disconnect()}
               >
                 Disconnect
               </button>
