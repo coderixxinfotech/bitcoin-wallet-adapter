@@ -5,6 +5,7 @@ interface CustomWindow extends Window {
   LeatherProvider?: any;
   unisat?: any;
   BitcoinProvider?: any;
+  btc?: any;
 }
 
 declare const window: CustomWindow;
@@ -65,6 +66,28 @@ export const useMessageSign = () => {
             // Assuming window.unisat.signMessage returns a promise
             const sign = await window.unisat.signMessage(options.message);
             setResult(sign); // Update the result with the signature
+          } catch (err) {
+            // Handle any errors that occur during the signing process
+            setError(
+              err instanceof Error
+                ? err
+                : new Error("An error occurred during message signing")
+            );
+          } finally {
+            setLoading(false); // End loading regardless of the outcome
+          }
+        } else if (
+          typeof window.btc !== "undefined" &&
+          walletDetails.wallet === "Leather"
+        ) {
+          setLoading(true); // Start loading
+          try {
+            // Assuming window.unisat.signMessage returns a promise
+            const sign = window.btc.request("signMessage", {
+              message: options.message,
+              paymentType: "p2tr", // or 'p2wphk' (default)
+            });
+            setResult(sign.result); // Update the result with the signature
           } catch (err) {
             // Handle any errors that occur during the signing process
             setError(
