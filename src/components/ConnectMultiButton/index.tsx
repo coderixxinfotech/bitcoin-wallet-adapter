@@ -205,12 +205,40 @@ function ConnectMultiWallet({
   //disconnect
   const disconnect = useCallback(() => {
     localStorage.removeItem("lastWallet");
-    localStorage.removeItem("walletBalance");
     localStorage.removeItem("wallet-detail");
     updateLastWallet("");
     updateWalletDetails(null);
     handleMenuClose();
+
+    // Iterate over all items in localStorage
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("walletBalance-")) {
+        // Remove items that start with 'walletBalance-'
+        localStorage.removeItem(key);
+      }
+    }
   }, [updateLastWallet, updateWalletDetails]);
+
+  useEffect(() => {
+    if (typeof window.unisat !== "undefined") {
+      let unisat = (window as any).unisat;
+      // Register the event listeners
+      unisat.on("accountsChanged", disconnect);
+      unisat.on("networkChanged", disconnect);
+    }
+
+    // Cleanup logic for the useEffect hook
+    return () => {
+      // Remove the event listeners when the component unmounts
+      if (typeof window.unisat !== "undefined") {
+        let unisat = (window as any).unisat;
+        // Register the event listeners
+        unisat.on("accountsChanged", disconnect);
+        unisat.on("networkChanged", disconnect);
+      }
+    };
+  }, []); // Empty array means this effect runs once on mount and cleanup on unmount
 
   //xVerse
 
