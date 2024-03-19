@@ -16,6 +16,7 @@ import {
   useUnisatSign,
   useLeatherSign,
   useSignTx,
+  useMessageSign,
 } from "./hooks";
 
 // Export Providers
@@ -31,4 +32,5 @@ export {
   useUnisatSign,
   useLeatherSign,
   useSignTx,
+  useMessageSign,
 };
