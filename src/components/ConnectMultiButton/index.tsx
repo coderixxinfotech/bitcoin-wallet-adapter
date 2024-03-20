@@ -197,6 +197,12 @@ function ConnectMultiWallet({
         updateWalletDetails(null);
         localStorage.removeItem("lastWallet");
         localStorage.removeItem("wallet-detail");
+        if (lastWallet === "MagicEden") {
+          const wallet = testWallets.filter(
+            (a: any) => a.name === "Magic Eden"
+          )[0];
+          setWallet(wallet);
+        }
       } else if (
         (lastWallet === "Xverse" || lastWallet === "MagicEden") &&
         walletDetail?.cardinal &&
@@ -205,6 +211,12 @@ function ConnectMultiWallet({
         // If the last wallet is xverse and user data is present, set the wallet details
         updateLastWallet(lastWallet);
         updateWalletDetails(walletDetail);
+        if (lastWallet === "MagicEden") {
+          const wallet = testWallets.filter(
+            (a: any) => a.name === "Magic Eden"
+          )[0];
+          setWallet(wallet);
+        }
       } else if (
         lastWallet === "Unisat" &&
         walletDetail?.cardinal &&

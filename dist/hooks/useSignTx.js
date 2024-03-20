@@ -14,6 +14,7 @@ const react_1 = require("react");
 const index_1 = require("./index");
 const index_2 = require("./index");
 const utils_1 = require("../utils");
+const useMESign_1 = require("./useMESign");
 const useSignTx = () => {
     const walletDetails = (0, index_2.useWalletAddress)();
     const [loading, setLoading] = (0, react_1.useState)(false);
@@ -21,6 +22,7 @@ const useSignTx = () => {
     const [error, setError] = (0, react_1.useState)(null);
     const { sign: leatherSign, result: leatherResult, error: leatherError, } = (0, index_1.useLeatherSign)();
     const { sign: xverseSign, result: xverseResult, error: xverseError, } = (0, index_1.useXverseSign)();
+    const { sign: meSign, result: meResult, error: meError } = (0, useMESign_1.useMESign)();
     const { sign: unisatSign, result: unisatResult, error: unisatError, } = (0, index_1.useUnisatSign)();
     const signTx = (0, react_1.useCallback)((props) => __awaiter(void 0, void 0, void 0, function* () {
         setLoading(true);
@@ -30,18 +32,23 @@ const useSignTx = () => {
             if (!walletDetails)
                 throw Error("Wallet Not Connected");
             const options = {
-                psbt: walletDetails.wallet === "Xverse"
+                psbt: walletDetails.wallet === "Xverse" ||
+                    walletDetails.wallet === "MagicEden"
                     ? props.psbt
                     : (0, utils_1.base64ToHex)(props.psbt),
                 network: props.network,
                 action: props.action,
                 inputs: props.inputs,
             };
+            console.log({ walletDetails }, "in useSignTx");
             if (walletDetails.wallet === "Leather") {
                 leatherSign(options);
             }
             else if (walletDetails.wallet === "Xverse") {
                 xverseSign(options);
+            }
+            else if (walletDetails.wallet === "MagicEden") {
+                meSign(options);
             }
             else if (walletDetails.wallet === "Unisat") {
                 unisatSign(options);
@@ -51,14 +58,14 @@ const useSignTx = () => {
             setError(err);
             setLoading(false);
         }
-    }), [walletDetails, leatherSign, xverseSign, unisatSign]);
+    }), [walletDetails, leatherSign, xverseSign, unisatSign, meSign]);
     (0, react_1.useEffect)(() => {
-        if (leatherResult || xverseResult || unisatResult) {
-            setResult(leatherResult || xverseResult || unisatResult);
+        if (leatherResult || xverseResult || unisatResult || meResult) {
+            setResult(leatherResult || xverseResult || unisatResult || meResult);
             setLoading(false);
         }
-        if (leatherError || xverseError || unisatError) {
-            setError(leatherError || xverseError || unisatError);
+        if (leatherError || xverseError || unisatError || meError) {
+            setError(leatherError || xverseError || unisatError || meError);
             setLoading(false);
         }
     }, [
@@ -68,6 +75,8 @@ const useSignTx = () => {
         xverseError,
         unisatResult,
         unisatError,
+        meResult,
+        meError,
     ]);
     return { signTx, loading, result, error };
 };
