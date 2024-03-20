@@ -47,6 +47,9 @@ const WalletButton_1 = __importDefault(require("./WalletButton"));
 const WalletModal_1 = __importDefault(require("./WalletModal"));
 const utils_1 = require("../../utils");
 const generalReducer_2 = require("../../stores/reducers/generalReducer");
+const react_2 = require("@wallet-standard/react");
+const ConnectionStatus_1 = require("../../common/ConnectionStatus");
+const SatsConnectNamespace = "sats-connect:";
 const purposes = ["ordinals", "payment"];
 function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, }) {
     //for notification
@@ -67,6 +70,12 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     const handleClose = () => {
         setOpen(false);
     };
+    const { wallets: testWallets } = (0, react_2.useWallets)();
+    const { setWallet, wallet } = (0, react_2.useWallet)();
+    const connectionStatus = (0, react_1.useContext)(ConnectionStatus_1.ConnectionStatusContext);
+    function isSatsConnectCompatibleWallet(wallet) {
+        return SatsConnectNamespace in wallet.features;
+    }
     // Function to check which wallets are installed
     function getInstalledWalletName() {
         var _a, _b, _c;
@@ -89,6 +98,10 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-xverse-logo.png",
             });
         }
+        checkWallets.push({
+            label: "Magic Eden",
+            logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-magiceden-logo.png",
+        });
         setWallets(checkWallets);
     }
     const getBTCPrice = (0, react_1.useCallback)(() => __awaiter(this, void 0, void 0, function* () {
@@ -285,6 +298,34 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
             handleClose();
         }
     });
+    function connectOrDeselect() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield (0, sats_connect_1.getAddress)({
+                    getProvider: () => __awaiter(this, void 0, void 0, function* () {
+                        var _a;
+                        return (_a = wallet.features[SatsConnectNamespace]) === null || _a === void 0 ? void 0 : _a.provider;
+                    }),
+                    payload: {
+                        purposes: [sats_connect_1.AddressPurpose.Ordinals, sats_connect_1.AddressPurpose.Payment],
+                        message: "Address for receiving Ordinals and payments",
+                        network: {
+                            type: sats_connect_1.BitcoinNetworkType.Mainnet,
+                        },
+                    },
+                    onFinish: (response) => {
+                        connectionStatus === null || connectionStatus === void 0 ? void 0 : connectionStatus.setAccounts(response.addresses);
+                    },
+                    onCancel: () => {
+                        alert("Request canceled");
+                    },
+                });
+            }
+            catch (err) {
+                setWallet(null);
+            }
+        });
+    }
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement("div", null,
             react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, InnerMenu: InnerMenu, balance: balance }),

@@ -1,6 +1,9 @@
 "use client";
 import React, { ReactNode } from "react";
 
+import { WalletStandardProvider } from "@wallet-standard/react";
+import { ConnectionStatusProvider } from "./ConnectionStatus";
+
 //mui
 import ThemeWrapper from "./mui/ThemeProvider";
 
@@ -24,11 +27,17 @@ function WalletProvider({ children, customAuthOptions }: WalletProviderProps) {
   const { authOptions, state } = useAuth(customAuthOptions);
   return (
     <ThemeWrapper>
-      <Provider store={store}>
-        <Connect authOptions={authOptions}>
-          <AppContext.Provider value={state}>{children}</AppContext.Provider>
-        </Connect>
-      </Provider>
+      <WalletStandardProvider>
+        <ConnectionStatusProvider>
+          <Provider store={store}>
+            <Connect authOptions={authOptions}>
+              <AppContext.Provider value={state}>
+                {children}
+              </AppContext.Provider>
+            </Connect>
+          </Provider>
+        </ConnectionStatusProvider>
+      </WalletStandardProvider>
     </ThemeWrapper>
   );
 }

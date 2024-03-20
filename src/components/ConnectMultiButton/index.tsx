@@ -1,7 +1,13 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+
+import React, { useState, useEffect, useCallback, useContext } from "react";
 //xverse
-import { AddressPurpose, BitcoinNetwork, getAddress } from "sats-connect";
+import {
+  AddressPurpose,
+  BitcoinNetwork,
+  BitcoinNetworkType,
+  getAddress,
+} from "sats-connect";
 
 //reducer
 import { useDispatch, useSelector } from "react-redux";
@@ -11,12 +17,19 @@ import {
   setLastWallet,
   setWalletDetails,
 } from "../../stores/reducers/generalReducer";
-import { WalletDetails } from "../../types";
+import { Account, WalletDetails } from "../../types";
 import WalletButton from "./WalletButton";
 import WalletModal from "./WalletModal";
 import { getBTCPriceInDollars } from "../../utils";
 import { setBTCPrice } from "../../stores/reducers/generalReducer";
 import { IInstalledWallets } from "../../types";
+
+// ME Wallet
+
+import type { Wallet, WalletWithFeatures } from "@wallet-standard/base";
+import { useWallet, useWallets } from "@wallet-standard/react";
+import { ConnectionStatusContext } from "../../common/ConnectionStatus";
+const SatsConnectNamespace = "sats-connect:";
 
 interface CustomWindow extends Window {
   LeatherProvider?: any;
@@ -98,6 +111,14 @@ function ConnectMultiWallet({
     setOpen(false);
   };
 
+  const { wallets: testWallets } = useWallets();
+  const { setWallet, wallet } = useWallet();
+  const connectionStatus = useContext(ConnectionStatusContext);
+
+  function isSatsConnectCompatibleWallet(wallet: Wallet) {
+    return SatsConnectNamespace in wallet.features;
+  }
+
   // Function to check which wallets are installed
   function getInstalledWalletName() {
     const checkWallets = [];
@@ -123,6 +144,11 @@ function ConnectMultiWallet({
         logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-xverse-logo.png",
       });
     }
+
+    checkWallets.push({
+      label: "Magic Eden",
+      logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-magiceden-logo.png",
+    });
 
     setWallets(checkWallets);
   }
@@ -361,6 +387,34 @@ function ConnectMultiWallet({
       handleClose();
     }
   };
+
+  async function connectOrDeselect() {
+    try {
+      await getAddress({
+        getProvider: async () =>
+          (wallet as unknown as WalletWithFeatures<any>).features[
+            SatsConnectNamespace
+          ]?.provider,
+        payload: {
+          purposes: [AddressPurpose.Ordinals, AddressPurpose.Payment],
+          message: "Address for receiving Ordinals and payments",
+          network: {
+            type: BitcoinNetworkType.Mainnet,
+          },
+        },
+        onFinish: (response) => {
+          connectionStatus?.setAccounts(
+            response.addresses as unknown as Account[]
+          );
+        },
+        onCancel: () => {
+          alert("Request canceled");
+        },
+      });
+    } catch (err) {
+      setWallet(null);
+    }
+  }
 
   return (
     <>

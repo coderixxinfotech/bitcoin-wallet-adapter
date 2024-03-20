@@ -7,7 +7,13 @@ export interface WalletDetails {
   wallet: string;
   derivationPath?: string;
 }
+export type Purpose = "payment" | "ordinals";
 
+export type Account = {
+  address: string;
+  publicKey: string;
+  purpose: Purpose;
+};
 export interface UTXO {
   status: {
     block_hash: string;

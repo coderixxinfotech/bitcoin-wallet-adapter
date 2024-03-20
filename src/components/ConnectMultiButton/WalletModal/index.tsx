@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Modal } from "@mui/material";
 import { RxCross1 } from "react-icons/rx";
 import { IInstalledWallets } from "../../../types";
@@ -100,6 +100,28 @@ const WalletModal: React.FC<WalletModalProps> = ({
                     </div>
                   </div>
                 ))}
+                {/* {testWallets
+                  .filter(isSatsConnectCompatibleWallet)
+                  .map((item, index) => (
+                    <div
+                      onClick={() => setWallet(wallet)}
+                      key={item.name}
+                      className={walletItemClass}
+                    >
+                      <div className="bwa-flex bwa-justify-between bwa-items-center bwa-p-3">
+                        <h5 className={walletLabelClass}>
+                          {item.name + " wallet"}
+                        </h5>
+                        <div className="bwa_center">
+                          <img
+                            className={walletImageClass}
+                            src={item.logo}
+                            alt={`${item.label} logo`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))} */}
               </div>
             ) : (
               <p>

@@ -1267,6 +1267,49 @@
   dependencies:
     "@types/yargs-parser" "*"
 
+"@wallet-standard/app@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@wallet-standard/app/-/app-1.0.1.tgz#f83c3ae887f7fb52497a7b259bba734ae10a2994"
+  integrity sha512-LnLYq2Vy2guTZ8GQKKSXQK3+FRGPil75XEdkZqE6fiLixJhZJoJa5hT7lXxwe0ykVTt9LEThdTbOpT7KadS26Q==
+  dependencies:
+    "@wallet-standard/base" "^1.0.1"
+
+"@wallet-standard/base@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@wallet-standard/base/-/base-1.0.1.tgz#860dd94d47c9e3c5c43b79d91c6afdbd7a36264e"
+  integrity sha512-1To3ekMfzhYxe0Yhkpri+Fedq0SYcfrOfJi3vbLjMwF2qiKPjTGLwZkf2C9ftdQmxES+hmxhBzTwF4KgcOwf8w==
+
+"@wallet-standard/experimental-features@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@wallet-standard/experimental-features/-/experimental-features-0.1.1.tgz#b7a8523482e0953646af488ba8027f9cd337a8cf"
+  integrity sha512-WKtnET1okeDACTbxmePGOGaIUrGvlu/DestLZvZ/ddFpUKw7nokkbinX/gHzsuAC9WGtLyhqLSppAHzN+vAAaQ==
+  dependencies:
+    "@wallet-standard/base" "^1.0.1"
+
+"@wallet-standard/features@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@wallet-standard/features/-/features-1.0.3.tgz#c992876c5e4f7a0672f8869c4146c87e0dfe48c8"
+  integrity sha512-m8475I6W5LTatTZuUz5JJNK42wFRgkJTB0I9tkruMwfqBF2UN2eomkYNVf9RbrsROelCRzSFmugqjKZBFaubsA==
+  dependencies:
+    "@wallet-standard/base" "^1.0.1"
+
+"@wallet-standard/react-core@^0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@wallet-standard/react-core/-/react-core-0.1.4.tgz#9829de4c13d535c2c57a5a249ab757d85914a2b4"
+  integrity sha512-RZNx0NDs/iTINAKZ9W1K0XY0UScH70QRxbkG6a4OZAN6Ry8R+ZzZUfNYau65Re1X3MRVL6Uy64EfQbUlZthTiA==
+  dependencies:
+    "@wallet-standard/app" "^1.0.1"
+    "@wallet-standard/base" "^1.0.1"
+    "@wallet-standard/experimental-features" "^0.1.1"
+    "@wallet-standard/features" "^1.0.3"
+
+"@wallet-standard/react@^0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@wallet-standard/react/-/react-0.1.4.tgz#6622a142abdff7b3eb37a53712e875195f839d23"
+  integrity sha512-LEI/qF6+P4YqyeGOyxzMhbFpIo7JcQ3tEZUOIKoBfvkZpDN2n/Ww60KjCGUMhXhnrEDLMpyfrKYJJ0qLacENQw==
+  dependencies:
+    "@wallet-standard/react-core" "^0.1.4"
+
 abab@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.6.tgz#41b80f2c871d19686216b82309231cfd3cb3d291"
