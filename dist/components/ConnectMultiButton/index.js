@@ -47,9 +47,10 @@ const WalletButton_1 = __importDefault(require("./WalletButton"));
 const WalletModal_1 = __importDefault(require("./WalletModal"));
 const utils_1 = require("../../utils");
 const generalReducer_2 = require("../../stores/reducers/generalReducer");
+// ME Wallet
+const SatsConnectNamespace = "sats-connect:";
 const react_2 = require("@wallet-standard/react");
 const ConnectionStatus_1 = require("../../common/ConnectionStatus");
-const SatsConnectNamespace = "sats-connect:";
 const purposes = ["ordinals", "payment"];
 function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, }) {
     //for notification
@@ -73,9 +74,10 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     const { wallets: testWallets } = (0, react_2.useWallets)();
     const { setWallet, wallet } = (0, react_2.useWallet)();
     const connectionStatus = (0, react_1.useContext)(ConnectionStatus_1.ConnectionStatusContext);
-    function isSatsConnectCompatibleWallet(wallet) {
-        return SatsConnectNamespace in wallet.features;
-    }
+    // ME
+    (0, react_1.useEffect)(() => {
+        connectOrDeselect();
+    }, [wallet]);
     // Function to check which wallets are installed
     function getInstalledWalletName() {
         var _a, _b, _c;
@@ -98,10 +100,11 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-xverse-logo.png",
             });
         }
-        checkWallets.push({
-            label: "Magic Eden",
-            logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-magiceden-logo.png",
-        });
+        if (typeof window.magicEden !== "undefined")
+            checkWallets.push({
+                label: "MagicEden",
+                logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-magiceden-logo.png",
+            });
         setWallets(checkWallets);
     }
     const getBTCPrice = (0, react_1.useCallback)(() => __awaiter(this, void 0, void 0, function* () {
@@ -131,7 +134,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 updateLastWallet(lastWallet);
                 updateWalletDetails(walletDetail);
             }
-            else if (lastWallet === "Xverse" &&
+            else if ((lastWallet === "Xverse" || lastWallet === "MagicEden") &&
                 walletDetail &&
                 (!(walletDetail === null || walletDetail === void 0 ? void 0 : walletDetail.cardinal) || !(walletDetail === null || walletDetail === void 0 ? void 0 : walletDetail.ordinal))) {
                 // If the last wallet is xverse and wallet detail is missing, set the wallet details to empty
@@ -140,7 +143,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 localStorage.removeItem("lastWallet");
                 localStorage.removeItem("wallet-detail");
             }
-            else if (lastWallet === "Xverse" &&
+            else if ((lastWallet === "Xverse" || lastWallet === "MagicEden") &&
                 (walletDetail === null || walletDetail === void 0 ? void 0 : walletDetail.cardinal) &&
                 (walletDetail === null || walletDetail === void 0 ? void 0 : walletDetail.ordinal)) {
                 // If the last wallet is xverse and user data is present, set the wallet details
@@ -315,6 +318,29 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                     },
                     onFinish: (response) => {
                         connectionStatus === null || connectionStatus === void 0 ? void 0 : connectionStatus.setAccounts(response.addresses);
+                        const cardinal = response.addresses.filter((a) => a.purpose === "payment")[0].address;
+                        const cardinalPubkey = response.addresses.filter((a) => a.purpose === "payment")[0].publicKey;
+                        const ordinal = response.addresses.filter((a) => a.purpose === "ordinals")[0].address;
+                        const ordinalPubkey = response.addresses.filter((a) => a.purpose === "ordinals")[0].publicKey;
+                        localStorage.setItem("wallet-detail", JSON.stringify({
+                            cardinal,
+                            cardinalPubkey,
+                            ordinal,
+                            ordinalPubkey,
+                            connected: true,
+                            wallet: "MagicEden",
+                        }));
+                        updateWalletDetails({
+                            wallet: "MagicEden",
+                            cardinal,
+                            cardinalPubkey,
+                            ordinal,
+                            ordinalPubkey,
+                            connected: true,
+                        });
+                        updateLastWallet("MagicEden");
+                        localStorage.setItem("lastWallet", "MagicEden");
+                        handleClose();
                     },
                     onCancel: () => {
                         alert("Request canceled");
@@ -322,6 +348,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 });
             }
             catch (err) {
+                console.log({ err }, "MEWALLETERROR");
                 setWallet(null);
             }
         });
@@ -329,6 +356,6 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement("div", null,
             react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, InnerMenu: InnerMenu, balance: balance }),
-            react_1.default.createElement(WalletModal_1.default, { open: open, handleClose: handleClose, wallets: wallets, getLeatherAddress: getLeatherAddress, getAddress: sats_connect_1.getAddress, getAddressOptions: getAddressOptions, getUnisatAddress: getUnisatAddress, modalContainerClass: modalContainerClass, modalContentClass: modalContentClass, closeButtonClass: closeButtonClass, headingClass: headingClass, walletItemClass: walletItemClass, walletImageClass: walletImageClass, walletLabelClass: walletLabelClass, icon: icon, iconClass: iconClass }))));
+            react_1.default.createElement(WalletModal_1.default, { open: open, handleClose: handleClose, wallets: wallets, getLeatherAddress: getLeatherAddress, getAddress: sats_connect_1.getAddress, getAddressOptions: getAddressOptions, getUnisatAddress: getUnisatAddress, modalContainerClass: modalContainerClass, modalContentClass: modalContentClass, closeButtonClass: closeButtonClass, headingClass: headingClass, walletItemClass: walletItemClass, walletImageClass: walletImageClass, walletLabelClass: walletLabelClass, icon: icon, iconClass: iconClass, meWallets: testWallets, setWallet: setWallet }))));
 }
 exports.default = ConnectMultiWallet;

@@ -15,6 +15,8 @@ interface WalletModalProps {
     walletItemClass?: string;
     walletImageClass?: string;
     walletLabelClass?: string;
+    meWallets: any;
+    setWallet: any;
     icon?: string;
     iconClass?: string;
     iconContainerClass?: string;

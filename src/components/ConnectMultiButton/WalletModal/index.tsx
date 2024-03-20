@@ -1,8 +1,7 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Modal } from "@mui/material";
 import { RxCross1 } from "react-icons/rx";
 import { IInstalledWallets } from "../../../types";
-
 interface WalletModalProps {
   open: boolean;
   handleClose: () => void;
@@ -20,6 +19,9 @@ interface WalletModalProps {
   walletImageClass?: string;
   walletLabelClass?: string;
 
+  meWallets: any;
+  setWallet: any;
+
   icon?: string;
   iconClass?: string;
   iconContainerClass?: string;
@@ -33,7 +35,8 @@ const WalletModal: React.FC<WalletModalProps> = ({
   getAddress,
   getAddressOptions,
   getUnisatAddress,
-
+  setWallet,
+  meWallets,
   modalContainerClass = "bwa-bg-black bwa-bg-opacity-75 bwa-h-screen bwa-w-full bwa_center",
   modalContentClass = "bwa-bg-bwa_secondary bwa-p-6 bwa-min-w-[50%] bwa-relative bwa-shadow-xl bwa-rounded-xl",
   closeButtonClass = "bwa-rounded bwa_font-bold bwa-bg-gray-700 hover:bwa-bg-red-500 bwa-bg-opacity-50 bwa-text-gray-300 bwa-p-2 bwa-cursor-pointer",
@@ -81,6 +84,11 @@ const WalletModal: React.FC<WalletModalProps> = ({
                         await getAddress(getAddressOptions);
                       } else if (selectedItem === "Unisat") {
                         await getUnisatAddress();
+                      } else if (selectedItem === "MagicEden") {
+                        const wallet = meWallets.filter(
+                          (a: any) => a.name === "Magic Eden"
+                        )[0];
+                        await setWallet(wallet);
                       }
                     }}
                     key={item.label + idx}
@@ -100,28 +108,6 @@ const WalletModal: React.FC<WalletModalProps> = ({
                     </div>
                   </div>
                 ))}
-                {/* {testWallets
-                  .filter(isSatsConnectCompatibleWallet)
-                  .map((item, index) => (
-                    <div
-                      onClick={() => setWallet(wallet)}
-                      key={item.name}
-                      className={walletItemClass}
-                    >
-                      <div className="bwa-flex bwa-justify-between bwa-items-center bwa-p-3">
-                        <h5 className={walletLabelClass}>
-                          {item.name + " wallet"}
-                        </h5>
-                        <div className="bwa_center">
-                          <img
-                            className={walletImageClass}
-                            src={item.logo}
-                            alt={`${item.label} logo`}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))} */}
               </div>
             ) : (
               <p>

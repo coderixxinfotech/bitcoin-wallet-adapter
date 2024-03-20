@@ -26,15 +26,17 @@ import { IInstalledWallets } from "../../types";
 
 // ME Wallet
 
-import type { Wallet, WalletWithFeatures } from "@wallet-standard/base";
+const SatsConnectNamespace = "sats-connect:";
+
+import type { WalletWithFeatures } from "@wallet-standard/base";
 import { useWallet, useWallets } from "@wallet-standard/react";
 import { ConnectionStatusContext } from "../../common/ConnectionStatus";
-const SatsConnectNamespace = "sats-connect:";
 
 interface CustomWindow extends Window {
   LeatherProvider?: any;
   unisat?: any;
   BitcoinProvider?: any;
+  magicEden?: any;
 }
 
 declare const window: CustomWindow;
@@ -115,9 +117,10 @@ function ConnectMultiWallet({
   const { setWallet, wallet } = useWallet();
   const connectionStatus = useContext(ConnectionStatusContext);
 
-  function isSatsConnectCompatibleWallet(wallet: Wallet) {
-    return SatsConnectNamespace in wallet.features;
-  }
+  // ME
+  useEffect(() => {
+    connectOrDeselect();
+  }, [wallet]);
 
   // Function to check which wallets are installed
   function getInstalledWalletName() {
@@ -145,10 +148,11 @@ function ConnectMultiWallet({
       });
     }
 
-    checkWallets.push({
-      label: "Magic Eden",
-      logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-magiceden-logo.png",
-    });
+    if (typeof window.magicEden !== "undefined")
+      checkWallets.push({
+        label: "MagicEden",
+        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-magiceden-logo.png",
+      });
 
     setWallets(checkWallets);
   }
@@ -184,7 +188,7 @@ function ConnectMultiWallet({
         updateLastWallet(lastWallet);
         updateWalletDetails(walletDetail);
       } else if (
-        lastWallet === "Xverse" &&
+        (lastWallet === "Xverse" || lastWallet === "MagicEden") &&
         walletDetail &&
         (!walletDetail?.cardinal || !walletDetail?.ordinal)
       ) {
@@ -194,7 +198,7 @@ function ConnectMultiWallet({
         localStorage.removeItem("lastWallet");
         localStorage.removeItem("wallet-detail");
       } else if (
-        lastWallet === "Xverse" &&
+        (lastWallet === "Xverse" || lastWallet === "MagicEden") &&
         walletDetail?.cardinal &&
         walletDetail?.ordinal
       ) {
@@ -406,12 +410,48 @@ function ConnectMultiWallet({
           connectionStatus?.setAccounts(
             response.addresses as unknown as Account[]
           );
+
+          const cardinal = response.addresses.filter(
+            (a: any) => a.purpose === "payment"
+          )[0].address;
+          const cardinalPubkey = response.addresses.filter(
+            (a: any) => a.purpose === "payment"
+          )[0].publicKey;
+          const ordinal = response.addresses.filter(
+            (a: any) => a.purpose === "ordinals"
+          )[0].address;
+          const ordinalPubkey = response.addresses.filter(
+            (a: any) => a.purpose === "ordinals"
+          )[0].publicKey;
+          localStorage.setItem(
+            "wallet-detail",
+            JSON.stringify({
+              cardinal,
+              cardinalPubkey,
+              ordinal,
+              ordinalPubkey,
+              connected: true,
+              wallet: "MagicEden",
+            })
+          );
+          updateWalletDetails({
+            wallet: "MagicEden",
+            cardinal,
+            cardinalPubkey,
+            ordinal,
+            ordinalPubkey,
+            connected: true,
+          });
+          updateLastWallet("MagicEden");
+          localStorage.setItem("lastWallet", "MagicEden");
+          handleClose();
         },
         onCancel: () => {
           alert("Request canceled");
         },
       });
     } catch (err) {
+      console.log({ err }, "MEWALLETERROR");
       setWallet(null);
     }
   }
@@ -452,6 +492,8 @@ function ConnectMultiWallet({
           walletLabelClass={walletLabelClass}
           icon={icon}
           iconClass={iconClass}
+          meWallets={testWallets}
+          setWallet={setWallet}
         />
       </div>
     </>
