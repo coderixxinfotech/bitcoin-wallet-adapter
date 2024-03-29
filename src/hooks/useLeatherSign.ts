@@ -38,25 +38,19 @@ export const useLeatherSign = (
           ...defaultOptions,
           hex: psbt,
           signAtIndex,
-          publicKey: inputs[0].publickey,
-          network:
-            network === "Mainnet" ? stacksMainnetNetwork : stacksTestnetNetwork,
+          // publicKey: inputs[0].publickey,
+          // network:
+          //   network === "Mainnet" ? stacksMainnetNetwork : stacksTestnetNetwork,
           allowedSighash: [0x00, 0x01, 0x02, 0x03, 0x80, 0x81, 0x82, 0x83],
         };
 
-        const hex = await new Promise<string>((resolve, reject) => {
-          signPsbt({
-            ...mergedOptions,
-            onFinish: (data: PsbtData) => {
-              resolve(data.hex);
-            },
-            onCancel: () => {
-              reject(new Error("Signing cancelled by user"));
-            },
-          });
-        });
+        // @ts-ignore
+        const { result } = await window.LeatherProvider.request(
+          "signPsbt",
+          mergedOptions
+        );
 
-        const base64Result = hexToBase64(hex);
+        const base64Result = hexToBase64(result.hex);
         setResult(base64Result);
       } catch (e: any) {
         setError(e);

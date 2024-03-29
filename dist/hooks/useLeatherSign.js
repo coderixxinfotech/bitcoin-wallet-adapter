@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.useLeatherSign = void 0;
 const react_1 = require("react");
 const connect_react_1 = require("@stacks/connect-react");
-const stacks_utils_1 = require("../common/stacks/stacks-utils");
 const utils_1 = require("../utils");
 const useLeatherSign = (defaultOptions = {}) => {
     const { signPsbt } = (0, connect_react_1.useConnect)();
@@ -29,15 +28,14 @@ const useLeatherSign = (defaultOptions = {}) => {
         }
         try {
             const signAtIndex = inputs.map((input) => input.index).flat();
-            const mergedOptions = Object.assign(Object.assign({}, defaultOptions), { hex: psbt, signAtIndex, publicKey: inputs[0].publickey, network: network === "Mainnet" ? stacks_utils_1.stacksMainnetNetwork : stacks_utils_1.stacksTestnetNetwork, allowedSighash: [0x00, 0x01, 0x02, 0x03, 0x80, 0x81, 0x82, 0x83] });
-            const hex = yield new Promise((resolve, reject) => {
-                signPsbt(Object.assign(Object.assign({}, mergedOptions), { onFinish: (data) => {
-                        resolve(data.hex);
-                    }, onCancel: () => {
-                        reject(new Error("Signing cancelled by user"));
-                    } }));
-            });
-            const base64Result = (0, utils_1.hexToBase64)(hex);
+            const mergedOptions = Object.assign(Object.assign({}, defaultOptions), { hex: psbt, signAtIndex, 
+                // publicKey: inputs[0].publickey,
+                // network:
+                //   network === "Mainnet" ? stacksMainnetNetwork : stacksTestnetNetwork,
+                allowedSighash: [0x00, 0x01, 0x02, 0x03, 0x80, 0x81, 0x82, 0x83] });
+            // @ts-ignore
+            const { result } = yield window.LeatherProvider.request("signPsbt", mergedOptions);
+            const base64Result = (0, utils_1.hexToBase64)(result.hex);
             setResult(base64Result);
         }
         catch (e) {
