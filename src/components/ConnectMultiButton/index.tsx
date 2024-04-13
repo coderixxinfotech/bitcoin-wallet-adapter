@@ -85,6 +85,7 @@ function ConnectMultiWallet({
   const walletDetails = useSelector(
     (state: RootState) => state.general.walletDetails
   );
+  const network = useSelector((state: RootState) => state.general.network);
   const lastWallet = useSelector(
     (state: RootState) => state.general.lastWallet
   );
@@ -288,9 +289,14 @@ function ConnectMultiWallet({
     payload: {
       purposes: purposes.map((p) => p as AddressPurpose),
       message: "Address for receiving Ordinals and payments",
-      network: {
-        type: "Mainnet",
-      } as BitcoinNetwork,
+      network:
+        network === "testnet"
+          ? ({
+              type: "Testnet",
+            } as BitcoinNetwork)
+          : ({
+              type: "Mainnet",
+            } as BitcoinNetwork),
     },
     onFinish: (response: any) => {
       // console.log(response, 'xverse wallet connect')
@@ -415,7 +421,10 @@ function ConnectMultiWallet({
           purposes: [AddressPurpose.Ordinals, AddressPurpose.Payment],
           message: "Address for receiving Ordinals and payments",
           network: {
-            type: BitcoinNetworkType.Mainnet,
+            type:
+              network === "testnet"
+                ? BitcoinNetworkType.Testnet
+                : BitcoinNetworkType.Mainnet,
           },
         },
         onFinish: (response) => {

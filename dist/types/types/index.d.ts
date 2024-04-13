@@ -39,6 +39,7 @@ export interface AddressTxsUtxo {
 export interface AuthOptionsArgs {
     manifestPath?: string;
     redirectTo?: string;
+    network?: "mainnet" | "testnet";
     appDetails?: {
         name?: string;
         icon?: string;

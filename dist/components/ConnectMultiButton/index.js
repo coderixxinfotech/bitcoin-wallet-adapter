@@ -56,6 +56,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     //for notification
     const dispatch = (0, react_redux_1.useDispatch)();
     const walletDetails = (0, react_redux_1.useSelector)((state) => state.general.walletDetails);
+    const network = (0, react_redux_1.useSelector)((state) => state.general.network);
     const lastWallet = (0, react_redux_1.useSelector)((state) => state.general.lastWallet);
     const [wallets, setWallets] = (0, react_1.useState)([]);
     //redux wallet management
@@ -220,9 +221,13 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
         payload: {
             purposes: purposes.map((p) => p),
             message: "Address for receiving Ordinals and payments",
-            network: {
-                type: "Mainnet",
-            },
+            network: network === "testnet"
+                ? {
+                    type: "Testnet",
+                }
+                : {
+                    type: "Mainnet",
+                },
         },
         onFinish: (response) => {
             // console.log(response, 'xverse wallet connect')
@@ -321,7 +326,9 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                         purposes: [sats_connect_1.AddressPurpose.Ordinals, sats_connect_1.AddressPurpose.Payment],
                         message: "Address for receiving Ordinals and payments",
                         network: {
-                            type: sats_connect_1.BitcoinNetworkType.Mainnet,
+                            type: network === "testnet"
+                                ? sats_connect_1.BitcoinNetworkType.Testnet
+                                : sats_connect_1.BitcoinNetworkType.Mainnet,
                         },
                     },
                     onFinish: (response) => {

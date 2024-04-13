@@ -80,6 +80,7 @@ export function useAuth(customAuthOptions?: AuthOptionsArgs) {
         "https://ordinalnovus.com/logo_default.png",
     },
   };
+
   return {
     authOptions,
     state,

@@ -1,5 +1,5 @@
 "use client";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 
 import { WalletStandardProvider } from "@wallet-standard/react";
 import { ConnectionStatusProvider } from "./ConnectionStatus";
@@ -13,10 +13,11 @@ import { useAuth } from "../common/stacks/use-auth";
 import { AppContext } from "../common/stacks/context";
 
 // Redux
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import { store } from "../stores";
 
 import { AuthOptionsArgs } from "../types";
+import { setNetwork } from "../stores/reducers/generalReducer";
 
 interface WalletProviderProps {
   children: ReactNode;
@@ -25,6 +26,8 @@ interface WalletProviderProps {
 
 function WalletProvider({ children, customAuthOptions }: WalletProviderProps) {
   const { authOptions, state } = useAuth(customAuthOptions);
+  console.log({ customAuthOptions });
+
   return (
     <ThemeWrapper>
       <WalletStandardProvider>
@@ -32,6 +35,7 @@ function WalletProvider({ children, customAuthOptions }: WalletProviderProps) {
           <Provider store={store}>
             <Connect authOptions={authOptions}>
               <AppContext.Provider value={state}>
+                <SetNetwork customAuthOptions={customAuthOptions} />
                 {children}
               </AppContext.Provider>
             </Connect>
@@ -41,5 +45,15 @@ function WalletProvider({ children, customAuthOptions }: WalletProviderProps) {
     </ThemeWrapper>
   );
 }
+
+const SetNetwork = ({ customAuthOptions }: any) => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (customAuthOptions?.network)
+      dispatch(setNetwork(customAuthOptions?.network));
+    return () => {};
+  }, [customAuthOptions?.network]);
+  return <></>;
+};
 
 export default WalletProvider;
