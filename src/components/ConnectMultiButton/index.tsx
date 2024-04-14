@@ -66,6 +66,7 @@ function ConnectMultiWallet({
   icon,
   iconClass,
   balance,
+  network,
 }: {
   buttonClassname?: string;
   modalContainerClass?: string;
@@ -79,13 +80,14 @@ function ConnectMultiWallet({
   icon?: string;
   iconClass?: string;
   balance?: number;
+  network?: "mainnet" | "testnet";
 }) {
   //for notification
   const dispatch = useDispatch();
   const walletDetails = useSelector(
     (state: RootState) => state.general.walletDetails
   );
-  const network = useSelector((state: RootState) => state.general.network);
+
   const lastWallet = useSelector(
     (state: RootState) => state.general.lastWallet
   );
