@@ -3,6 +3,7 @@ export declare const useMessageSign: () => {
         network: string;
         address: string;
         message: string;
+        wallet: string;
     }) => Promise<void>;
     loading: boolean;
     result: any;

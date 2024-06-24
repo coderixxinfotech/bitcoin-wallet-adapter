@@ -51,18 +51,34 @@ const generalReducer_2 = require("../../stores/reducers/generalReducer");
 const SatsConnectNamespace = "sats-connect:";
 const react_2 = require("@wallet-standard/react");
 const ConnectionStatus_1 = require("../../common/ConnectionStatus");
+const hooks_1 = require("../../hooks");
 const purposes = ["ordinals", "payment"];
-function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, }) {
+function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, }) {
+    const { loading, result, error, signMessage } = (0, hooks_1.useMessageSign)();
     //for notification
     const dispatch = (0, react_redux_1.useDispatch)();
     const walletDetails = (0, react_redux_1.useSelector)((state) => state.general.walletDetails);
-    const network = (0, react_redux_1.useSelector)((state) => state.general.network);
     const lastWallet = (0, react_redux_1.useSelector)((state) => state.general.lastWallet);
     const [wallets, setWallets] = (0, react_1.useState)([]);
+    const [tempWD, setTempWD] = (0, react_1.useState)(null); //hold wallet details till user signs the message
+    const getMessage = (address) => {
+        const issuedAt = new Date().toISOString(); // Get the current date and time in ISO format
+        return `Ordinalnovus wants you to sign in with your Bitcoin account:
+
+${address}
+
+Welcome to Ordinalnovus. \n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Ordinalnovus permission to perform any transactions with your wallet.\n
+
+\nURI: https://ordinalnovus.com\n\n
+
+Version: 1\n\n
+
+Issued At: ${issuedAt}`;
+    };
     //redux wallet management
-    const updateWalletDetails = (0, react_1.useCallback)((newWalletDetails) => {
+    const updateWalletDetails = (0, react_1.useCallback)((newWalletDetails) => __awaiter(this, void 0, void 0, function* () {
         dispatch((0, generalReducer_1.setWalletDetails)(newWalletDetails));
-    }, [dispatch]);
+    }), [dispatch]);
     const updateLastWallet = (0, react_1.useCallback)((newLastWallet) => {
         dispatch((0, generalReducer_1.setLastWallet)(newLastWallet));
     }, [dispatch]);
@@ -229,33 +245,44 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                     type: "Mainnet",
                 },
         },
-        onFinish: (response) => {
+        onFinish: (response) => __awaiter(this, void 0, void 0, function* () {
             // console.log(response, 'xverse wallet connect')
             // If the last wallet is Leather and user data is present, set the wallet details
             const cardinal = response.addresses.filter((a) => a.purpose === "payment")[0].address;
             const cardinalPubkey = response.addresses.filter((a) => a.purpose === "payment")[0].publicKey;
             const ordinal = response.addresses.filter((a) => a.purpose === "ordinals")[0].address;
             const ordinalPubkey = response.addresses.filter((a) => a.purpose === "ordinals")[0].publicKey;
-            localStorage.setItem("wallet-detail", JSON.stringify({
+            const wd = {
                 cardinal,
                 cardinalPubkey,
                 ordinal,
                 ordinalPubkey,
                 connected: true,
                 wallet: "Xverse",
-            }));
-            updateWalletDetails({
+            };
+            setTempWD(wd);
+            // localStorage.setItem(
+            //   "wallet-detail",
+            //   JSON.stringify()
+            // );
+            yield signMessage({
+                network: network || "mainnet",
+                address: ordinal,
+                message: getMessage(ordinal),
                 wallet: "Xverse",
-                cardinal,
-                cardinalPubkey,
-                ordinal,
-                ordinalPubkey,
-                connected: true,
             });
-            updateLastWallet("Xverse");
-            localStorage.setItem("lastWallet", "Xverse");
-            handleClose();
-        },
+            // updateWalletDetails({
+            //   wallet: "Xverse",
+            //   cardinal,
+            //   cardinalPubkey,
+            //   ordinal,
+            //   ordinalPubkey,
+            //   connected: true,
+            // });
+            // updateLastWallet("Xverse");
+            // localStorage.setItem("lastWallet", "Xverse");
+            // handleClose();
+        }),
         onCancel: () => {
             updateLastWallet("");
             localStorage.removeItem("lastWallet");
@@ -281,11 +308,19 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 cardinalPubkey: publicKey,
                 connected: true,
             };
-            localStorage.setItem("wallet-detail", JSON.stringify(wd));
-            updateWalletDetails(wd);
-            updateLastWallet("Unisat");
-            localStorage.setItem("lastWallet", "Unisat");
-            handleClose();
+            // console.log("Sign MESSAGE");
+            yield signMessage({
+                network: network || "mainnet",
+                address: wd.ordinal,
+                message: getMessage(wd.ordinal),
+                wallet: "Unisat",
+            });
+            setTempWD(wd);
+            // localStorage.setItem("wallet-detail", JSON.stringify(wd));
+            // updateWalletDetails(wd);
+            // updateLastWallet("Unisat");
+            // localStorage.setItem("lastWallet", "Unisat");
+            // handleClose();
         }
     });
     const getLeatherAddress = () => __awaiter(this, void 0, void 0, function* () {
@@ -297,7 +332,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
         const addresses = userAddresses.result.addresses;
         const ordinalsAddress = addresses.find((x) => x.type === "p2tr");
         const paymentAddress = addresses.find((x) => x.type === "p2wpkh");
-        console.log({ userAddresses });
+        // console.log({ userAddresses });
         if (userAddresses.result.addresses.length) {
             const wd = {
                 wallet: "Leather",
@@ -307,11 +342,18 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                 cardinalPubkey: paymentAddress.publicKey,
                 connected: true,
             };
-            localStorage.setItem("wallet-detail", JSON.stringify(wd));
-            updateWalletDetails(wd);
-            updateLastWallet("Leather");
-            localStorage.setItem("lastWallet", "Leather");
-            handleClose();
+            yield signMessage({
+                network: network || "mainnet",
+                address: wd.ordinal,
+                message: getMessage(wd.ordinal),
+                wallet: "Leather",
+            });
+            setTempWD(wd);
+            // localStorage.setItem("wallet-detail", JSON.stringify(wd));
+            // updateWalletDetails(wd);
+            // updateLastWallet("Leather");
+            // localStorage.setItem("lastWallet", "Leather");
+            // handleClose();
         }
     });
     function connectOrDeselect() {
@@ -331,32 +373,39 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
                                 : sats_connect_1.BitcoinNetworkType.Mainnet,
                         },
                     },
-                    onFinish: (response) => {
+                    onFinish: (response) => __awaiter(this, void 0, void 0, function* () {
                         connectionStatus === null || connectionStatus === void 0 ? void 0 : connectionStatus.setAccounts(response.addresses);
                         const cardinal = response.addresses.filter((a) => a.purpose === "payment")[0].address;
                         const cardinalPubkey = response.addresses.filter((a) => a.purpose === "payment")[0].publicKey;
                         const ordinal = response.addresses.filter((a) => a.purpose === "ordinals")[0].address;
                         const ordinalPubkey = response.addresses.filter((a) => a.purpose === "ordinals")[0].publicKey;
-                        localStorage.setItem("wallet-detail", JSON.stringify({
+                        const wd = {
                             cardinal,
                             cardinalPubkey,
                             ordinal,
                             ordinalPubkey,
                             connected: true,
                             wallet: "MagicEden",
-                        }));
-                        updateWalletDetails({
+                        };
+                        yield signMessage({
+                            network: network || "mainnet",
+                            address: cardinal,
+                            message: getMessage(cardinal),
                             wallet: "MagicEden",
-                            cardinal,
-                            cardinalPubkey,
-                            ordinal,
-                            ordinalPubkey,
-                            connected: true,
                         });
-                        updateLastWallet("MagicEden");
-                        localStorage.setItem("lastWallet", "MagicEden");
-                        handleClose();
-                    },
+                        // localStorage.setItem("wallet-detail", JSON.stringify(wd));
+                        // updateWalletDetails({
+                        //   wallet: "MagicEden",
+                        //   cardinal,
+                        //   cardinalPubkey,
+                        //   ordinal,
+                        //   ordinalPubkey,
+                        //   connected: true,
+                        // });
+                        // updateLastWallet("MagicEden");
+                        // localStorage.setItem("lastWallet", "MagicEden");
+                        // handleClose();
+                    }),
                     onCancel: () => {
                         alert("Request canceled");
                     },
@@ -368,6 +417,15 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
             }
         });
     }
+    (0, react_1.useEffect)(() => {
+        if (tempWD && result) {
+            localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
+            updateWalletDetails(tempWD);
+            updateLastWallet(tempWD.wallet);
+            localStorage.setItem("lastWallet", tempWD.wallet);
+            handleClose();
+        }
+    }, [tempWD, result]);
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement("div", null,
             react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, InnerMenu: InnerMenu, balance: balance }),

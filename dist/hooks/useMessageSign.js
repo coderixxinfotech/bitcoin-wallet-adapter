@@ -11,10 +11,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useMessageSign = void 0;
 const react_1 = require("react");
-const index_1 = require("./index");
+const react_redux_1 = require("react-redux");
 const sats_connect_1 = require("sats-connect"); // Renamed to avoid naming conflict
+const generalReducer_1 = require("../stores/reducers/generalReducer");
+const react_2 = require("@wallet-standard/react");
+const SatsConnectNamespace = "sats-connect:";
 const useMessageSign = () => {
-    const walletDetails = (0, index_1.useWalletAddress)();
+    const dispatch = (0, react_redux_1.useDispatch)();
+    const { wallets: testWallets } = (0, react_2.useWallets)();
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [result, setResult] = (0, react_1.useState)(null);
     const [error, setError] = (0, react_1.useState)(null);
@@ -22,28 +26,28 @@ const useMessageSign = () => {
         setLoading(true);
         setResult(null);
         setError(null);
-        if (!walletDetails) {
+        if (!options.wallet) {
             setError(new Error("Wallet Not Connected"));
             setLoading(false);
             return;
         }
         try {
-            if (walletDetails.wallet === "Xverse") {
+            if (options.wallet === "Xverse") {
+                setLoading(true);
                 const signMessageOptions = {
                     payload: {
                         network: {
-                            type: options.network,
+                            type: options.network === "mainnet" ? "Mainnet" : "Testnet",
                         },
                         address: options.address,
                         message: options.message,
                     },
                     onFinish: (response) => {
-                        // Here you update the result with the response from the onFinish callback
-                        setResult(response); // Assume response contains the data you want as result
+                        dispatch((0, generalReducer_1.setSignature)(response));
+                        setResult(response);
                         setLoading(false);
                     },
                     onCancel: () => {
-                        // Update the error state if the user cancels the operation
                         setError(new Error("User canceled the operation"));
                         setLoading(false);
                     },
@@ -53,51 +57,81 @@ const useMessageSign = () => {
                 yield (0, sats_connect_1.signMessage)(signMessageOptions);
             }
             else if (typeof window.unisat !== "undefined" &&
-                walletDetails.wallet === "Unisat") {
-                setLoading(true); // Start loading
+                options.wallet === "Unisat") {
+                setLoading(true);
                 try {
-                    // Assuming window.unisat.signMessage returns a promise
                     const sign = yield window.unisat.signMessage(options.message);
-                    setResult(sign); // Update the result with the signature
+                    dispatch((0, generalReducer_1.setSignature)(sign));
+                    setResult(sign);
                 }
                 catch (err) {
-                    // Handle any errors that occur during the signing process
                     setError(err instanceof Error
                         ? err
                         : new Error("An error occurred during message signing"));
                 }
                 finally {
-                    setLoading(false); // End loading regardless of the outcome
+                    setLoading(false);
                 }
             }
             else if (typeof window.btc !== "undefined" &&
-                walletDetails.wallet === "Leather") {
-                setLoading(true); // Start loading
+                options.wallet === "Leather") {
+                setLoading(true);
                 try {
-                    // Assuming window.unisat.signMessage returns a promise
-                    const sign = window.btc.request("signMessage", {
+                    const sign = yield window.btc.request("signMessage", {
                         message: options.message,
-                        paymentType: "p2tr", // or 'p2wphk' (default)
+                        paymentType: "p2tr",
                     });
-                    setResult(sign.result); // Update the result with the signature
+                    dispatch((0, generalReducer_1.setSignature)(sign.result.signature));
+                    setResult(sign.result.signature);
                 }
                 catch (err) {
-                    // Handle any errors that occur during the signing process
                     setError(err instanceof Error
                         ? err
                         : new Error("An error occurred during message signing"));
                 }
                 finally {
-                    setLoading(false); // End loading regardless of the outcome
+                    setLoading(false);
                 }
             }
-            // Implement other wallet types...
+            else if (options.wallet === "MagicEden") {
+                setLoading(true);
+                const wallet = testWallets.filter((a) => a.name === "Magic Eden")[0];
+                const signMessageOptions = {
+                    getProvider: () => __awaiter(void 0, void 0, void 0, function* () {
+                        var _a;
+                        return (_a = wallet.features[SatsConnectNamespace]) === null || _a === void 0 ? void 0 : _a.provider;
+                    }),
+                    payload: {
+                        network: {
+                            type: options.network === "mainnet"
+                                ? sats_connect_1.BitcoinNetworkType.Mainnet
+                                : sats_connect_1.BitcoinNetworkType.Testnet,
+                        },
+                        address: options.address,
+                        message: options.message,
+                    },
+                    onFinish: (response) => {
+                        dispatch((0, generalReducer_1.setSignature)(response));
+                        setResult(response);
+                        setLoading(false);
+                    },
+                    onCancel: () => {
+                        setError(new Error("User canceled the operation"));
+                        setLoading(false);
+                    },
+                };
+                // Call the signMessageApi with the options
+                //@ts-ignore
+                yield (0, sats_connect_1.signMessage)(signMessageOptions);
+            }
         }
         catch (err) {
+            console.log({ err });
             setError(err instanceof Error ? err : new Error("An unknown error occurred"));
             setLoading(false);
+            throw new Error("Error signing message");
         }
-    }), [walletDetails]);
+    }), []);
     return { signMessage, loading, result, error };
 };
 exports.useMessageSign = useMessageSign;

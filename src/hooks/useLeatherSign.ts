@@ -1,15 +1,7 @@
 import { useCallback, useState } from "react";
-import {
-  PsbtData,
-  PsbtPayload,
-  PsbtRequestOptions,
-  useConnect,
-} from "@stacks/connect-react";
+import { PsbtRequestOptions, useConnect } from "@stacks/connect-react";
 import { CommonSignOptions, CommonSignResponse } from "../types"; // Import your CommonSignOptions
-import {
-  stacksMainnetNetwork,
-  stacksTestnetNetwork,
-} from "../common/stacks/stacks-utils";
+
 import { hexToBase64, isHex } from "../utils";
 
 export const useLeatherSign = (

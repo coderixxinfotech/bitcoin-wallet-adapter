@@ -31,6 +31,7 @@ const SatsConnectNamespace = "sats-connect:";
 import type { WalletWithFeatures } from "@wallet-standard/base";
 import { useWallet, useWallets } from "@wallet-standard/react";
 import { ConnectionStatusContext } from "../../common/ConnectionStatus";
+import { useMessageSign } from "../../hooks";
 
 interface CustomWindow extends Window {
   LeatherProvider?: any;
@@ -82,6 +83,7 @@ function ConnectMultiWallet({
   balance?: number;
   network?: "mainnet" | "testnet";
 }) {
+  const { loading, result, error, signMessage } = useMessageSign();
   //for notification
   const dispatch = useDispatch();
   const walletDetails = useSelector(
@@ -93,10 +95,26 @@ function ConnectMultiWallet({
   );
 
   const [wallets, setWallets] = useState<IInstalledWallets[]>([]);
+  const [tempWD, setTempWD] = useState<WalletDetails | null>(null); //hold wallet details till user signs the message
+
+  const getMessage = (address: string) => {
+    const issuedAt = new Date().toISOString(); // Get the current date and time in ISO format
+    return `Ordinalnovus wants you to sign in with your Bitcoin account:
+
+${address}
+
+Welcome to Ordinalnovus. \n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Ordinalnovus permission to perform any transactions with your wallet.\n
+
+\nURI: https://ordinalnovus.com\n\n
+
+Version: 1\n\n
+
+Issued At: ${issuedAt}`;
+  };
 
   //redux wallet management
   const updateWalletDetails = useCallback(
-    (newWalletDetails: WalletDetails | null) => {
+    async (newWalletDetails: WalletDetails | null) => {
       dispatch(setWalletDetails(newWalletDetails));
     },
     [dispatch]
@@ -300,7 +318,7 @@ function ConnectMultiWallet({
               type: "Mainnet",
             } as BitcoinNetwork),
     },
-    onFinish: (response: any) => {
+    onFinish: async (response: any) => {
       // console.log(response, 'xverse wallet connect')
       // If the last wallet is Leather and user data is present, set the wallet details
       const cardinal = response.addresses.filter(
@@ -315,28 +333,37 @@ function ConnectMultiWallet({
       const ordinalPubkey = response.addresses.filter(
         (a: any) => a.purpose === "ordinals"
       )[0].publicKey;
-      localStorage.setItem(
-        "wallet-detail",
-        JSON.stringify({
-          cardinal,
-          cardinalPubkey,
-          ordinal,
-          ordinalPubkey,
-          connected: true,
-          wallet: "Xverse",
-        })
-      );
-      updateWalletDetails({
-        wallet: "Xverse",
+
+      const wd = {
         cardinal,
         cardinalPubkey,
         ordinal,
         ordinalPubkey,
         connected: true,
+        wallet: "Xverse",
+      };
+      setTempWD(wd);
+      // localStorage.setItem(
+      //   "wallet-detail",
+      //   JSON.stringify()
+      // );
+      await signMessage({
+        network: network || "mainnet",
+        address: ordinal,
+        message: getMessage(ordinal),
+        wallet: "Xverse",
       });
-      updateLastWallet("Xverse");
-      localStorage.setItem("lastWallet", "Xverse");
-      handleClose();
+      // updateWalletDetails({
+      //   wallet: "Xverse",
+      //   cardinal,
+      //   cardinalPubkey,
+      //   ordinal,
+      //   ordinalPubkey,
+      //   connected: true,
+      // });
+      // updateLastWallet("Xverse");
+      // localStorage.setItem("lastWallet", "Xverse");
+      // handleClose();
     },
     onCancel: () => {
       updateLastWallet("");
@@ -367,11 +394,21 @@ function ConnectMultiWallet({
         connected: true,
       };
 
-      localStorage.setItem("wallet-detail", JSON.stringify(wd));
-      updateWalletDetails(wd);
-      updateLastWallet("Unisat");
-      localStorage.setItem("lastWallet", "Unisat");
-      handleClose();
+      // console.log("Sign MESSAGE");
+      await signMessage({
+        network: network || "mainnet",
+        address: wd.ordinal,
+        message: getMessage(wd.ordinal),
+        wallet: "Unisat",
+      });
+
+      setTempWD(wd);
+
+      // localStorage.setItem("wallet-detail", JSON.stringify(wd));
+      // updateWalletDetails(wd);
+      // updateLastWallet("Unisat");
+      // localStorage.setItem("lastWallet", "Unisat");
+      // handleClose();
     }
   };
 
@@ -393,7 +430,7 @@ function ConnectMultiWallet({
       (x: { type: string }) => x.type === "p2wpkh"
     );
 
-    console.log({ userAddresses });
+    // console.log({ userAddresses });
     if (userAddresses.result.addresses.length) {
       const wd = {
         wallet: "Leather",
@@ -404,11 +441,20 @@ function ConnectMultiWallet({
         connected: true,
       };
 
-      localStorage.setItem("wallet-detail", JSON.stringify(wd));
-      updateWalletDetails(wd);
-      updateLastWallet("Leather");
-      localStorage.setItem("lastWallet", "Leather");
-      handleClose();
+      await signMessage({
+        network: network || "mainnet",
+        address: wd.ordinal,
+        message: getMessage(wd.ordinal),
+        wallet: "Leather",
+      });
+
+      setTempWD(wd);
+
+      // localStorage.setItem("wallet-detail", JSON.stringify(wd));
+      // updateWalletDetails(wd);
+      // updateLastWallet("Leather");
+      // localStorage.setItem("lastWallet", "Leather");
+      // handleClose();
     }
   };
 
@@ -429,7 +475,7 @@ function ConnectMultiWallet({
                 : BitcoinNetworkType.Mainnet,
           },
         },
-        onFinish: (response) => {
+        onFinish: async (response) => {
           connectionStatus?.setAccounts(
             response.addresses as unknown as Account[]
           );
@@ -446,28 +492,35 @@ function ConnectMultiWallet({
           const ordinalPubkey = response.addresses.filter(
             (a: any) => a.purpose === "ordinals"
           )[0].publicKey;
-          localStorage.setItem(
-            "wallet-detail",
-            JSON.stringify({
-              cardinal,
-              cardinalPubkey,
-              ordinal,
-              ordinalPubkey,
-              connected: true,
-              wallet: "MagicEden",
-            })
-          );
-          updateWalletDetails({
-            wallet: "MagicEden",
+
+          const wd = {
             cardinal,
             cardinalPubkey,
             ordinal,
             ordinalPubkey,
             connected: true,
+            wallet: "MagicEden",
+          };
+
+          await signMessage({
+            network: network || "mainnet",
+            address: cardinal,
+            message: getMessage(cardinal),
+            wallet: "MagicEden",
           });
-          updateLastWallet("MagicEden");
-          localStorage.setItem("lastWallet", "MagicEden");
-          handleClose();
+
+          // localStorage.setItem("wallet-detail", JSON.stringify(wd));
+          // updateWalletDetails({
+          //   wallet: "MagicEden",
+          //   cardinal,
+          //   cardinalPubkey,
+          //   ordinal,
+          //   ordinalPubkey,
+          //   connected: true,
+          // });
+          // updateLastWallet("MagicEden");
+          // localStorage.setItem("lastWallet", "MagicEden");
+          // handleClose();
         },
         onCancel: () => {
           alert("Request canceled");
@@ -478,6 +531,16 @@ function ConnectMultiWallet({
       setWallet(null);
     }
   }
+
+  useEffect(() => {
+    if (tempWD && result) {
+      localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
+      updateWalletDetails(tempWD);
+      updateLastWallet(tempWD.wallet);
+      localStorage.setItem("lastWallet", tempWD.wallet);
+      handleClose();
+    }
+  }, [tempWD, result]);
 
   return (
     <>
