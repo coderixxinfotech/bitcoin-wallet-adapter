@@ -42,7 +42,7 @@ const stores_1 = require("../stores");
 const generalReducer_1 = require("../stores/reducers/generalReducer");
 function WalletProvider({ children, customAuthOptions }) {
     const { authOptions, state } = (0, use_auth_1.useAuth)(customAuthOptions);
-    console.log({ customAuthOptions });
+    // console.log({ customAuthOptions });
     return (react_1.default.createElement(ThemeProvider_1.default, null,
         react_1.default.createElement(react_2.WalletStandardProvider, null,
             react_1.default.createElement(ConnectionStatus_1.ConnectionStatusProvider, null,

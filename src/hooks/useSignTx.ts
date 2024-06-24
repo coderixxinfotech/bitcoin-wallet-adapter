@@ -46,7 +46,7 @@ export const useSignTx = () => {
           action: props.action,
           inputs: props.inputs,
         };
-        console.log({ walletDetails }, "in useSignTx");
+        // console.log({ walletDetails }, "in useSignTx");
         if (walletDetails.wallet === "Leather") {
           leatherSign(options);
         } else if (walletDetails.wallet === "Xverse") {

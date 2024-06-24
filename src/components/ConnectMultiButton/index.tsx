@@ -89,7 +89,6 @@ function ConnectMultiWallet({
   const walletDetails = useSelector(
     (state: RootState) => state.general.walletDetails
   );
-
   const lastWallet = useSelector(
     (state: RootState) => state.general.lastWallet
   );
@@ -343,27 +342,13 @@ Issued At: ${issuedAt}`;
         wallet: "Xverse",
       };
       setTempWD(wd);
-      // localStorage.setItem(
-      //   "wallet-detail",
-      //   JSON.stringify()
-      // );
+
       await signMessage({
         network: network || "mainnet",
         address: ordinal,
         message: getMessage(ordinal),
         wallet: "Xverse",
       });
-      // updateWalletDetails({
-      //   wallet: "Xverse",
-      //   cardinal,
-      //   cardinalPubkey,
-      //   ordinal,
-      //   ordinalPubkey,
-      //   connected: true,
-      // });
-      // updateLastWallet("Xverse");
-      // localStorage.setItem("lastWallet", "Xverse");
-      // handleClose();
     },
     onCancel: () => {
       updateLastWallet("");
@@ -403,12 +388,6 @@ Issued At: ${issuedAt}`;
       });
 
       setTempWD(wd);
-
-      // localStorage.setItem("wallet-detail", JSON.stringify(wd));
-      // updateWalletDetails(wd);
-      // updateLastWallet("Unisat");
-      // localStorage.setItem("lastWallet", "Unisat");
-      // handleClose();
     }
   };
 
@@ -449,12 +428,6 @@ Issued At: ${issuedAt}`;
       });
 
       setTempWD(wd);
-
-      // localStorage.setItem("wallet-detail", JSON.stringify(wd));
-      // updateWalletDetails(wd);
-      // updateLastWallet("Leather");
-      // localStorage.setItem("lastWallet", "Leather");
-      // handleClose();
     }
   };
 
@@ -508,19 +481,7 @@ Issued At: ${issuedAt}`;
             message: getMessage(cardinal),
             wallet: "MagicEden",
           });
-
-          // localStorage.setItem("wallet-detail", JSON.stringify(wd));
-          // updateWalletDetails({
-          //   wallet: "MagicEden",
-          //   cardinal,
-          //   cardinalPubkey,
-          //   ordinal,
-          //   ordinalPubkey,
-          //   connected: true,
-          // });
-          // updateLastWallet("MagicEden");
-          // localStorage.setItem("lastWallet", "MagicEden");
-          // handleClose();
+          setTempWD(wd);
         },
         onCancel: () => {
           alert("Request canceled");
@@ -533,6 +494,7 @@ Issued At: ${issuedAt}`;
   }
 
   useEffect(() => {
+    // console.log({ tempWD, result });
     if (tempWD && result) {
       localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
       updateWalletDetails(tempWD);

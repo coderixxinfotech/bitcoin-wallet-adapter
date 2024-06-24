@@ -22,6 +22,8 @@ A provider component that should be wrapped around your application to enable wa
 
 #### Usage
 
+If your project has an extra Redux provider make sure it acts as a wrapper for this provider
+
 ```javascript
 import { WalletProvider } from "bitcoin-wallet-adapter";
 
@@ -48,7 +50,7 @@ import { ConnectMultiButton } from "bitcoin-wallet-adapter";
   InnerMenu={InnerMenu} // component to show a menu when wallet is connected
   icon=""
   iconClass=""
-  balance={1000}
+  balance={1000} // comment it if you dont know the wallet balance
 />;
 ```
 
@@ -213,6 +215,59 @@ useEffect(() => {
 		console.log("Sign Result:", result);
 		if (result) {
 			listOrdinal(result);
+		}
+	}
+
+
+
+	if (error) {
+		// Handle error from wallet sign
+		console.error(" Sign Error:", error);
+		// Turn off loading after handling results or errors
+		setLoading(false);
+		alert(error.message  ||  "wallet error occurred");
+	}
+
+}, [result, error]);
+```
+
+### `useMessageSign`
+
+A hook to facilitate the message signing process for various wallets (Magiceden, Unisat, Xverse and Leather/Hiro).
+
+#### Usage
+
+##### Sell Psbt Sign
+
+```javascript
+import { useMessageSign } from "bitcoin-wallet-adapter";
+
+const MyComponent = () => {
+  const { signMessage, loading, result, error } = useMessageSign();
+
+  const handleMessageSign = async () => {
+    const messageOptions = {
+      network: "mainnet",
+      address: walletDetails.ordinal_address,
+      message: "Any Message Here",
+      wallet: walletDetails.wallet,
+    };
+
+    await signMessage(messageOptions);
+  };
+};
+```
+
+##### Usage of Result / Error Listener
+
+```
+useEffect(() => {
+	// Handling Wallet Sign Results/Errors
+	if (result) {
+		// Handle successful result from wallet sign
+		console.log("Message Sign Result:", result);
+		if (result) {
+			delistOrdinal(result);
 		}
 	}
 

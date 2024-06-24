@@ -15,6 +15,7 @@ const react_redux_1 = require("react-redux");
 const sats_connect_1 = require("sats-connect"); // Renamed to avoid naming conflict
 const generalReducer_1 = require("../stores/reducers/generalReducer");
 const react_2 = require("@wallet-standard/react");
+const bip322_js_1 = require("bip322-js");
 const SatsConnectNamespace = "sats-connect:";
 const useMessageSign = () => {
     const dispatch = (0, react_redux_1.useDispatch)();
@@ -22,6 +23,14 @@ const useMessageSign = () => {
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [result, setResult] = (0, react_1.useState)(null);
     const [error, setError] = (0, react_1.useState)(null);
+    const verifyAndSetResult = (address, message, response) => {
+        const validity = bip322_js_1.Verifier.verifySignature(address, message, response);
+        // console.log({ validity });
+        if (!validity)
+            throw new Error("Invalid signature");
+        dispatch((0, generalReducer_1.setSignature)(response));
+        setResult(response);
+    };
     const signMessage = (0, react_1.useCallback)((options) => __awaiter(void 0, void 0, void 0, function* () {
         setLoading(true);
         setResult(null);
@@ -33,7 +42,6 @@ const useMessageSign = () => {
         }
         try {
             if (options.wallet === "Xverse") {
-                setLoading(true);
                 const signMessageOptions = {
                     payload: {
                         network: {
@@ -43,8 +51,7 @@ const useMessageSign = () => {
                         message: options.message,
                     },
                     onFinish: (response) => {
-                        dispatch((0, generalReducer_1.setSignature)(response));
-                        setResult(response);
+                        verifyAndSetResult(options.address, options.message, response);
                         setLoading(false);
                     },
                     onCancel: () => {
@@ -52,49 +59,23 @@ const useMessageSign = () => {
                         setLoading(false);
                     },
                 };
-                // Call the signMessageApi with the options
                 //@ts-ignore
                 yield (0, sats_connect_1.signMessage)(signMessageOptions);
             }
             else if (typeof window.unisat !== "undefined" &&
                 options.wallet === "Unisat") {
-                setLoading(true);
-                try {
-                    const sign = yield window.unisat.signMessage(options.message);
-                    dispatch((0, generalReducer_1.setSignature)(sign));
-                    setResult(sign);
-                }
-                catch (err) {
-                    setError(err instanceof Error
-                        ? err
-                        : new Error("An error occurred during message signing"));
-                }
-                finally {
-                    setLoading(false);
-                }
+                const sign = yield window.unisat.signMessage(options.message);
+                verifyAndSetResult(options.address, options.message, sign);
             }
             else if (typeof window.btc !== "undefined" &&
                 options.wallet === "Leather") {
-                setLoading(true);
-                try {
-                    const sign = yield window.btc.request("signMessage", {
-                        message: options.message,
-                        paymentType: "p2tr",
-                    });
-                    dispatch((0, generalReducer_1.setSignature)(sign.result.signature));
-                    setResult(sign.result.signature);
-                }
-                catch (err) {
-                    setError(err instanceof Error
-                        ? err
-                        : new Error("An error occurred during message signing"));
-                }
-                finally {
-                    setLoading(false);
-                }
+                const sign = yield window.btc.request("signMessage", {
+                    message: options.message,
+                    paymentType: "p2tr",
+                });
+                verifyAndSetResult(options.address, options.message, sign.result.signature);
             }
             else if (options.wallet === "MagicEden") {
-                setLoading(true);
                 const wallet = testWallets.filter((a) => a.name === "Magic Eden")[0];
                 const signMessageOptions = {
                     getProvider: () => __awaiter(void 0, void 0, void 0, function* () {
@@ -111,8 +92,7 @@ const useMessageSign = () => {
                         message: options.message,
                     },
                     onFinish: (response) => {
-                        dispatch((0, generalReducer_1.setSignature)(response));
-                        setResult(response);
+                        verifyAndSetResult(options.address, options.message, response);
                         setLoading(false);
                     },
                     onCancel: () => {
@@ -120,18 +100,21 @@ const useMessageSign = () => {
                         setLoading(false);
                     },
                 };
-                // Call the signMessageApi with the options
                 //@ts-ignore
                 yield (0, sats_connect_1.signMessage)(signMessageOptions);
+            }
+            else {
+                throw new Error("Unsupported wallet");
             }
         }
         catch (err) {
             console.log({ err });
             setError(err instanceof Error ? err : new Error("An unknown error occurred"));
-            setLoading(false);
-            throw new Error("Error signing message");
         }
-    }), []);
+        finally {
+            setLoading(false);
+        }
+    }), [dispatch, testWallets]);
     return { signMessage, loading, result, error };
 };
 exports.useMessageSign = useMessageSign;

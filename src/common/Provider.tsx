@@ -26,7 +26,7 @@ interface WalletProviderProps {
 
 function WalletProvider({ children, customAuthOptions }: WalletProviderProps) {
   const { authOptions, state } = useAuth(customAuthOptions);
-  console.log({ customAuthOptions });
+  // console.log({ customAuthOptions });
 
   return (
     <ThemeWrapper>

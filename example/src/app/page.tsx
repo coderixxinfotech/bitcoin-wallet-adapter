@@ -54,7 +54,7 @@ export default function Home() {
 
   useEffect(() => {
     console.log({ result, error });
-    console.log("Signing successful:", result);
+    // console.log("Signing successful:", result);
   }, [result, error]);
 
   return (
@@ -122,7 +122,7 @@ export default function Home() {
 const Face = ({ balance }: { balance: number }) => {
   let balInBTC = balance / 100_000_000;
 
-  console.log({ balInBTC }, "BTCBAL");
+  // console.log({ balInBTC }, "BTCBAL");
 
   // Check from the highest threshold down to the lowest
   if (balInBTC >= 0.01) {
@@ -144,7 +144,7 @@ const Face = ({ balance }: { balance: number }) => {
 const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
   const walletDetails = useWalletAddress();
   const balance = 100000000;
-  console.log({ walletDetails });
+  // console.log({ walletDetails });
   if (walletDetails)
     return (
       <Popover
