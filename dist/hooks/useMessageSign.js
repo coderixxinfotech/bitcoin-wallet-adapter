@@ -72,6 +72,7 @@ const useMessageSign = () => {
                 const sign = yield window.btc.request("signMessage", {
                     message: options.message,
                     paymentType: "p2tr",
+                    network: options.network,
                 });
                 verifyAndSetResult(options.address, options.message, sign.result.signature);
             }

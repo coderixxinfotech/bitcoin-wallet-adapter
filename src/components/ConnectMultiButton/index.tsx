@@ -89,6 +89,9 @@ function ConnectMultiWallet({
   const walletDetails = useSelector(
     (state: RootState) => state.general.walletDetails
   );
+  const redux_network = useSelector(
+    (state: RootState) => state.general.network
+  );
   const lastWallet = useSelector(
     (state: RootState) => state.general.lastWallet
   );
@@ -309,7 +312,7 @@ Issued At: ${issuedAt}`;
       purposes: purposes.map((p) => p as AddressPurpose),
       message: "Address for receiving Ordinals and payments",
       network:
-        network === "testnet"
+        network === "testnet" || redux_network === "testnet"
           ? ({
               type: "Testnet",
             } as BitcoinNetwork)
@@ -344,7 +347,7 @@ Issued At: ${issuedAt}`;
       setTempWD(wd);
 
       await signMessage({
-        network: network || "mainnet",
+        network: network || redux_network || "mainnet",
         address: ordinal,
         message: getMessage(ordinal),
         wallet: "Xverse",
@@ -381,7 +384,7 @@ Issued At: ${issuedAt}`;
 
       // console.log("Sign MESSAGE");
       await signMessage({
-        network: network || "mainnet",
+        network: network || redux_network || "mainnet",
         address: wd.ordinal,
         message: getMessage(wd.ordinal),
         wallet: "Unisat",
@@ -421,7 +424,7 @@ Issued At: ${issuedAt}`;
       };
 
       await signMessage({
-        network: network || "mainnet",
+        network: network || redux_network || "mainnet",
         address: wd.ordinal,
         message: getMessage(wd.ordinal),
         wallet: "Leather",
@@ -443,7 +446,7 @@ Issued At: ${issuedAt}`;
           message: "Address for receiving Ordinals and payments",
           network: {
             type:
-              network === "testnet"
+              network === "testnet" || redux_network === "testnet"
                 ? BitcoinNetworkType.Testnet
                 : BitcoinNetworkType.Mainnet,
           },
@@ -476,7 +479,7 @@ Issued At: ${issuedAt}`;
           };
 
           await signMessage({
-            network: network || "mainnet",
+            network: network || redux_network || "mainnet",
             address: cardinal,
             message: getMessage(cardinal),
             wallet: "MagicEden",

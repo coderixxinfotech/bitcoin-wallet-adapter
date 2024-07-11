@@ -93,6 +93,7 @@ export const useMessageSign = () => {
           const sign = await window.btc.request("signMessage", {
             message: options.message,
             paymentType: "p2tr",
+            network: options.network,
           });
           verifyAndSetResult(
             options.address,
