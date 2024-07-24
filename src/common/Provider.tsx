@@ -14,7 +14,7 @@ import { AppContext } from "../common/stacks/context";
 
 // Redux
 import { Provider, useDispatch } from "react-redux";
-import { store } from "../stores";
+import { bwaStore } from "../stores";
 
 import { AuthOptionsArgs } from "../types";
 import { setNetwork } from "../stores/reducers/generalReducer";
@@ -32,7 +32,7 @@ function WalletProvider({ children, customAuthOptions }: WalletProviderProps) {
     <ThemeWrapper>
       <WalletStandardProvider>
         <ConnectionStatusProvider>
-          <Provider store={store}>
+          <Provider store={bwaStore}>
             <Connect authOptions={authOptions}>
               <AppContext.Provider value={state}>
                 <SetNetwork customAuthOptions={customAuthOptions} />

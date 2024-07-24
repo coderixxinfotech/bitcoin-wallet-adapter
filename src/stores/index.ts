@@ -8,11 +8,11 @@ const rootReducer = combineReducers({
   general: generalReducer,
 });
 
-export const store = configureStore({
+export const bwaStore = configureStore({
   reducer: rootReducer,
   devTools: process.env.NODE_ENV !== "production",
   middleware: [thunk],
 });
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof bwaStore.getState>;
+export type AppDispatch = typeof bwaStore.dispatch;

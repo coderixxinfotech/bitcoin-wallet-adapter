@@ -46,7 +46,7 @@ function WalletProvider({ children, customAuthOptions }) {
     return (react_1.default.createElement(ThemeProvider_1.default, null,
         react_1.default.createElement(react_2.WalletStandardProvider, null,
             react_1.default.createElement(ConnectionStatus_1.ConnectionStatusProvider, null,
-                react_1.default.createElement(react_redux_1.Provider, { store: stores_1.store },
+                react_1.default.createElement(react_redux_1.Provider, { store: stores_1.bwaStore },
                     react_1.default.createElement(connect_react_1.Connect, { authOptions: authOptions },
                         react_1.default.createElement(context_1.AppContext.Provider, { value: state },
                             react_1.default.createElement(SetNetwork, { customAuthOptions: customAuthOptions }),
