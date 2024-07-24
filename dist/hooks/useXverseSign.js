@@ -46,7 +46,7 @@ const useXverseSign = () => {
             const signedPsbt = yield (0, sats_connect_1.signTransaction)({
                 payload: {
                     network: {
-                        type: network === "Mainnet"
+                        type: network.toLowerCase() === "mainnet"
                             ? sats_connect_1.BitcoinNetworkType.Mainnet
                             : sats_connect_1.BitcoinNetworkType.Testnet,
                     },

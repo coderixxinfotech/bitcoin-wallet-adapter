@@ -45,7 +45,9 @@ const useMessageSign = () => {
                 const signMessageOptions = {
                     payload: {
                         network: {
-                            type: options.network === "mainnet" ? "Mainnet" : "Testnet",
+                            type: options.network.toLowerCase() === "mainnet"
+                                ? "Mainnet"
+                                : "Testnet",
                         },
                         address: options.address,
                         message: options.message,
@@ -72,7 +74,7 @@ const useMessageSign = () => {
                 const sign = yield window.btc.request("signMessage", {
                     message: options.message,
                     paymentType: "p2tr",
-                    network: options.network,
+                    network: options.network.toLowerCase(),
                 });
                 verifyAndSetResult(options.address, options.message, sign.result.signature);
             }
@@ -85,7 +87,7 @@ const useMessageSign = () => {
                     }),
                     payload: {
                         network: {
-                            type: options.network === "mainnet"
+                            type: options.network.toLowerCase() === "mainnet"
                                 ? sats_connect_1.BitcoinNetworkType.Mainnet
                                 : sats_connect_1.BitcoinNetworkType.Testnet,
                         },

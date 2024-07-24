@@ -89,8 +89,8 @@ function ConnectMultiWallet({
   const walletDetails = useSelector(
     (state: RootState) => state.general.walletDetails
   );
-  const redux_network = useSelector(
-    (state: RootState) => state.general.network
+  const redux_network = useSelector((state: RootState) =>
+    state.general.network.toLowerCase()
   );
   const lastWallet = useSelector(
     (state: RootState) => state.general.lastWallet
@@ -312,7 +312,8 @@ Issued At: ${issuedAt}`;
       purposes: purposes.map((p) => p as AddressPurpose),
       message: "Address for receiving Ordinals and payments",
       network:
-        network === "testnet" || redux_network === "testnet"
+        network?.toLowerCase() === "testnet" ||
+        redux_network.toLowerCase() === "testnet"
           ? ({
               type: "Testnet",
             } as BitcoinNetwork)
@@ -347,7 +348,8 @@ Issued At: ${issuedAt}`;
       setTempWD(wd);
 
       await signMessage({
-        network: network || redux_network || "mainnet",
+        network:
+          network?.toLowerCase() || redux_network.toLowerCase() || "mainnet",
         address: ordinal,
         message: getMessage(ordinal),
         wallet: "Xverse",
@@ -384,7 +386,8 @@ Issued At: ${issuedAt}`;
 
       // console.log("Sign MESSAGE");
       await signMessage({
-        network: network || redux_network || "mainnet",
+        network:
+          network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
         address: wd.ordinal,
         message: getMessage(wd.ordinal),
         wallet: "Unisat",
@@ -424,7 +427,8 @@ Issued At: ${issuedAt}`;
       };
 
       await signMessage({
-        network: network || redux_network || "mainnet",
+        network:
+          network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
         address: wd.ordinal,
         message: getMessage(wd.ordinal),
         wallet: "Leather",
@@ -446,7 +450,8 @@ Issued At: ${issuedAt}`;
           message: "Address for receiving Ordinals and payments",
           network: {
             type:
-              network === "testnet" || redux_network === "testnet"
+              network?.toLowerCase() === "testnet" ||
+              redux_network?.toLowerCase() === "testnet"
                 ? BitcoinNetworkType.Testnet
                 : BitcoinNetworkType.Mainnet,
           },
@@ -479,7 +484,10 @@ Issued At: ${issuedAt}`;
           };
 
           await signMessage({
-            network: network || redux_network || "mainnet",
+            network:
+              network?.toLowerCase() ||
+              redux_network.toLowerCase() ||
+              "mainnet",
             address: cardinal,
             message: getMessage(cardinal),
             wallet: "MagicEden",

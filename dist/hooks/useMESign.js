@@ -54,7 +54,7 @@ const useMESign = () => {
                 }),
                 payload: {
                     network: {
-                        type: network === "Mainnet"
+                        type: network.toLowerCase() === "mainnet"
                             ? sats_connect_1.BitcoinNetworkType.Mainnet
                             : sats_connect_1.BitcoinNetworkType.Testnet,
                     },

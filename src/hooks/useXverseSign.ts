@@ -51,7 +51,7 @@ export const useXverseSign = (): CommonSignResponse => {
         payload: {
           network: {
             type:
-              network === "Mainnet"
+              network.toLowerCase() === "mainnet"
                 ? BitcoinNetworkType.Mainnet
                 : BitcoinNetworkType.Testnet,
           },

@@ -56,7 +56,7 @@ export interface IInstalledWallets {
 
 export interface CommonSignOptions {
   psbt: string;
-  network: "Mainnet" | "Testnet";
+  network: "mainnet" | "testnet";
   action: "sell" | "buy" | "dummy" | "other";
   inputs: {
     publickey: string;

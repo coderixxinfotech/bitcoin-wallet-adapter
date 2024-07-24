@@ -36,21 +36,25 @@ const useSignTx = () => {
                     walletDetails.wallet === "MagicEden"
                     ? props.psbt
                     : (0, utils_1.base64ToHex)(props.psbt),
-                network: props.network,
+                network: props.network.toLowerCase(),
                 action: props.action,
                 inputs: props.inputs,
             };
             // console.log({ walletDetails }, "in useSignTx");
             if (walletDetails.wallet === "Leather") {
+                //@ts-ignore
                 leatherSign(options);
             }
             else if (walletDetails.wallet === "Xverse") {
+                //@ts-ignore
                 xverseSign(options);
             }
             else if (walletDetails.wallet === "MagicEden") {
+                //@ts-ignore
                 meSign(options);
             }
             else if (walletDetails.wallet === "Unisat") {
+                //@ts-ignore
                 unisatSign(options);
             }
         }

@@ -58,7 +58,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     //for notification
     const dispatch = (0, react_redux_1.useDispatch)();
     const walletDetails = (0, react_redux_1.useSelector)((state) => state.general.walletDetails);
-    const redux_network = (0, react_redux_1.useSelector)((state) => state.general.network);
+    const redux_network = (0, react_redux_1.useSelector)((state) => state.general.network.toLowerCase());
     const lastWallet = (0, react_redux_1.useSelector)((state) => state.general.lastWallet);
     const [wallets, setWallets] = (0, react_1.useState)([]);
     const [tempWD, setTempWD] = (0, react_1.useState)(null); //hold wallet details till user signs the message
@@ -238,7 +238,8 @@ Issued At: ${issuedAt}`;
         payload: {
             purposes: purposes.map((p) => p),
             message: "Address for receiving Ordinals and payments",
-            network: network === "testnet" || redux_network === "testnet"
+            network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) === "testnet" ||
+                redux_network.toLowerCase() === "testnet"
                 ? {
                     type: "Testnet",
                 }
@@ -263,7 +264,7 @@ Issued At: ${issuedAt}`;
             };
             setTempWD(wd);
             yield signMessage({
-                network: network || redux_network || "mainnet",
+                network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || redux_network.toLowerCase() || "mainnet",
                 address: ordinal,
                 message: getMessage(ordinal),
                 wallet: "Xverse",
@@ -296,7 +297,7 @@ Issued At: ${issuedAt}`;
             };
             // console.log("Sign MESSAGE");
             yield signMessage({
-                network: network || redux_network || "mainnet",
+                network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                 address: wd.ordinal,
                 message: getMessage(wd.ordinal),
                 wallet: "Unisat",
@@ -324,7 +325,7 @@ Issued At: ${issuedAt}`;
                 connected: true,
             };
             yield signMessage({
-                network: network || redux_network || "mainnet",
+                network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                 address: wd.ordinal,
                 message: getMessage(wd.ordinal),
                 wallet: "Leather",
@@ -344,7 +345,8 @@ Issued At: ${issuedAt}`;
                         purposes: [sats_connect_1.AddressPurpose.Ordinals, sats_connect_1.AddressPurpose.Payment],
                         message: "Address for receiving Ordinals and payments",
                         network: {
-                            type: network === "testnet" || redux_network === "testnet"
+                            type: (network === null || network === void 0 ? void 0 : network.toLowerCase()) === "testnet" ||
+                                (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) === "testnet"
                                 ? sats_connect_1.BitcoinNetworkType.Testnet
                                 : sats_connect_1.BitcoinNetworkType.Mainnet,
                         },
@@ -364,7 +366,9 @@ Issued At: ${issuedAt}`;
                             wallet: "MagicEden",
                         };
                         yield signMessage({
-                            network: network || redux_network || "mainnet",
+                            network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) ||
+                                redux_network.toLowerCase() ||
+                                "mainnet",
                             address: cardinal,
                             message: getMessage(cardinal),
                             wallet: "MagicEden",
