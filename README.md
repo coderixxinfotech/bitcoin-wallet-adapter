@@ -360,4 +360,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 Made with ❤️ by the Bitcoin Wallet Adapter Team
 
-[![](https://visitcount.itsvg.in/api?id=crypticmeta&icon=0&color=0)](https://visitcount.itsvg.in)
+[![](https://visitcount.itsvg.in/api?id=bitcoin-wallet-adapter&label=repo%20visit&pretty=false)](https://visitcount.itsvg.in)

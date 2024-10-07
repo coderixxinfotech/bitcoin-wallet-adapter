@@ -1656,6 +1656,37 @@ bip66@^1.1.5:
   dependencies:
     safe-buffer "^5.0.1"
 
+bitcoin-wallet-adapter@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/bitcoin-wallet-adapter/-/bitcoin-wallet-adapter-1.7.1.tgz#645491d9c6f6f6d1e776633d153f3b2f81ed4c30"
+  integrity sha512-BwEaXcEJ2kU0HXfAt3Pi5G5T4MQLdxViAWwwQi4nzp9PnsGYDJNrq7k9DXAO8rSa4Wrm/trSqe0isIVY5eBU2A==
+  dependencies:
+    "@emotion/react" "^11.11.3"
+    "@emotion/styled" "^11.11.0"
+    "@exodus/bitcoin-wallet-standard-features" "0.0.1"
+    "@exodus/bitcoin-wallet-standard-react" "0.0.0"
+    "@mui/material" "^5.15.7"
+    "@reduxjs/toolkit" "^1.9.5"
+    "@stacks/auth" "^6.7.0"
+    "@stacks/connect" "^7.3.1"
+    "@stacks/connect-react" "^22.1.1"
+    "@stacks/network" "^6.5.5"
+    "@stacks/rpc-client" "^0.8.18"
+    "@wallet-standard/react" "^0.1.4"
+    autoprefixer "^10.4.15"
+    axios "^1.6.7"
+    bip322-js "^2.0.0"
+    postcss "^8.4.21"
+    react "^18.2.0"
+    react-dom "^18.2.0"
+    react-icons "^5.0.1"
+    react-redux "^8.1.2"
+    redux-thunk "^2.4.2"
+    reselect "^4.1.8"
+    sats-connect "^1.4.1"
+    tailwindcss "^3.3.3"
+    typescript "^5.1.6"
+
 bitcoinjs-lib@^6.1.5:
   version "6.1.6"
   resolved "https://registry.yarnpkg.com/bitcoinjs-lib/-/bitcoinjs-lib-6.1.6.tgz#f57c17c82511f860f11946d784c18da39f8618a8"
