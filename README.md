@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/bitcoin-wallet-adapter.svg)](https://www.npmjs.com/package/bitcoin-wallet-adapter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm downloads](https://img.shields.io/npm/dm/bitcoin-wallet-adapter.svg)](https://www.npmjs.com/package/bitcoin-wallet-adapter)
-[![GitHub stars](https://img.shields.io/github/stars/crypticmetadev/bitcoin-wallet-adapter.svg?style=social&label=Star)](https://github.com/crypticmetadev/bitcoin-wallet-adapter)
+[![GitHub stars](https://img.shields.io/github/stars/coderixxinfotech/bitcoin-wallet-adapter.svg?style=social&label=Star)](https://github.com/coderixxinfotech/bitcoin-wallet-adapter)
 
 A robust React-based solution for connecting and interacting with Bitcoin wallets. This package provides components and hooks for seamless integration within your React application. 🚀
 
