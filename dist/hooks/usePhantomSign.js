@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.usePhantomSign = void 0;
 const react_1 = require("react");
 const utils_1 = require("../utils");
+const __1 = require("..");
 const usePhantomSign = () => {
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [result, setResult] = (0, react_1.useState)(null);
@@ -25,16 +26,17 @@ const usePhantomSign = () => {
         }
         setLoading(true);
         try {
-            const phantomInputs = inputs.map(({ address, index, sighash }) => (Object.assign({ address,
-                index }, (action == "sell" && { sighashTypes: [sighash] }))));
+            const phantomInputs = inputs.map(({ address, index, sighash }) => (Object.assign({ address, signingIndexes: index }, (action == "sell" && { sigHash: sighash }))));
             const options = {
-                toSignInputs: phantomInputs,
-                autoFinalized: false,
+                inputsToSign: phantomInputs,
+                // autoFinalized: false,
             };
             const phantom = (_b = (_a = window.window) === null || _a === void 0 ? void 0 : _a.phantom) === null || _b === void 0 ? void 0 : _b.bitcoin;
+            console.log({ phantom });
+            console.log({ psbt, options });
             // @ts-ignore
-            const signedPsbt = yield phantom.signPsbts(psbt, options);
-            setResult((0, utils_1.hexToBase64)(signedPsbt));
+            const signedPsbt = yield phantom.signPSBT((0, utils_1.BytesFromHex)(psbt), options);
+            setResult((0, __1.bytesToBase64)(signedPsbt));
         }
         catch (e) {
             setError(e);

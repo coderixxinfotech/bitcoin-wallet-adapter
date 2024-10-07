@@ -70,6 +70,7 @@ function ConnectMultiWallet({
   iconClass,
   balance,
   network,
+  connectionMessage,
 }: {
   buttonClassname?: string;
   modalContainerClass?: string;
@@ -84,6 +85,7 @@ function ConnectMultiWallet({
   iconClass?: string;
   balance?: number;
   network?: "mainnet" | "testnet";
+  connectionMessage?: string;
 }) {
   const { loading, result, error, signMessage } = useMessageSign();
   //for notification
@@ -383,7 +385,7 @@ Issued At: ${issuedAt}`;
         network:
           network?.toLowerCase() || redux_network.toLowerCase() || "mainnet",
         address: ordinal,
-        message: getMessage(ordinal),
+        message: connectionMessage || getMessage(ordinal),
         wallet: "Xverse",
       });
     },
@@ -421,7 +423,7 @@ Issued At: ${issuedAt}`;
         network:
           network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
         address: wd.ordinal,
-        message: getMessage(wd.ordinal),
+        message: connectionMessage || getMessage(wd.ordinal),
         wallet: "Unisat",
       });
 
@@ -462,7 +464,7 @@ Issued At: ${issuedAt}`;
         network:
           network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
         address: wd.ordinal,
-        message: getMessage(wd.ordinal),
+        message: connectionMessage || getMessage(wd.ordinal),
         wallet: "Leather",
       });
 
@@ -496,7 +498,7 @@ Issued At: ${issuedAt}`;
           network:
             network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
           address: wd.ordinal,
-          message: getMessage(wd.ordinal),
+          message: connectionMessage || getMessage(wd.ordinal),
           wallet: "Phantom",
         });
       } else {
@@ -528,7 +530,7 @@ Issued At: ${issuedAt}`;
         network:
           network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
         address: wd.ordinal,
-        message: getMessage(wd.ordinal),
+        message: connectionMessage || getMessage(wd.ordinal),
         wallet: "Okxwallet",
       });
 
@@ -587,7 +589,7 @@ Issued At: ${issuedAt}`;
               redux_network.toLowerCase() ||
               "mainnet",
             address: cardinal,
-            message: getMessage(cardinal),
+            message: connectionMessage || getMessage(cardinal),
             wallet: "MagicEden",
           });
           setTempWD(wd);

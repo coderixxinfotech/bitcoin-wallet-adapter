@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { CommonSignOptions, CommonSignResponse } from "../types";
-import { hexToBase64, isHex } from "../utils";
+import { BytesFromHex, hexToBase64, isHex } from "../utils";
+import { bytesToBase64 } from "..";
 
 export const usePhantomSign = (): CommonSignResponse => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -9,7 +10,6 @@ export const usePhantomSign = (): CommonSignResponse => {
 
   const sign = useCallback(async (options: CommonSignOptions) => {
     const { psbt, network, action, inputs } = options;
- 
 
     if (!isHex(psbt)) {
       setError(new Error("Phantom requires hexPsbt"));
@@ -21,20 +21,22 @@ export const usePhantomSign = (): CommonSignResponse => {
     try {
       const phantomInputs = inputs.map(({ address, index, sighash }) => ({
         address,
-        index,
-        ...(action == "sell" && { sighashTypes: [sighash] }),
+        signingIndexes: index,
+        ...(action == "sell" && { sigHash: sighash }),
       }));
 
       const options = {
-        toSignInputs: phantomInputs,
-        autoFinalized: false,
+        inputsToSign: phantomInputs,
+        // autoFinalized: false,
       };
 
       const phantom = (window as any).window?.phantom?.bitcoin;
+      console.log({ phantom });
+      console.log({ psbt, options });
       // @ts-ignore
-      const signedPsbt = await phantom.signPsbts(psbt, options);
+      const signedPsbt = await phantom.signPSBT(BytesFromHex(psbt), options);
 
-      setResult(hexToBase64(signedPsbt));
+      setResult(bytesToBase64(signedPsbt));
     } catch (e: any) {
       setError(e);
     } finally {

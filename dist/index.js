@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useMessageSign = exports.useSignTx = exports.useLeatherSign = exports.useUnisatSign = exports.useXverseSign = exports.useWalletAddress = exports.PayButton = exports.Notification = exports.ConnectMultiButton = exports.WalletProvider = void 0;
+exports.useMessageSign = exports.useSignTx = exports.useLeatherSign = exports.useUnisatSign = exports.useXverseSign = exports.useWalletAddress = exports.bytesToBase64 = exports.PayButton = exports.Notification = exports.ConnectMultiButton = exports.WalletProvider = void 0;
 // Styles
 require("./styles.css");
 // Providers
@@ -24,3 +24,8 @@ Object.defineProperty(exports, "useUnisatSign", { enumerable: true, get: functio
 Object.defineProperty(exports, "useLeatherSign", { enumerable: true, get: function () { return hooks_1.useLeatherSign; } });
 Object.defineProperty(exports, "useSignTx", { enumerable: true, get: function () { return hooks_1.useSignTx; } });
 Object.defineProperty(exports, "useMessageSign", { enumerable: true, get: function () { return hooks_1.useMessageSign; } });
+function bytesToBase64(bytes) {
+    const binString = String.fromCodePoint(...bytes);
+    return btoa(binString);
+}
+exports.bytesToBase64 = bytesToBase64;

@@ -25,6 +25,10 @@ export { WalletProvider };
 // Export Components
 export { ConnectMultiButton, Notification, PayButton };
 
+export function bytesToBase64(bytes: any) {
+  const binString = String.fromCodePoint(...bytes);
+  return btoa(binString);
+}
 // Export Hooks
 export {
   useWalletAddress,

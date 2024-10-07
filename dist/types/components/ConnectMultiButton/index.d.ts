@@ -6,7 +6,7 @@ interface InnerMenuProps {
     disconnect: () => void;
 }
 type InnerMenuType = React.ComponentType<InnerMenuProps>;
-declare function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, }: {
+declare function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, }: {
     buttonClassname?: string;
     modalContainerClass?: string;
     modalContentClass?: string;
@@ -20,5 +20,6 @@ declare function ConnectMultiWallet({ buttonClassname, modalContainerClass, moda
     iconClass?: string;
     balance?: number;
     network?: "mainnet" | "testnet";
+    connectionMessage?: string;
 }): React.JSX.Element;
 export default ConnectMultiWallet;

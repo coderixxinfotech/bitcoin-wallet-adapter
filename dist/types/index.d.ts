@@ -6,4 +6,5 @@ import PayButton from "./components/PayButton";
 import { useWalletAddress, useXverseSign, useUnisatSign, useLeatherSign, useSignTx, useMessageSign } from "./hooks";
 export { WalletProvider };
 export { ConnectMultiButton, Notification, PayButton };
+export declare function bytesToBase64(bytes: any): string;
 export { useWalletAddress, useXverseSign, useUnisatSign, useLeatherSign, useSignTx, useMessageSign, };

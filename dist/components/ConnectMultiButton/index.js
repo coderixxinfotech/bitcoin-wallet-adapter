@@ -53,7 +53,7 @@ const react_2 = require("@wallet-standard/react");
 const ConnectionStatus_1 = require("../../common/ConnectionStatus");
 const hooks_1 = require("../../hooks");
 const purposes = ["ordinals", "payment"];
-function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, }) {
+function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, }) {
     const { loading, result, error, signMessage } = (0, hooks_1.useMessageSign)();
     //for notification
     const dispatch = (0, react_redux_1.useDispatch)();
@@ -292,7 +292,7 @@ Issued At: ${issuedAt}`;
             yield signMessage({
                 network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || redux_network.toLowerCase() || "mainnet",
                 address: ordinal,
-                message: getMessage(ordinal),
+                message: connectionMessage || getMessage(ordinal),
                 wallet: "Xverse",
             });
         }),
@@ -325,7 +325,7 @@ Issued At: ${issuedAt}`;
             yield signMessage({
                 network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                 address: wd.ordinal,
-                message: getMessage(wd.ordinal),
+                message: connectionMessage || getMessage(wd.ordinal),
                 wallet: "Unisat",
             });
             setTempWD(wd);
@@ -353,7 +353,7 @@ Issued At: ${issuedAt}`;
             yield signMessage({
                 network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                 address: wd.ordinal,
-                message: getMessage(wd.ordinal),
+                message: connectionMessage || getMessage(wd.ordinal),
                 wallet: "Leather",
             });
             setTempWD(wd);
@@ -381,7 +381,7 @@ Issued At: ${issuedAt}`;
                 yield signMessage({
                     network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                     address: wd.ordinal,
-                    message: getMessage(wd.ordinal),
+                    message: connectionMessage || getMessage(wd.ordinal),
                     wallet: "Phantom",
                 });
             }
@@ -411,7 +411,7 @@ Issued At: ${issuedAt}`;
             yield signMessage({
                 network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                 address: wd.ordinal,
-                message: getMessage(wd.ordinal),
+                message: connectionMessage || getMessage(wd.ordinal),
                 wallet: "Okxwallet",
             });
             setTempWD(wd);
@@ -454,7 +454,7 @@ Issued At: ${issuedAt}`;
                                 redux_network.toLowerCase() ||
                                 "mainnet",
                             address: cardinal,
-                            message: getMessage(cardinal),
+                            message: connectionMessage || getMessage(cardinal),
                             wallet: "MagicEden",
                         });
                         setTempWD(wd);

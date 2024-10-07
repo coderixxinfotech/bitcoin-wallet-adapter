@@ -16,6 +16,7 @@ const sats_connect_1 = require("sats-connect"); // Renamed to avoid naming confl
 const generalReducer_1 = require("../stores/reducers/generalReducer");
 const react_2 = require("@wallet-standard/react");
 const bip322_js_1 = require("bip322-js");
+const __1 = require("..");
 const SatsConnectNamespace = "sats-connect:";
 const useMessageSign = () => {
     const dispatch = (0, react_redux_1.useDispatch)();
@@ -83,12 +84,7 @@ const useMessageSign = () => {
                 options.wallet === "Phantom") {
                 const message = new TextEncoder().encode(options.message);
                 const { signature } = yield ((_b = (_a = window === null || window === void 0 ? void 0 : window.phantom) === null || _a === void 0 ? void 0 : _a.bitcoin) === null || _b === void 0 ? void 0 : _b.signMessage(options.address, message));
-                // helper method
-                function bytesToBase64(bytes) {
-                    const binString = String.fromCodePoint(...bytes);
-                    return btoa(binString);
-                }
-                const base64 = bytesToBase64(signature);
+                const base64 = (0, __1.bytesToBase64)(signature);
                 verifyAndSetResult(options.address, new TextDecoder().decode(message), base64);
             }
             // okx wallett

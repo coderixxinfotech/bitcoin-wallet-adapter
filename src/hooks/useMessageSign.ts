@@ -9,6 +9,7 @@ import { useWallets } from "@wallet-standard/react";
 import type { WalletWithFeatures } from "@wallet-standard/base";
 
 import { Verifier } from "bip322-js";
+import { bytesToBase64 } from "..";
 
 interface CustomWindow extends Window {
   LeatherProvider?: any;
@@ -115,12 +116,6 @@ export const useMessageSign = () => {
             message
           );
 
-          // helper method
-          function bytesToBase64(bytes: any) {
-            const binString = String.fromCodePoint(...bytes);
-            return btoa(binString);
-          }
-
           const base64 = bytesToBase64(signature);
 
           verifyAndSetResult(
@@ -135,10 +130,10 @@ export const useMessageSign = () => {
           typeof window?.okxwallet !== "undefined" &&
           options.wallet === "Okxwallet"
         ) {
-        const signature = await window.okxwallet.bitcoin.signMessage(
-          options.message,
-          "ecdsa"
-        );
+          const signature = await window.okxwallet.bitcoin.signMessage(
+            options.message,
+            "ecdsa"
+          );
 
           verifyAndSetResult(options.address, options.message, signature);
         } else if (options.wallet === "MagicEden") {
