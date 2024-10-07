@@ -38,6 +38,8 @@ interface CustomWindow extends Window {
   unisat?: any;
   BitcoinProvider?: any;
   magicEden?: any;
+  phantom?: any;
+  okxwallet?: any;
 }
 
 declare const window: CustomWindow;
@@ -147,7 +149,7 @@ Issued At: ${issuedAt}`;
 
   // Function to check which wallets are installed
   function getInstalledWalletName() {
-    const checkWallets = [];
+    const checkWallets: any = [];
     if (typeof window.unisat !== "undefined") {
       checkWallets.push({
         label: "Unisat",
@@ -176,6 +178,20 @@ Issued At: ${issuedAt}`;
         label: "MagicEden",
         logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-magiceden-logo.png",
       });
+
+    if (typeof window.phantom !== "undefined") {
+      checkWallets.push({
+        label: "Phantom",
+        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-phantom-logo.png",
+      });
+    }
+
+    if (typeof window.okxwallet !== "undefined") {
+      checkWallets.push({
+        label: "Okxwallet",
+        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-okx-logo.png",
+      });
+    }
 
     setWallets(checkWallets);
   }
@@ -242,6 +258,22 @@ Issued At: ${issuedAt}`;
         }
       } else if (
         lastWallet === "Unisat" &&
+        walletDetail?.cardinal &&
+        walletDetail?.ordinal
+      ) {
+        // If the last wallet is unisat and user data is present, set the wallet details
+        updateLastWallet(lastWallet);
+        updateWalletDetails(walletDetail);
+      } else if (
+        lastWallet === "Phantom" &&
+        walletDetail?.cardinal &&
+        walletDetail?.ordinal
+      ) {
+        // If the last wallet is unisat and user data is present, set the wallet details
+        updateLastWallet(lastWallet);
+        updateWalletDetails(walletDetail);
+      } else if (
+        lastWallet === "Okxwallet" &&
         walletDetail?.cardinal &&
         walletDetail?.ordinal
       ) {
@@ -438,6 +470,72 @@ Issued At: ${issuedAt}`;
     }
   };
 
+  const getPhantomAddress = async () => {
+    // Accessing the phantom Bitcoin object from the window
+    const phantom = (window as any).window?.phantom?.bitcoin;
+
+    // Requesting accounts and awaiting the promise to resolve
+    const accounts = await phantom.requestAccounts();
+
+    const userAddresses = accounts;
+    const addresses = userAddresses[0];
+
+    if (addresses) {
+      const wd = {
+        wallet: "Phantom",
+        ordinal: addresses ? addresses.address : null,
+        cardinal: addresses ? addresses.address : null,
+        ordinalPubkey: addresses ? addresses.publicKey : null,
+        cardinalPubkey: addresses ? addresses.publicKey : null,
+        connected: true,
+      };
+
+      // Sign the message with the ordinal address if available
+      if (wd.ordinal) {
+        await signMessage({
+          network:
+            network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
+          address: wd.ordinal,
+          message: getMessage(wd.ordinal),
+          wallet: "Phantom",
+        });
+      } else {
+        console.warn("No ordinal address found.");
+      }
+
+      // Store the wallet data
+      setTempWD(wd);
+    } else {
+      console.warn("No addresses found.");
+    }
+  };
+
+  const getOkxAddress = async () => {
+    let okxwallet = (window as any).okxwallet.bitcoin;
+    const accounts = await okxwallet.requestAccounts();
+    const publicKey = await okxwallet.getPublicKey();
+
+    if (accounts.length && publicKey) {
+      const wd = {
+        wallet: "Okxwallet",
+        ordinal: accounts[0],
+        cardinal: accounts[0],
+        ordinalPubkey: publicKey,
+        cardinalPubkey: publicKey,
+        connected: true,
+      };
+      await signMessage({
+        network:
+          network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
+        address: wd.ordinal,
+        message: getMessage(wd.ordinal),
+        wallet: "Okxwallet",
+      });
+
+      setTempWD(wd);
+    }
+  };
+
   async function connectOrDeselect() {
     try {
       await getAddress({
@@ -539,6 +637,8 @@ Issued At: ${issuedAt}`;
           handleClose={handleClose}
           wallets={wallets}
           getLeatherAddress={getLeatherAddress}
+          getPhantomAddress={getPhantomAddress}
+          getOkxAddress={getOkxAddress}
           getAddress={getAddress}
           getAddressOptions={getAddressOptions}
           getUnisatAddress={getUnisatAddress}

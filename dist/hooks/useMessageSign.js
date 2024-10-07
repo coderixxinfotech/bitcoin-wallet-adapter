@@ -32,6 +32,7 @@ const useMessageSign = () => {
         setResult(response);
     };
     const signMessage = (0, react_1.useCallback)((options) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b;
         setLoading(true);
         setResult(null);
         setError(null);
@@ -78,12 +79,30 @@ const useMessageSign = () => {
                 });
                 verifyAndSetResult(options.address, options.message, sign.result.signature);
             }
+            else if (typeof (window === null || window === void 0 ? void 0 : window.phantom) !== "undefined" &&
+                options.wallet === "Phantom") {
+                const message = new TextEncoder().encode(options.message);
+                const { signature } = yield ((_b = (_a = window === null || window === void 0 ? void 0 : window.phantom) === null || _a === void 0 ? void 0 : _a.bitcoin) === null || _b === void 0 ? void 0 : _b.signMessage(options.address, message));
+                // helper method
+                function bytesToBase64(bytes) {
+                    const binString = String.fromCodePoint(...bytes);
+                    return btoa(binString);
+                }
+                const base64 = bytesToBase64(signature);
+                verifyAndSetResult(options.address, new TextDecoder().decode(message), base64);
+            }
+            // okx wallett
+            else if (typeof (window === null || window === void 0 ? void 0 : window.okxwallet) !== "undefined" &&
+                options.wallet === "Okxwallet") {
+                const signature = yield window.okxwallet.bitcoin.signMessage(options.message, "ecdsa");
+                verifyAndSetResult(options.address, options.message, signature);
+            }
             else if (options.wallet === "MagicEden") {
                 const wallet = testWallets.filter((a) => a.name === "Magic Eden")[0];
                 const signMessageOptions = {
                     getProvider: () => __awaiter(void 0, void 0, void 0, function* () {
-                        var _a;
-                        return (_a = wallet.features[SatsConnectNamespace]) === null || _a === void 0 ? void 0 : _a.provider;
+                        var _c;
+                        return (_c = wallet.features[SatsConnectNamespace]) === null || _c === void 0 ? void 0 : _c.provider;
                     }),
                     payload: {
                         network: {

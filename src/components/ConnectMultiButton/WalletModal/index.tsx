@@ -7,6 +7,8 @@ interface WalletModalProps {
   handleClose: () => void;
   wallets: IInstalledWallets[];
   getLeatherAddress: () => void;
+  getPhantomAddress: () => void;
+  getOkxAddress:() => void;
   getAddress: (options: any) => Promise<void>;
   getAddressOptions: any;
   getUnisatAddress: any;
@@ -32,6 +34,8 @@ const WalletModal: React.FC<WalletModalProps> = ({
   handleClose,
   wallets,
   getLeatherAddress,
+  getPhantomAddress,
+  getOkxAddress,
   getAddress,
   getAddressOptions,
   getUnisatAddress,
@@ -84,6 +88,10 @@ const WalletModal: React.FC<WalletModalProps> = ({
                         await getAddress(getAddressOptions);
                       } else if (selectedItem === "Unisat") {
                         await getUnisatAddress();
+                      } else if (selectedItem === "Phantom") {
+                        await getPhantomAddress();
+                      } else if (selectedItem === "Okxwallet") {
+                        await getOkxAddress();
                       } else if (selectedItem === "MagicEden") {
                         const wallet = meWallets.filter(
                           (a: any) => a.name === "Magic Eden"

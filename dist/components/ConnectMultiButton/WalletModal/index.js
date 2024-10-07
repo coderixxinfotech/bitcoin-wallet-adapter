@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importDefault(require("react"));
 const material_1 = require("@mui/material");
 const rx_1 = require("react-icons/rx");
-const WalletModal = ({ open, handleClose, wallets, getLeatherAddress, getAddress, getAddressOptions, getUnisatAddress, setWallet, meWallets, modalContainerClass = "bwa-bg-black bwa-bg-opacity-75 bwa-h-screen bwa-w-full bwa_center", modalContentClass = "bwa-bg-bwa_secondary bwa-p-6 bwa-min-w-[50%] bwa-relative bwa-shadow-xl bwa-rounded-xl", closeButtonClass = "bwa-rounded bwa_font-bold bwa-bg-gray-700 hover:bwa-bg-red-500 bwa-bg-opacity-50 bwa-text-gray-300 bwa-p-2 bwa-cursor-pointer", headingClass = "bwa_modalHeading bwa-text-bwa_accent", walletItemClass = "bwa-w-full bwa-cursor-pointer bwa-border bwa-border-transparent bwa-p-4 bwa-rounded-xl bwa-transition-all", walletImageClass = "bwa-w-[50px]", walletLabelClass = "bwa-text-white bwa-font-bold bwa-capitalize bwa-text-xl bwa-pl-3 bwa-text-center", icon = "https://ordinalnovus.com/logo_default.png", iconClass = "bwa-w-[100px]", iconContainerClass = "bwa-w-full bwa_center", }) => {
+const WalletModal = ({ open, handleClose, wallets, getLeatherAddress, getPhantomAddress, getOkxAddress, getAddress, getAddressOptions, getUnisatAddress, setWallet, meWallets, modalContainerClass = "bwa-bg-black bwa-bg-opacity-75 bwa-h-screen bwa-w-full bwa_center", modalContentClass = "bwa-bg-bwa_secondary bwa-p-6 bwa-min-w-[50%] bwa-relative bwa-shadow-xl bwa-rounded-xl", closeButtonClass = "bwa-rounded bwa_font-bold bwa-bg-gray-700 hover:bwa-bg-red-500 bwa-bg-opacity-50 bwa-text-gray-300 bwa-p-2 bwa-cursor-pointer", headingClass = "bwa_modalHeading bwa-text-bwa_accent", walletItemClass = "bwa-w-full bwa-cursor-pointer bwa-border bwa-border-transparent bwa-p-4 bwa-rounded-xl bwa-transition-all", walletImageClass = "bwa-w-[50px]", walletLabelClass = "bwa-text-white bwa-font-bold bwa-capitalize bwa-text-xl bwa-pl-3 bwa-text-center", icon = "https://ordinalnovus.com/logo_default.png", iconClass = "bwa-w-[100px]", iconContainerClass = "bwa-w-full bwa_center", }) => {
     return (react_1.default.createElement(material_1.Modal, { open: open, onClose: handleClose, "aria-labelledby": "modal-modal-title", "aria-describedby": "modal-modal-description" },
         react_1.default.createElement("div", { className: modalContainerClass },
             react_1.default.createElement("div", { className: modalContentClass },
@@ -36,6 +36,12 @@ const WalletModal = ({ open, handleClose, wallets, getLeatherAddress, getAddress
                         }
                         else if (selectedItem === "Unisat") {
                             yield getUnisatAddress();
+                        }
+                        else if (selectedItem === "Phantom") {
+                            yield getPhantomAddress();
+                        }
+                        else if (selectedItem === "Okxwallet") {
+                            yield getOkxAddress();
                         }
                         else if (selectedItem === "MagicEden") {
                             const wallet = meWallets.filter((a) => a.name === "Magic Eden")[0];
