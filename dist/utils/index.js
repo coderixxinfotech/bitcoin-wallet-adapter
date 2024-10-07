@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.countDummyUtxos = exports.isBase64 = exports.isHex = exports.hexToBase64 = exports.shortenString = exports.getBTCPriceInDollars = exports.base64ToHex = exports.convertBtcToSat = exports.convertSatToBtc = void 0;
+exports.countDummyUtxos = exports.isBase64 = exports.isHex = exports.hexToBase64 = exports.BytesFromHex = exports.shortenString = exports.getBTCPriceInDollars = exports.base64ToHex = exports.convertBtcToSat = exports.convertSatToBtc = void 0;
 const axios_1 = __importDefault(require("axios"));
 // Function to convert price from satoshi to Bitcoin
 function convertSatToBtc(priceInSat) {
@@ -55,6 +55,19 @@ function shortenString(str, length = 4) {
     return `${start}...${end}`;
 }
 exports.shortenString = shortenString;
+const BytesFromHex = (hexString) => {
+    var _a, _b;
+    const cleanHexString = hexString.replace(/[^0-9A-Fa-f]/g, "");
+    if (cleanHexString.length % 2 !== 0) {
+        throw new Error("Invalid hex string length");
+    }
+    const bytes = (_b = (_a = cleanHexString.match(/.{2}/g)) === null || _a === void 0 ? void 0 : _a.map((byte) => parseInt(byte, 16))) !== null && _b !== void 0 ? _b : [];
+    if (bytes.some(isNaN)) {
+        throw new Error("Invalid hex string");
+    }
+    return new Uint8Array(bytes);
+};
+exports.BytesFromHex = BytesFromHex;
 const hexToBase64 = (hexString) => {
     const bytes = new Uint8Array(Math.ceil(hexString.length / 2));
     for (let i = 0; i < bytes.length; i++) {

@@ -4,6 +4,8 @@ import { useWalletAddress } from "./index";
 import { CommonSignOptions } from "../types/index";
 import { base64ToHex } from "../utils";
 import { useMESign } from "./useMESign";
+import { useOkxSign } from "./useOkxSign";
+import { usePhantomSign } from "./usePhantomSign";
 
 export const useSignTx = () => {
   const walletDetails = useWalletAddress();
@@ -27,6 +29,9 @@ export const useSignTx = () => {
     result: unisatResult,
     error: unisatError,
   } = useUnisatSign();
+
+  const { sign: phantomSign, result: phantomResult, error: phantomError } = usePhantomSign();
+  const { sign: okxSign, result: okxResult, error: okxError } = useOkxSign();
 
   const signTx = useCallback(
     async (props: CommonSignOptions) => {
@@ -59,23 +64,41 @@ export const useSignTx = () => {
         } else if (walletDetails.wallet === "Unisat") {
           //@ts-ignore
           unisatSign(options);
+        } else if (walletDetails.wallet === "Phantom") {
+          //@ts-ignore
+          phantomSign(options);
+        } else if (walletDetails.wallet === "Okxwallet") {
+          //@ts-ignore
+          okxSign(options);
         }
       } catch (err: any) {
         setError(err);
         setLoading(false);
       }
     },
-    [walletDetails, leatherSign, xverseSign, unisatSign, meSign]
+    [walletDetails, leatherSign, xverseSign, unisatSign, meSign, okxSign, phantomSign]
   );
 
   useEffect(() => {
-    if (leatherResult || xverseResult || unisatResult || meResult) {
-      setResult(leatherResult || xverseResult || unisatResult || meResult);
+    if (
+      leatherResult ||
+      xverseResult ||
+      unisatResult ||
+      meResult ||
+      okxResult ||
+      okxResult ||
+      phantomResult
+    ) {
+      setResult(
+        leatherResult || xverseResult || unisatResult || meResult || okxResult || phantomResult
+      );
       setLoading(false);
     }
 
-    if (leatherError || xverseError || unisatError || meError) {
-      setError(leatherError || xverseError || unisatError || meError);
+    if (leatherError || xverseError || unisatError || meError || okxError || phantomError) {
+      setError(
+        leatherError || xverseError || unisatError || meError || okxError || phantomError
+      );
       setLoading(false);
     }
   }, [
@@ -87,6 +110,10 @@ export const useSignTx = () => {
     unisatError,
     meResult,
     meError,
+    okxResult,
+    okxError,
+    phantomResult,
+    phantomError
   ]);
 
   return { signTx, loading, result, error };

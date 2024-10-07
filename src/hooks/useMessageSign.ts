@@ -9,12 +9,15 @@ import { useWallets } from "@wallet-standard/react";
 import type { WalletWithFeatures } from "@wallet-standard/base";
 
 import { Verifier } from "bip322-js";
+import { bytesToBase64 } from "..";
 
 interface CustomWindow extends Window {
   LeatherProvider?: any;
   unisat?: any;
   BitcoinProvider?: any;
   btc?: any;
+  phantom?: any;
+  okxwallet?: any;
 }
 
 const SatsConnectNamespace = "sats-connect:";
@@ -103,6 +106,36 @@ export const useMessageSign = () => {
             options.message,
             sign.result.signature
           );
+        } else if (
+          typeof window?.phantom !== "undefined" &&
+          options.wallet === "Phantom"
+        ) {
+          const message = new TextEncoder().encode(options.message);
+          const { signature } = await window?.phantom?.bitcoin?.signMessage(
+            options.address,
+            message
+          );
+
+          const base64 = bytesToBase64(signature);
+
+          verifyAndSetResult(
+            options.address,
+            new TextDecoder().decode(message),
+            base64
+          );
+        }
+
+        // okx wallett
+        else if (
+          typeof window?.okxwallet !== "undefined" &&
+          options.wallet === "Okx"
+        ) {
+          const signature = await window.okxwallet.bitcoin.signMessage(
+            options.message,
+            "ecdsa"
+          );
+
+          verifyAndSetResult(options.address, options.message, signature);
         } else if (options.wallet === "MagicEden") {
           const wallet = testWallets.filter(
             (a: any) => a.name === "Magic Eden"

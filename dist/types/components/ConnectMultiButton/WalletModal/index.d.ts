@@ -5,6 +5,8 @@ interface WalletModalProps {
     handleClose: () => void;
     wallets: IInstalledWallets[];
     getLeatherAddress: () => void;
+    getPhantomAddress: () => void;
+    getOkxAddress: () => void;
     getAddress: (options: any) => Promise<void>;
     getAddressOptions: any;
     getUnisatAddress: any;

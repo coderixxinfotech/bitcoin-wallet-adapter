@@ -40,6 +40,19 @@ export function shortenString(str: string, length = 4): string {
   return `${start}...${end}`;
 }
 
+export const BytesFromHex = (hexString: string): Uint8Array => {
+  const cleanHexString = hexString.replace(/[^0-9A-Fa-f]/g, "");
+  if (cleanHexString.length % 2 !== 0) {
+    throw new Error("Invalid hex string length");
+  }
+  const bytes =
+    cleanHexString.match(/.{2}/g)?.map((byte) => parseInt(byte, 16)) ?? [];
+  if (bytes.some(isNaN)) {
+    throw new Error("Invalid hex string");
+  }
+  return new Uint8Array(bytes);
+};
+
 export const hexToBase64 = (hexString: string) => {
   const bytes = new Uint8Array(Math.ceil(hexString.length / 2));
 
