@@ -131,7 +131,7 @@ Issued At: ${issuedAt}`;
         }
         if (typeof window.okxwallet !== "undefined") {
             checkWallets.push({
-                label: "Okxwallet",
+                label: "OKX",
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-okx-logo.png",
             });
         }
@@ -202,7 +202,7 @@ Issued At: ${issuedAt}`;
                 updateLastWallet(lastWallet);
                 updateWalletDetails(walletDetail);
             }
-            else if (lastWallet === "Okxwallet" &&
+            else if (lastWallet === "Okx" &&
                 (walletDetail === null || walletDetail === void 0 ? void 0 : walletDetail.cardinal) &&
                 (walletDetail === null || walletDetail === void 0 ? void 0 : walletDetail.ordinal)) {
                 // If the last wallet is unisat and user data is present, set the wallet details
@@ -396,12 +396,12 @@ Issued At: ${issuedAt}`;
         }
     });
     const getOkxAddress = () => __awaiter(this, void 0, void 0, function* () {
-        const okxwallet = window.okxwallet.bitcoin;
-        const accounts = yield okxwallet.requestAccounts();
-        const publicKey = yield okxwallet.getPublicKey();
+        const Okx = window.okxwallet.bitcoin;
+        const accounts = yield Okx.requestAccounts();
+        const publicKey = yield Okx.getPublicKey();
         if (accounts.length && publicKey) {
             const wd = {
-                wallet: "Okxwallet",
+                wallet: "Okx",
                 ordinal: accounts[0],
                 cardinal: accounts[0],
                 ordinalPubkey: publicKey,
@@ -412,7 +412,7 @@ Issued At: ${issuedAt}`;
                 network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                 address: wd.ordinal,
                 message: connectionMessage || getMessage(wd.ordinal),
-                wallet: "Okxwallet",
+                wallet: "Okx",
             });
             setTempWD(wd);
         }

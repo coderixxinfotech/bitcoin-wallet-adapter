@@ -30,9 +30,9 @@ const useOkxSign = () => {
                 toSignInputs: okxInputs,
                 autoFinalized: false,
             };
-            const okxwallet = window.okxwallet.bitcoin;
+            const Okx = window.okxwallet.bitcoin;
             // @ts-ignore
-            const signedPsbt = yield okxwallet.signPsbts(psbt, options);
+            const signedPsbt = yield Okx.signPsbts(psbt, options);
             setResult((0, utils_1.hexToBase64)(signedPsbt));
         }
         catch (e) {

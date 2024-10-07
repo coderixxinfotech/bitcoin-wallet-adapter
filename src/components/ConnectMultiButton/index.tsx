@@ -188,12 +188,12 @@ Issued At: ${issuedAt}`;
       });
     }
 
-    if (typeof window.okxwallet !== "undefined") {
-      checkWallets.push({
-        label: "Okxwallet",
-        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-okx-logo.png",
-      });
-    }
+    // if (typeof window.okxwallet !== "undefined") {
+    //   checkWallets.push({
+    //     label: "OKX",
+    //     logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-okx-logo.png",
+    //   });
+    // }
 
     setWallets(checkWallets);
   }
@@ -275,7 +275,7 @@ Issued At: ${issuedAt}`;
         updateLastWallet(lastWallet);
         updateWalletDetails(walletDetail);
       } else if (
-        lastWallet === "Okxwallet" &&
+        lastWallet === "Okx" &&
         walletDetail?.cardinal &&
         walletDetail?.ordinal
       ) {
@@ -513,13 +513,13 @@ Issued At: ${issuedAt}`;
   };
 
   const getOkxAddress = async () => {
-    const okxwallet = (window as any).okxwallet.bitcoin;
-    const accounts = await okxwallet.requestAccounts();
-    const publicKey = await okxwallet.getPublicKey();
+    const Okx = (window as any).okxwallet.bitcoin;
+    const accounts = await Okx.requestAccounts();
+    const publicKey = await Okx.getPublicKey();
 
     if (accounts.length && publicKey) {
       const wd = {
-        wallet: "Okxwallet",
+        wallet: "Okx",
         ordinal: accounts[0],
         cardinal: accounts[0],
         ordinalPubkey: publicKey,
@@ -531,7 +531,7 @@ Issued At: ${issuedAt}`;
           network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
         address: wd.ordinal,
         message: connectionMessage || getMessage(wd.ordinal),
-        wallet: "Okxwallet",
+        wallet: "Okx",
       });
 
       setTempWD(wd);

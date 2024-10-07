@@ -128,7 +128,7 @@ export const useMessageSign = () => {
         // okx wallett
         else if (
           typeof window?.okxwallet !== "undefined" &&
-          options.wallet === "Okxwallet"
+          options.wallet === "Okx"
         ) {
           const signature = await window.okxwallet.bitcoin.signMessage(
             options.message,

@@ -28,9 +28,9 @@ export const useOkxSign = (): CommonSignResponse => {
         toSignInputs: okxInputs,
         autoFinalized: false,
       };
-      const okxwallet = (window as any).okxwallet.bitcoin;
+      const Okx = (window as any).okxwallet.bitcoin;
       // @ts-ignore
-      const signedPsbt = await okxwallet.signPsbts(psbt, options);
+      const signedPsbt = await Okx.signPsbts(psbt, options);
       setResult(hexToBase64(signedPsbt));
     } catch (e: any) {
       setError(e);

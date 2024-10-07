@@ -89,7 +89,7 @@ const useMessageSign = () => {
             }
             // okx wallett
             else if (typeof (window === null || window === void 0 ? void 0 : window.okxwallet) !== "undefined" &&
-                options.wallet === "Okxwallet") {
+                options.wallet === "Okx") {
                 const signature = yield window.okxwallet.bitcoin.signMessage(options.message, "ecdsa");
                 verifyAndSetResult(options.address, options.message, signature);
             }
