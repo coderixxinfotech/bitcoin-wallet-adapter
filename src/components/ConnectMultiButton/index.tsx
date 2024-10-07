@@ -511,7 +511,7 @@ Issued At: ${issuedAt}`;
   };
 
   const getOkxAddress = async () => {
-    let okxwallet = (window as any).okxwallet.bitcoin;
+    const okxwallet = (window as any).okxwallet.bitcoin;
     const accounts = await okxwallet.requestAccounts();
     const publicKey = await okxwallet.getPublicKey();
 

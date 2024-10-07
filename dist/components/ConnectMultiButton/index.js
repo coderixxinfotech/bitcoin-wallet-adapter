@@ -396,7 +396,7 @@ Issued At: ${issuedAt}`;
         }
     });
     const getOkxAddress = () => __awaiter(this, void 0, void 0, function* () {
-        let okxwallet = window.okxwallet.bitcoin;
+        const okxwallet = window.okxwallet.bitcoin;
         const accounts = yield okxwallet.requestAccounts();
         const publicKey = yield okxwallet.getPublicKey();
         if (accounts.length && publicKey) {
