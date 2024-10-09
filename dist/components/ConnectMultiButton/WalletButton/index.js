@@ -9,10 +9,10 @@ const utils_1 = require("../../../utils");
 const ri_1 = require("react-icons/ri");
 const fa_1 = require("react-icons/fa");
 const material_1 = require("@mui/material");
-const WalletButton = ({ wallets, lastWallet, walletDetails, handleMenuOpen, handleMenuClose, handleOpen, handleClose, disconnect, anchorEl, menuOpen, classname, InnerMenu, balance, }) => {
+const WalletButton = ({ wallets, lastWallet, walletDetails, handleMenuOpen, handleMenuClose, handleOpen, handleClose, disconnect, anchorEl, menuOpen, classname, InnerMenu, balance, fractal, }) => {
     return lastWallet && walletDetails ? (react_1.default.createElement("div", { className: "relative" },
         react_1.default.createElement(CustomButton_1.default, { icon: ri_1.RiAccountCircleFill, text: `${balance
-                ? `${(balance / 100000000).toFixed(5)} BTC`
+                ? `${(balance / 100000000).toFixed(5)} ${fractal ? " FB" : " BTC"}`
                 : (0, utils_1.shortenString)(walletDetails.cardinal, 5)}`, onClick: (e) => (menuOpen ? handleMenuClose() : handleMenuOpen(e)), className: classname }),
         InnerMenu ? (react_1.default.createElement(InnerMenu, { anchorEl: anchorEl, open: menuOpen, onClose: handleMenuClose, disconnect: disconnect })) : (react_1.default.createElement(material_1.Menu, { id: "connected-menu", anchorEl: anchorEl, open: menuOpen, onClose: handleMenuClose, PaperProps: {
                 elevation: 0,

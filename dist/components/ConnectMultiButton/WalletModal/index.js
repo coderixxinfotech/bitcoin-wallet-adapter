@@ -40,7 +40,7 @@ const WalletModal = ({ open, handleClose, wallets, getLeatherAddress, getPhantom
                         else if (selectedItem === "Phantom") {
                             yield getPhantomAddress();
                         }
-                        else if (selectedItem === "Okx") {
+                        else if (selectedItem === "OKX") {
                             yield getOkxAddress();
                         }
                         else if (selectedItem === "MagicEden") {

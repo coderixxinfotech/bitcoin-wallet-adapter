@@ -32,6 +32,7 @@ import type { WalletWithFeatures } from "@wallet-standard/base";
 import { useWallet, useWallets } from "@wallet-standard/react";
 import { ConnectionStatusContext } from "../../common/ConnectionStatus";
 import { useMessageSign } from "../../hooks";
+import useWalletEffect from "../../hooks/useWalletEffect";
 
 interface CustomWindow extends Window {
   LeatherProvider?: any;
@@ -71,6 +72,7 @@ function ConnectMultiWallet({
   balance,
   network,
   connectionMessage,
+  fractal,
 }: {
   buttonClassname?: string;
   modalContainerClass?: string;
@@ -86,6 +88,7 @@ function ConnectMultiWallet({
   balance?: number;
   network?: "mainnet" | "testnet";
   connectionMessage?: string;
+  fractal?: boolean;
 }) {
   const { loading, result, error, signMessage } = useMessageSign();
   //for notification
@@ -159,7 +162,7 @@ Issued At: ${issuedAt}`;
       });
     }
 
-    if (typeof window.LeatherProvider !== "undefined") {
+    if (!fractal && typeof window.LeatherProvider !== "undefined") {
       checkWallets.push({
         label: "Leather",
         logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.png",
@@ -167,6 +170,7 @@ Issued At: ${issuedAt}`;
     }
 
     if (
+      !fractal &&
       window?.BitcoinProvider?.signTransaction?.toString()?.includes("Psbt")
     ) {
       checkWallets.push({
@@ -175,25 +179,25 @@ Issued At: ${issuedAt}`;
       });
     }
 
-    if (typeof window.magicEden !== "undefined")
+    if (!fractal && typeof window.magicEden !== "undefined")
       checkWallets.push({
         label: "MagicEden",
         logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-magiceden-logo.png",
       });
 
-    if (typeof window.phantom !== "undefined") {
+    if (!fractal && typeof window.phantom !== "undefined") {
       checkWallets.push({
         label: "Phantom",
         logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-phantom-logo.png",
       });
     }
 
-    // if (typeof window.okxwallet !== "undefined") {
-    //   checkWallets.push({
-    //     label: "OKX",
-    //     logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-okx-logo.png",
-    //   });
-    // }
+    if (typeof window.okxwallet !== "undefined") {
+      checkWallets.push({
+        label: "OKX",
+        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-okx-logo.png",
+      });
+    }
 
     setWallets(checkWallets);
   }
@@ -319,25 +323,8 @@ Issued At: ${issuedAt}`;
     }
   }, [updateLastWallet, updateWalletDetails]);
 
-  useEffect(() => {
-    if (typeof window.unisat !== "undefined") {
-      let unisat = (window as any).unisat;
-      // Register the event listeners
-      unisat.on("accountsChanged", disconnect);
-      unisat.on("networkChanged", disconnect);
-    }
-
-    // Cleanup logic for the useEffect hook
-    return () => {
-      // Remove the event listeners when the component unmounts
-      if (typeof window.unisat !== "undefined") {
-        let unisat = (window as any).unisat;
-        // Register the event listeners
-        unisat.on("accountsChanged", disconnect);
-        unisat.on("networkChanged", disconnect);
-      }
-    };
-  }, []); // Empty array means this effect runs once on mount and cleanup on unmount
+  // Use the custom hook
+  useWalletEffect(walletDetails, disconnect, network, redux_network);
 
   //xVerse
 
@@ -513,9 +500,13 @@ Issued At: ${issuedAt}`;
   };
 
   const getOkxAddress = async () => {
-    const Okx = (window as any).okxwallet.bitcoin;
+    const Okx = fractal
+      ? (window as any).okxwallet.fractalBitcoin
+      : (window as any).okxwallet.bitcoin;
     const accounts = await Okx.requestAccounts();
     const publicKey = await Okx.getPublicKey();
+
+    // console.log({ accounts, publicKey });
 
     if (accounts.length && publicKey) {
       const wd = {
@@ -532,6 +523,7 @@ Issued At: ${issuedAt}`;
         address: wd.ordinal,
         message: connectionMessage || getMessage(wd.ordinal),
         wallet: "Okx",
+        fractal,
       });
 
       setTempWD(wd);
@@ -632,6 +624,7 @@ Issued At: ${issuedAt}`;
           classname={buttonClassname}
           InnerMenu={InnerMenu}
           balance={balance}
+          fractal={fractal}
         />
 
         <WalletModal

@@ -52,8 +52,9 @@ const SatsConnectNamespace = "sats-connect:";
 const react_2 = require("@wallet-standard/react");
 const ConnectionStatus_1 = require("../../common/ConnectionStatus");
 const hooks_1 = require("../../hooks");
+const useWalletEffect_1 = __importDefault(require("../../hooks/useWalletEffect"));
 const purposes = ["ordinals", "payment"];
-function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, }) {
+function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, fractal, }) {
     const { loading, result, error, signMessage } = (0, hooks_1.useMessageSign)();
     //for notification
     const dispatch = (0, react_redux_1.useDispatch)();
@@ -106,24 +107,25 @@ Issued At: ${issuedAt}`;
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-unisat-logo.png",
             });
         }
-        if (typeof window.LeatherProvider !== "undefined") {
+        if (!fractal && typeof window.LeatherProvider !== "undefined") {
             checkWallets.push({
                 label: "Leather",
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-leather-logo.png",
             });
         }
-        if ((_c = (_b = (_a = window === null || window === void 0 ? void 0 : window.BitcoinProvider) === null || _a === void 0 ? void 0 : _a.signTransaction) === null || _b === void 0 ? void 0 : _b.toString()) === null || _c === void 0 ? void 0 : _c.includes("Psbt")) {
+        if (!fractal &&
+            ((_c = (_b = (_a = window === null || window === void 0 ? void 0 : window.BitcoinProvider) === null || _a === void 0 ? void 0 : _a.signTransaction) === null || _b === void 0 ? void 0 : _b.toString()) === null || _c === void 0 ? void 0 : _c.includes("Psbt"))) {
             checkWallets.push({
                 label: "Xverse",
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-xverse-logo.png",
             });
         }
-        if (typeof window.magicEden !== "undefined")
+        if (!fractal && typeof window.magicEden !== "undefined")
             checkWallets.push({
                 label: "MagicEden",
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-magiceden-logo.png",
             });
-        if (typeof window.phantom !== "undefined") {
+        if (!fractal && typeof window.phantom !== "undefined") {
             checkWallets.push({
                 label: "Phantom",
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-phantom-logo.png",
@@ -241,24 +243,8 @@ Issued At: ${issuedAt}`;
             }
         }
     }, [updateLastWallet, updateWalletDetails]);
-    (0, react_1.useEffect)(() => {
-        if (typeof window.unisat !== "undefined") {
-            let unisat = window.unisat;
-            // Register the event listeners
-            unisat.on("accountsChanged", disconnect);
-            unisat.on("networkChanged", disconnect);
-        }
-        // Cleanup logic for the useEffect hook
-        return () => {
-            // Remove the event listeners when the component unmounts
-            if (typeof window.unisat !== "undefined") {
-                let unisat = window.unisat;
-                // Register the event listeners
-                unisat.on("accountsChanged", disconnect);
-                unisat.on("networkChanged", disconnect);
-            }
-        };
-    }, []); // Empty array means this effect runs once on mount and cleanup on unmount
+    // Use the custom hook
+    (0, useWalletEffect_1.default)(walletDetails, disconnect, network, redux_network);
     //xVerse
     const getAddressOptions = {
         payload: {
@@ -396,9 +382,12 @@ Issued At: ${issuedAt}`;
         }
     });
     const getOkxAddress = () => __awaiter(this, void 0, void 0, function* () {
-        const Okx = window.okxwallet.bitcoin;
+        const Okx = fractal
+            ? window.okxwallet.fractalBitcoin
+            : window.okxwallet.bitcoin;
         const accounts = yield Okx.requestAccounts();
         const publicKey = yield Okx.getPublicKey();
+        console.log({ accounts, publicKey });
         if (accounts.length && publicKey) {
             const wd = {
                 wallet: "Okx",
@@ -413,6 +402,7 @@ Issued At: ${issuedAt}`;
                 address: wd.ordinal,
                 message: connectionMessage || getMessage(wd.ordinal),
                 wallet: "Okx",
+                fractal,
             });
             setTempWD(wd);
         }
@@ -482,7 +472,7 @@ Issued At: ${issuedAt}`;
     }, [tempWD, result]);
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement("div", null,
-            react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, InnerMenu: InnerMenu, balance: balance }),
+            react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, InnerMenu: InnerMenu, balance: balance, fractal: fractal }),
             react_1.default.createElement(WalletModal_1.default, { open: open, handleClose: handleClose, wallets: wallets, getLeatherAddress: getLeatherAddress, getPhantomAddress: getPhantomAddress, getOkxAddress: getOkxAddress, getAddress: sats_connect_1.getAddress, getAddressOptions: getAddressOptions, getUnisatAddress: getUnisatAddress, modalContainerClass: modalContainerClass, modalContentClass: modalContentClass, closeButtonClass: closeButtonClass, headingClass: headingClass, walletItemClass: walletItemClass, walletImageClass: walletImageClass, walletLabelClass: walletLabelClass, icon: icon, iconClass: iconClass, meWallets: testWallets, setWallet: setWallet }))));
 }
 exports.default = ConnectMultiWallet;

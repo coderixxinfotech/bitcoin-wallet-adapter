@@ -36,6 +36,7 @@ export const useMessageSign = () => {
     address: string;
     message: string;
     wallet: string;
+    fractal?: boolean;
   };
 
   const verifyAndSetResult = (
@@ -130,10 +131,12 @@ export const useMessageSign = () => {
           typeof window?.okxwallet !== "undefined" &&
           options.wallet === "Okx"
         ) {
-          const signature = await window.okxwallet.bitcoin.signMessage(
-            options.message,
-            "ecdsa"
-          );
+          const Okx = options.fractal
+            ? (window as any).okxwallet.fractalBitcoin
+            : options.network === "testnet"
+            ? (window as any).okxwallet.bitcoinTestnet
+            : (window as any).okxwallet.bitcoin;
+          const signature = await Okx.signMessage(options.message, "ecdsa");
 
           verifyAndSetResult(options.address, options.message, signature);
         } else if (options.wallet === "MagicEden") {

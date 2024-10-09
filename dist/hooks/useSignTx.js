@@ -26,7 +26,7 @@ const useSignTx = () => {
     const { sign: xverseSign, result: xverseResult, error: xverseError, } = (0, index_1.useXverseSign)();
     const { sign: meSign, result: meResult, error: meError } = (0, useMESign_1.useMESign)();
     const { sign: unisatSign, result: unisatResult, error: unisatError, } = (0, index_1.useUnisatSign)();
-    const { sign: phantomSign, result: phantomResult, error: phantomError } = (0, usePhantomSign_1.usePhantomSign)();
+    const { sign: phantomSign, result: phantomResult, error: phantomError, } = (0, usePhantomSign_1.usePhantomSign)();
     const { sign: okxSign, result: okxResult, error: okxError } = (0, useOkxSign_1.useOkxSign)();
     const signTx = (0, react_1.useCallback)((props) => __awaiter(void 0, void 0, void 0, function* () {
         setLoading(true);
@@ -65,7 +65,7 @@ const useSignTx = () => {
                 //@ts-ignore
                 phantomSign(options);
             }
-            else if (walletDetails.wallet === "Okxwallet") {
+            else if (walletDetails.wallet === "Okx") {
                 //@ts-ignore
                 okxSign(options);
             }
@@ -74,7 +74,15 @@ const useSignTx = () => {
             setError(err);
             setLoading(false);
         }
-    }), [walletDetails, leatherSign, xverseSign, unisatSign, meSign, okxSign, phantomSign]);
+    }), [
+        walletDetails,
+        leatherSign,
+        xverseSign,
+        unisatSign,
+        meSign,
+        okxSign,
+        phantomSign,
+    ]);
     (0, react_1.useEffect)(() => {
         if (leatherResult ||
             xverseResult ||
@@ -83,11 +91,26 @@ const useSignTx = () => {
             okxResult ||
             okxResult ||
             phantomResult) {
-            setResult(leatherResult || xverseResult || unisatResult || meResult || okxResult || phantomResult);
+            setResult(leatherResult ||
+                xverseResult ||
+                unisatResult ||
+                meResult ||
+                okxResult ||
+                phantomResult);
             setLoading(false);
         }
-        if (leatherError || xverseError || unisatError || meError || okxError || phantomError) {
-            setError(leatherError || xverseError || unisatError || meError || okxError || phantomError);
+        if (leatherError ||
+            xverseError ||
+            unisatError ||
+            meError ||
+            okxError ||
+            phantomError) {
+            setError(leatherError ||
+                xverseError ||
+                unisatError ||
+                meError ||
+                okxError ||
+                phantomError);
             setLoading(false);
         }
     }, [
@@ -102,7 +125,7 @@ const useSignTx = () => {
         okxResult,
         okxError,
         phantomResult,
-        phantomError
+        phantomError,
     ]);
     return { signTx, loading, result, error };
 };

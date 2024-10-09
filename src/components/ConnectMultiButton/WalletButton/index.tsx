@@ -28,6 +28,7 @@ interface WalletButtonProps {
   classname?: string;
   InnerMenu?: InnerMenuType;
   balance?: number | null;
+  fractal?: boolean;
 }
 
 const WalletButton: React.FC<WalletButtonProps> = ({
@@ -44,6 +45,7 @@ const WalletButton: React.FC<WalletButtonProps> = ({
   classname,
   InnerMenu,
   balance,
+  fractal,
 }) => {
   return lastWallet && walletDetails ? (
     <div className="relative">
@@ -51,7 +53,9 @@ const WalletButton: React.FC<WalletButtonProps> = ({
         icon={RiAccountCircleFill}
         text={`${
           balance
-            ? `${(balance / 100_000_000).toFixed(5)} BTC`
+            ? `${(balance / 100_000_000).toFixed(5)} ${
+                fractal ? " FB" : " BTC"
+              }`
             : shortenString(walletDetails.cardinal, 5)
         }`}
         onClick={(e) => (menuOpen ? handleMenuClose() : handleMenuOpen(e))}

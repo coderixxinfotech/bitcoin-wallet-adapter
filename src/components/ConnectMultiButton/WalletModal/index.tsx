@@ -90,7 +90,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
                         await getUnisatAddress();
                       } else if (selectedItem === "Phantom") {
                         await getPhantomAddress();
-                      } else if (selectedItem === "Okx") {
+                      } else if (selectedItem === "OKX") {
                         await getOkxAddress();
                       } else if (selectedItem === "MagicEden") {
                         const wallet = meWallets.filter(

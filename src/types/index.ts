@@ -58,6 +58,7 @@ export interface CommonSignOptions {
   psbt: string;
   network: "mainnet" | "testnet";
   action: "sell" | "buy" | "dummy" | "other";
+  fractal?: boolean;
   inputs: {
     publickey: string;
     address: string;

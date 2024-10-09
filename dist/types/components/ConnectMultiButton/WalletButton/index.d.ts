@@ -21,6 +21,7 @@ interface WalletButtonProps {
     classname?: string;
     InnerMenu?: InnerMenuType;
     balance?: number | null;
+    fractal?: boolean;
 }
 declare const WalletButton: React.FC<WalletButtonProps>;
 export default WalletButton;

@@ -30,7 +30,11 @@ export const useSignTx = () => {
     error: unisatError,
   } = useUnisatSign();
 
-  const { sign: phantomSign, result: phantomResult, error: phantomError } = usePhantomSign();
+  const {
+    sign: phantomSign,
+    result: phantomResult,
+    error: phantomError,
+  } = usePhantomSign();
   const { sign: okxSign, result: okxResult, error: okxError } = useOkxSign();
 
   const signTx = useCallback(
@@ -67,7 +71,7 @@ export const useSignTx = () => {
         } else if (walletDetails.wallet === "Phantom") {
           //@ts-ignore
           phantomSign(options);
-        } else if (walletDetails.wallet === "Okxwallet") {
+        } else if (walletDetails.wallet === "Okx") {
           //@ts-ignore
           okxSign(options);
         }
@@ -76,7 +80,15 @@ export const useSignTx = () => {
         setLoading(false);
       }
     },
-    [walletDetails, leatherSign, xverseSign, unisatSign, meSign, okxSign, phantomSign]
+    [
+      walletDetails,
+      leatherSign,
+      xverseSign,
+      unisatSign,
+      meSign,
+      okxSign,
+      phantomSign,
+    ]
   );
 
   useEffect(() => {
@@ -90,14 +102,31 @@ export const useSignTx = () => {
       phantomResult
     ) {
       setResult(
-        leatherResult || xverseResult || unisatResult || meResult || okxResult || phantomResult
+        leatherResult ||
+          xverseResult ||
+          unisatResult ||
+          meResult ||
+          okxResult ||
+          phantomResult
       );
       setLoading(false);
     }
 
-    if (leatherError || xverseError || unisatError || meError || okxError || phantomError) {
+    if (
+      leatherError ||
+      xverseError ||
+      unisatError ||
+      meError ||
+      okxError ||
+      phantomError
+    ) {
       setError(
-        leatherError || xverseError || unisatError || meError || okxError || phantomError
+        leatherError ||
+          xverseError ||
+          unisatError ||
+          meError ||
+          okxError ||
+          phantomError
       );
       setLoading(false);
     }
@@ -113,7 +142,7 @@ export const useSignTx = () => {
     okxResult,
     okxError,
     phantomResult,
-    phantomError
+    phantomError,
   ]);
 
   return { signTx, loading, result, error };

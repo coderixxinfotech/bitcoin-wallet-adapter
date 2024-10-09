@@ -8,7 +8,9 @@ export const useOkxSign = (): CommonSignResponse => {
   const [error, setError] = useState<Error | null>(null);
 
   const sign = useCallback(async (options: CommonSignOptions) => {
-    const { psbt, network, action, inputs } = options;
+    const { psbt, network, action, inputs, fractal } = options;
+
+    // console.log({ options });
 
     if (!isHex(psbt)) {
       setError(new Error("Okx wallet requires hexPsbt"));
@@ -18,19 +20,29 @@ export const useOkxSign = (): CommonSignResponse => {
     setLoading(true);
 
     try {
-      const okxInputs = inputs.map(({ address, index, sighash }) => ({
-        address,
-        index,
-        ...(action == "sell" && { sighashTypes: [sighash] }),
-      }));
+      const okxInputs = inputs.map(
+        ({ address, index, sighash, publickey }) => ({
+          address,
+          index: index[0],
+          // publickey,
+          ...(action == "sell" && { sighashTypes: [sighash] }),
+        })
+      );
 
       const options = {
         toSignInputs: okxInputs,
         autoFinalized: false,
       };
-      const Okx = (window as any).okxwallet.bitcoin;
+
+      // console.log({ options });
+      const Okx = fractal
+        ? (window as any).okxwallet.fractalBitcoin
+        : network === "testnet"
+        ? (window as any).okxwallet.bitcoinTestnet
+        : (window as any).okxwallet.bitcoin;
       // @ts-ignore
-      const signedPsbt = await Okx.signPsbts(psbt, options);
+      const signedPsbt = await Okx.signPsbt(psbt, options);
+      // console.log({ signedPsbt });
       setResult(hexToBase64(signedPsbt));
     } catch (e: any) {
       setError(e);

@@ -98,6 +98,7 @@ function WalletConnect() {
       balance={1000}
       network="mainnet"
       connectionMessage="Custom connection message"
+      fractal={true}
     />
   );
 }
@@ -116,12 +117,12 @@ function WalletConnect() {
 | walletImageClass    | string (optional)                              | Custom class for wallet logos                                |
 | walletLabelClass    | string (optional)                              | Custom class for wallet labels                               |
 | InnerMenu           | React.ComponentType<InnerMenuProps> (optional) | Custom component for the inner menu when wallet is connected |
-| icon                | string (optional)                              | Custom icon URL                                              |
+| icon                | string (optional)                              | Custom logo URL of your application                                              |
 | iconClass           | string (optional)                              | Custom class for the icon                                    |
 | balance             | number (optional)                              | Wallet balance to display                                    |
 | network             | "mainnet" \| "testnet" (optional)              | Bitcoin network to use                                       |
 | connectionMessage   | string (optional)                              | Custom message for wallet connection                         |
-
+| fractal             | boolean (optional)                             | Show only fractal supporting wallets (Unisat | OKX)    |
 ### 💸 PayButton
 
 Use the `PayButton` component to facilitate BTC payments:
@@ -276,7 +277,7 @@ Bitcoin Wallet Adapter currently supports the following wallets:
 - 🐂 Leather/Hiro
 - 🔮 MagicEden
 - 👻 Phantom
-- 🅾️ OKX (coming soon! 🚧)
+- 🅾️ OKX 
 
 ## 📚 Types
 
@@ -318,6 +319,7 @@ interface CommonSignOptions {
   psbt: string;
   network: "mainnet" | "testnet";
   action: "sell" | "buy" | "dummy" | "other";
+  fractal?: boolean;
   inputs: {
     publickey: string;
     address: string;

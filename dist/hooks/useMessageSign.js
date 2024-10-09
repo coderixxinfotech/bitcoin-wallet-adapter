@@ -90,7 +90,12 @@ const useMessageSign = () => {
             // okx wallett
             else if (typeof (window === null || window === void 0 ? void 0 : window.okxwallet) !== "undefined" &&
                 options.wallet === "Okx") {
-                const signature = yield window.okxwallet.bitcoin.signMessage(options.message, "ecdsa");
+                const Okx = options.fractal
+                    ? window.okxwallet.fractalBitcoin
+                    : options.network === "testnet"
+                        ? window.okxwallet.bitcoinTestnet
+                        : window.okxwallet.bitcoin;
+                const signature = yield Okx.signMessage(options.message, "ecdsa");
                 verifyAndSetResult(options.address, options.message, signature);
             }
             else if (options.wallet === "MagicEden") {
