@@ -4,6 +4,7 @@ import { useUnisatSign } from "./useUnisatSign";
 import { useWalletAddress } from "./useWalletAddress";
 import { useSignTx } from "./useSignTx";
 import { useMessageSign } from "./useMessageSign";
+import useDisconnect from "./useDisconnect";
 export {
   useLeatherSign,
   useXverseSign,
@@ -11,4 +12,5 @@ export {
   useWalletAddress,
   useSignTx,
   useMessageSign,
+  useDisconnect,
 };

@@ -33,6 +33,7 @@ import { useWallet, useWallets } from "@wallet-standard/react";
 import { ConnectionStatusContext } from "../../common/ConnectionStatus";
 import { useMessageSign } from "../../hooks";
 import useWalletEffect from "../../hooks/useWalletEffect";
+import useDisconnect from "../../hooks/useDisconnect";
 
 interface CustomWindow extends Window {
   LeatherProvider?: any;
@@ -92,6 +93,7 @@ function ConnectMultiWallet({
 }) {
   const { loading, result, error, signMessage } = useMessageSign();
   //for notification
+  const disconnectFunc = useDisconnect();
   const dispatch = useDispatch();
   const walletDetails = useSelector(
     (state: RootState) => state.general.walletDetails
@@ -307,21 +309,9 @@ Issued At: ${issuedAt}`;
 
   //disconnect
   const disconnect = useCallback(() => {
-    localStorage.removeItem("lastWallet");
-    localStorage.removeItem("wallet-detail");
-    updateLastWallet("");
-    updateWalletDetails(null);
+    disconnectFunc();
     handleMenuClose();
-
-    // Iterate over all items in localStorage
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith("walletBalance-")) {
-        // Remove items that start with 'walletBalance-'
-        localStorage.removeItem(key);
-      }
-    }
-  }, [updateLastWallet, updateWalletDetails]);
+  }, []);
 
   // Use the custom hook
   useWalletEffect(walletDetails, disconnect, network, redux_network);

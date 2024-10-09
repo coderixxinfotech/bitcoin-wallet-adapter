@@ -53,10 +53,12 @@ const react_2 = require("@wallet-standard/react");
 const ConnectionStatus_1 = require("../../common/ConnectionStatus");
 const hooks_1 = require("../../hooks");
 const useWalletEffect_1 = __importDefault(require("../../hooks/useWalletEffect"));
+const useDisconnect_1 = __importDefault(require("../../hooks/useDisconnect"));
 const purposes = ["ordinals", "payment"];
 function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, fractal, }) {
     const { loading, result, error, signMessage } = (0, hooks_1.useMessageSign)();
     //for notification
+    const disconnectFunc = (0, useDisconnect_1.default)();
     const dispatch = (0, react_redux_1.useDispatch)();
     const walletDetails = (0, react_redux_1.useSelector)((state) => state.general.walletDetails);
     const redux_network = (0, react_redux_1.useSelector)((state) => state.general.network.toLowerCase());
@@ -229,20 +231,9 @@ Issued At: ${issuedAt}`;
     };
     //disconnect
     const disconnect = (0, react_1.useCallback)(() => {
-        localStorage.removeItem("lastWallet");
-        localStorage.removeItem("wallet-detail");
-        updateLastWallet("");
-        updateWalletDetails(null);
+        disconnectFunc();
         handleMenuClose();
-        // Iterate over all items in localStorage
-        for (let i = localStorage.length - 1; i >= 0; i--) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith("walletBalance-")) {
-                // Remove items that start with 'walletBalance-'
-                localStorage.removeItem(key);
-            }
-        }
-    }, [updateLastWallet, updateWalletDetails]);
+    }, []);
     // Use the custom hook
     (0, useWalletEffect_1.default)(walletDetails, disconnect, network, redux_network);
     //xVerse
@@ -387,7 +378,7 @@ Issued At: ${issuedAt}`;
             : window.okxwallet.bitcoin;
         const accounts = yield Okx.requestAccounts();
         const publicKey = yield Okx.getPublicKey();
-        console.log({ accounts, publicKey });
+        // console.log({ accounts, publicKey });
         if (accounts.length && publicKey) {
             const wd = {
                 wallet: "Okx",

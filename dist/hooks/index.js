@@ -1,6 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useMessageSign = exports.useSignTx = exports.useWalletAddress = exports.useUnisatSign = exports.useXverseSign = exports.useLeatherSign = void 0;
+exports.useDisconnect = exports.useMessageSign = exports.useSignTx = exports.useWalletAddress = exports.useUnisatSign = exports.useXverseSign = exports.useLeatherSign = void 0;
 const useLeatherSign_1 = require("./useLeatherSign");
 Object.defineProperty(exports, "useLeatherSign", { enumerable: true, get: function () { return useLeatherSign_1.useLeatherSign; } });
 const useXverseSign_1 = require("./useXverseSign");
@@ -13,3 +16,5 @@ const useSignTx_1 = require("./useSignTx");
 Object.defineProperty(exports, "useSignTx", { enumerable: true, get: function () { return useSignTx_1.useSignTx; } });
 const useMessageSign_1 = require("./useMessageSign");
 Object.defineProperty(exports, "useMessageSign", { enumerable: true, get: function () { return useMessageSign_1.useMessageSign; } });
+const useDisconnect_1 = __importDefault(require("./useDisconnect"));
+exports.useDisconnect = useDisconnect_1.default;

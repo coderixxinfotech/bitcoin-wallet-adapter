@@ -18,7 +18,7 @@ const useOkxSign = () => {
     const [error, setError] = (0, react_1.useState)(null);
     const sign = (0, react_1.useCallback)((options) => __awaiter(void 0, void 0, void 0, function* () {
         const { psbt, network, action, inputs, fractal } = options;
-        console.log({ options });
+        // console.log({ options });
         if (!(0, utils_1.isHex)(psbt)) {
             setError(new Error("Okx wallet requires hexPsbt"));
             return;
@@ -30,7 +30,7 @@ const useOkxSign = () => {
                 toSignInputs: okxInputs,
                 autoFinalized: false,
             };
-            console.log({ options });
+            // console.log({ options });
             const Okx = fractal
                 ? window.okxwallet.fractalBitcoin
                 : network === "testnet"
@@ -38,7 +38,7 @@ const useOkxSign = () => {
                     : window.okxwallet.bitcoin;
             // @ts-ignore
             const signedPsbt = yield Okx.signPsbt(psbt, options);
-            console.log({ signedPsbt });
+            // console.log({ signedPsbt });
             setResult((0, utils_1.hexToBase64)(signedPsbt));
         }
         catch (e) {

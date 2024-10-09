@@ -17,6 +17,7 @@ import {
   useLeatherSign,
   useSignTx,
   useMessageSign,
+  useDisconnect,
 } from "./hooks";
 
 // Export Providers
@@ -29,6 +30,7 @@ export function bytesToBase64(bytes: any) {
   const binString = String.fromCodePoint(...bytes);
   return btoa(binString);
 }
+
 // Export Hooks
 export {
   useWalletAddress,
@@ -37,4 +39,5 @@ export {
   useLeatherSign,
   useSignTx,
   useMessageSign,
+  useDisconnect,
 };
