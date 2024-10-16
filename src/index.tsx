@@ -18,6 +18,7 @@ import {
   useSignTx,
   useMessageSign,
   useDisconnect,
+  usePayBTC,
 } from "./hooks";
 
 // Export Providers
@@ -40,4 +41,5 @@ export {
   useSignTx,
   useMessageSign,
   useDisconnect,
+  usePayBTC,
 };
