@@ -55,7 +55,7 @@ const hooks_1 = require("../../hooks");
 const useWalletEffect_1 = __importDefault(require("../../hooks/useWalletEffect"));
 const useDisconnect_1 = __importDefault(require("../../hooks/useDisconnect"));
 const purposes = ["ordinals", "payment"];
-function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, fractal, }) {
+function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, fractal, supportedWallets, }) {
     const { loading, result, error, signMessage } = (0, hooks_1.useMessageSign)();
     //for notification
     const disconnectFunc = (0, useDisconnect_1.default)();
@@ -102,7 +102,7 @@ Issued At: ${issuedAt}`;
     // Function to check which wallets are installed
     function getInstalledWalletName() {
         var _a, _b, _c;
-        const checkWallets = [];
+        let checkWallets = [];
         if (typeof window.unisat !== "undefined") {
             checkWallets.push({
                 label: "Unisat",
@@ -139,6 +139,9 @@ Issued At: ${issuedAt}`;
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-okx-logo.png",
             });
         }
+        if (supportedWallets && supportedWallets.length > 0)
+            // Filter out wallets that are not in supportedWallets
+            checkWallets = checkWallets.filter((wallet) => supportedWallets.includes(wallet.label.toLowerCase()));
         setWallets(checkWallets);
     }
     const getBTCPrice = (0, react_1.useCallback)(() => __awaiter(this, void 0, void 0, function* () {

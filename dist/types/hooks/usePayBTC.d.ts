@@ -2,7 +2,6 @@ type PaymentOptions = {
     network: "testnet" | "mainnet";
     address: string;
     amount: number;
-    wallet: string;
     fractal?: boolean;
 };
 export declare const usePayBTC: () => {

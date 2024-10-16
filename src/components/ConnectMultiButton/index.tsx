@@ -74,6 +74,7 @@ function ConnectMultiWallet({
   network,
   connectionMessage,
   fractal,
+  supportedWallets,
 }: {
   buttonClassname?: string;
   modalContainerClass?: string;
@@ -90,6 +91,7 @@ function ConnectMultiWallet({
   network?: "mainnet" | "testnet";
   connectionMessage?: string;
   fractal?: boolean;
+  supportedWallets?: string[];
 }) {
   const { loading, result, error, signMessage } = useMessageSign();
   //for notification
@@ -156,7 +158,7 @@ Issued At: ${issuedAt}`;
 
   // Function to check which wallets are installed
   function getInstalledWalletName() {
-    const checkWallets: any = [];
+    let checkWallets: any = [];
     if (typeof window.unisat !== "undefined") {
       checkWallets.push({
         label: "Unisat",
@@ -200,6 +202,12 @@ Issued At: ${issuedAt}`;
         logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-okx-logo.png",
       });
     }
+
+    if (supportedWallets && supportedWallets.length > 0)
+      // Filter out wallets that are not in supportedWallets
+      checkWallets = checkWallets.filter((wallet: any) =>
+        supportedWallets.includes(wallet.label.toLowerCase())
+      );
 
     setWallets(checkWallets);
   }

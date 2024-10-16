@@ -18,7 +18,7 @@ A robust React-based solution for connecting and interacting with Bitcoin wallet
 - 🔌 Easy-to-use React components for wallet connection and interactions
 - 🔐 Support for multiple Bitcoin wallet providers
 - 🎨 Customizable UI components
-- 🪝 Hooks for common wallet operations (address fetching, transaction signing, message signing)
+- 🪝 Hooks for common wallet operations (address fetching, transaction signing, message signing, BTC payments)
 - 📘 TypeScript support
 
 ## 🚀 Installation
@@ -99,6 +99,7 @@ function WalletConnect() {
       network="mainnet"
       connectionMessage="Custom connection message"
       fractal={true}
+      supportedWallets={["unisat", "xverse", "leather"]}
     />
   );
 }
@@ -117,29 +118,25 @@ function WalletConnect() {
 | walletImageClass    | string (optional)                              | Custom class for wallet logos                                |
 | walletLabelClass    | string (optional)                              | Custom class for wallet labels                               |
 | InnerMenu           | React.ComponentType<InnerMenuProps> (optional) | Custom component for the inner menu when wallet is connected |
-| icon                | string (optional)                              | Custom logo URL of your application                                              |
+| icon                | string (optional)                              | Custom logo URL of your application                          |
 | iconClass           | string (optional)                              | Custom class for the icon                                    |
 | balance             | number (optional)                              | Wallet balance to display                                    |
 | network             | "mainnet" \| "testnet" (optional)              | Bitcoin network to use                                       |
 | connectionMessage   | string (optional)                              | Custom message for wallet connection                         |
-| fractal             | boolean (optional)                             | Show only fractal supporting wallets (Unisat | OKX)    |
-### 💸 PayButton
+| fractal             | boolean (optional)                             | Show only fractal supporting wallets (Unisat                 | OKX) |
+| supportedWallets    | string[] (optional)                            | Array of wallet names to be supported in the dApp            |
 
-Use the `PayButton` component to facilitate BTC payments:
+The `supportedWallets` prop allows you to specify which wallets you want to support in your dApp. Pass an array of wallet names (in lowercase) to filter the available wallets. For example:
 
 ```jsx
-import { PayButton } from "bitcoin-wallet-adapter";
-
-function Payment() {
-  return (
-    <PayButton
-      amount={5000} // Amount in satoshis
-      recipient="bc1qrwtu9ec4sl6txnxqhvgmuavm72gv32jsaz2mks"
-      buttonClassname="custom-button-class" // Optional: custom button class
-    />
-  );
-}
+supportedWallets={["unisat", "xverse", "leather"]}
 ```
+
+This will only show the Unisat, Xverse, and Leather wallet options in the connect modal, even if other wallets are installed in the user's browser.
+
+> 📝 Note: If `supportedWallets` is not provided, all available wallets will be shown.
+
+
 
 ### 🔔 Notification
 
@@ -268,6 +265,84 @@ function MessageSigner() {
 }
 ```
 
+### 💸 usePayBTC
+
+The `usePayBTC` hook facilitates BTC payments from the currently connected wallet:
+
+```jsx
+import { usePayBTC } from "bitcoin-wallet-adapter";
+
+function BTCPayment() {
+  const { payBTC, loading, result, error } = usePayBTC();
+
+  const handlePayment = async () => {
+    const paymentOptions = {
+      network: "mainnet",
+      address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+      amount: 1000, // Amount in satoshis
+      fractal: false, // Optional: use fractal for OKX wallet
+    };
+
+    await payBTC(paymentOptions);
+  };
+
+  // Use useEffect to handle the result or error
+  useEffect(() => {
+    if (result) {
+      console.log("Payment Result (txid):", result);
+      // Handle successful payment
+    }
+    if (error) {
+      console.error("Payment Error:", error);
+      // Handle error
+    }
+  }, [result, error]);
+
+  return (
+    <button onClick={handlePayment} disabled={loading}>
+      {loading ? "Processing Payment..." : "Pay BTC"}
+    </button>
+  );
+}
+```
+
+#### PaymentOptions
+
+The `payBTC` function accepts a `PaymentOptions` object with the following properties:
+
+| Property | Type                   | Description                           |
+| -------- | ---------------------- | ------------------------------------- |
+| network  | "testnet" \| "mainnet" | The Bitcoin network to use            |
+| address  | string                 | The recipient's Bitcoin address       |
+| amount   | number                 | The amount to send in satoshis        |
+| fractal  | boolean (optional)     | Whether to use fractal for OKX wallet |
+
+#### Return Values
+
+The `usePayBTC` hook returns an object with the following properties:
+
+| Property | Type                                       | Description                                             |
+| -------- | ------------------------------------------ | ------------------------------------------------------- |
+| payBTC   | (options: PaymentOptions) => Promise<void> | Function to initiate the payment                        |
+| loading  | boolean                                    | Indicates if a payment is in progress                   |
+| result   | string \| null                             | The transaction ID (txid) if the payment was successful |
+| error    | Error \| null                              | Any error that occurred during the payment process      |
+
+#### Supported Wallets
+
+The `usePayBTC` hook supports the following wallets:
+
+- Leather
+- Xverse
+- MagicEden
+- Unisat
+- OKX
+- Phantom (not implemented for BTC payments)
+
+> 📝 Note: Make sure a wallet is connected before attempting to make a payment. The hook will return an error if no wallet is connected. The payment will be made using the currently connected wallet, which is determined by the `walletDetails` in the app's state.
+
+This hook integrates with the notification system of the Bitcoin Wallet Adapter. Any errors during the payment process will be displayed as notifications in your application.
+
 ## 👛 Supported Wallets
 
 Bitcoin Wallet Adapter currently supports the following wallets:
@@ -277,7 +352,7 @@ Bitcoin Wallet Adapter currently supports the following wallets:
 - 🐂 Leather/Hiro
 - 🔮 MagicEden
 - 👻 Phantom
-- 🅾️ OKX 
+- 🅾️ OKX
 
 ## 📚 Types
 
@@ -356,10 +431,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
-![Redux](https://img.shields.io/badge/redux-%23593d88.svg?style=for-the-badge&logo=redux&logoColor=white)
-
----
-
-Made with ❤️ by the Bitcoin Wallet Adapter Team
-
-[![](https://visitcount.itsvg.in/api?id=bitcoin-wallet-adapter&label=repo%20visit&pretty=false)](https://visitcount.itsvg.in)
+![Redux](https://img.shields.io/badge/redux-%23593d88.svg

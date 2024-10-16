@@ -46,20 +46,20 @@ const usePayBTC = () => {
         }
         try {
             let txid;
-            switch (options.wallet) {
+            switch (walletDetails.wallet) {
                 case "Leather":
                     const resp = yield ((_a = window.btc) === null || _a === void 0 ? void 0 : _a.request("sendTransfer", {
                         address: options.address,
                         amount: options.amount,
                     }));
-                    txid = resp === null || resp === void 0 ? void 0 : resp.id;
+                    txid = resp === null || resp === void 0 ? void 0 : resp.result.txid;
                     break;
                 case "Xverse":
                 case "MagicEden":
-                    const wallet = options.wallet === "MagicEden"
+                    const wallet = walletDetails.wallet === "MagicEden"
                         ? testWallets.find((a) => a.name === "Magic Eden")
                         : undefined;
-                    const sendBtcOptions = Object.assign(Object.assign({}, (options.wallet === "MagicEden" && {
+                    const sendBtcOptions = Object.assign(Object.assign({}, (walletDetails.wallet === "MagicEden" && {
                         getProvider: () => __awaiter(void 0, void 0, void 0, function* () {
                             var _b;
                             return (_b = wallet.features[SatsConnectNamespace]) === null || _b === void 0 ? void 0 : _b.provider;

@@ -23,7 +23,6 @@ type PaymentOptions = {
   network: "testnet" | "mainnet";
   address: string;
   amount: number;
-  wallet: string;
   fractal?: boolean;
 };
 
@@ -68,24 +67,24 @@ export const usePayBTC = () => {
       try {
         let txid: string;
 
-        switch (options.wallet) {
+        switch (walletDetails.wallet) {
           case "Leather":
             const resp = await window.btc?.request("sendTransfer", {
               address: options.address,
               amount: options.amount,
             });
-            txid = resp?.id;
+            txid = resp?.result.txid;
             break;
 
           case "Xverse":
           case "MagicEden":
             const wallet =
-              options.wallet === "MagicEden"
+              walletDetails.wallet === "MagicEden"
                 ? testWallets.find((a: any) => a.name === "Magic Eden")
                 : undefined;
 
             const sendBtcOptions = {
-              ...(options.wallet === "MagicEden" && {
+              ...(walletDetails.wallet === "MagicEden" && {
                 getProvider: async () =>
                   (wallet as unknown as WalletWithFeatures<any>).features[
                     SatsConnectNamespace
