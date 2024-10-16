@@ -2,7 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { usePayBTC, useWalletAddress } from "bitcoin-wallet-adapter";
 
-const recipient = "2N8eAf15Vgwuki6vQkuWC3noBRVkVzAQ4h4";
+const network = "testnet";
+const testnet_recipient = "2N8eAf15Vgwuki6vQkuWC3noBRVkVzAQ4h4";
+
+const mainnet_recipient = "bc1qacu2uu02kjn47psvvy2lvx66qzhaeu8ph3vnsk";
 
 function TestMintButton() {
   const { payBTC, loading, result, error } = usePayBTC();
@@ -40,8 +43,8 @@ function TestMintButton() {
 
     try {
       await payBTC({
-        network: "testnet",
-        address: recipient,
+        network,
+        address: network === "testnet" ? testnet_recipient : mainnet_recipient,
         amount: 2_000,
       });
     } catch (err) {

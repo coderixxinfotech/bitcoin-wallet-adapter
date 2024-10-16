@@ -81,6 +81,8 @@ export const usePayBTC = () => {
               amount: options.amount,
             });
             txid = resp?.result.txid;
+
+            setResult(txid);
             break;
 
           case "Xverse":
@@ -94,6 +96,8 @@ export const usePayBTC = () => {
             });
             console.log({ response });
             txid = response.result.txid;
+
+            setResult(txid);
             break;
           case "MagicEden":
             const wallet =
@@ -125,12 +129,16 @@ export const usePayBTC = () => {
               },
               onFinish: (response: any) => {
                 console.log({ response });
-                SetResult(response);
+
                 setLoading(false);
                 if (typeof response === "string") {
                   txid = response;
+                  setLoading(false);
+                  setResult(response);
                 } else if (response && typeof response.txid === "string") {
                   txid = response.txid;
+                  setResult(response.txid);
+                  setLoading(false);
                 } else {
                   throw new Error("Invalid response format");
                 }
@@ -141,10 +149,8 @@ export const usePayBTC = () => {
               },
             };
 
-            txid = (await sendBtcTransaction(
-              sendBtcOptions
-            )) as unknown as string;
-            console.log({ txid });
+            (await sendBtcTransaction(sendBtcOptions)) as unknown as string;
+
             break;
 
           case "Unisat":
@@ -152,6 +158,8 @@ export const usePayBTC = () => {
               options.address,
               options.amount
             );
+
+            setResult(txid);
             break;
 
           case "Okx":
@@ -162,6 +170,8 @@ export const usePayBTC = () => {
               : window.okxwallet.bitcoin;
 
             txid = await Okx.sendBitcoin(options.address, options.amount);
+
+            setResult(txid);
             break;
 
           case "Phantom":
@@ -170,8 +180,6 @@ export const usePayBTC = () => {
           default:
             throw new Error("Unsupported wallet");
         }
-
-        setResult(txid);
       } catch (err) {
         handleError(err);
       } finally {

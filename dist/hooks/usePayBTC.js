@@ -61,6 +61,7 @@ const usePayBTC = () => {
                         amount: options.amount,
                     }));
                     txid = resp === null || resp === void 0 ? void 0 : resp.result.txid;
+                    setResult(txid);
                     break;
                 case "Xverse":
                     const response = yield sats_connect_v2_1.default.request("sendTransfer", {
@@ -73,6 +74,7 @@ const usePayBTC = () => {
                     });
                     console.log({ response });
                     txid = response.result.txid;
+                    setResult(txid);
                     break;
                 case "MagicEden":
                     const wallet = walletDetails.wallet === "MagicEden"
@@ -98,13 +100,16 @@ const usePayBTC = () => {
                             senderAddress: walletDetails.cardinal,
                         }, onFinish: (response) => {
                             console.log({ response });
-                            SetResult(response);
                             setLoading(false);
                             if (typeof response === "string") {
                                 txid = response;
+                                setLoading(false);
+                                setResult(response);
                             }
                             else if (response && typeof response.txid === "string") {
                                 txid = response.txid;
+                                setResult(response.txid);
+                                setLoading(false);
                             }
                             else {
                                 throw new Error("Invalid response format");
@@ -113,11 +118,11 @@ const usePayBTC = () => {
                             // throw new Error("Transaction cancelled");
                             console.log("Cancelled ");
                         } });
-                    txid = (yield (0, sats_connect_1.sendBtcTransaction)(sendBtcOptions));
-                    console.log({ txid });
+                    (yield (0, sats_connect_1.sendBtcTransaction)(sendBtcOptions));
                     break;
                 case "Unisat":
                     txid = yield window.unisat.sendBitcoin(options.address, options.amount);
+                    setResult(txid);
                     break;
                 case "Okx":
                     const Okx = options.fractal
@@ -126,13 +131,13 @@ const usePayBTC = () => {
                             ? window.okxwallet.bitcoinTestnet
                             : window.okxwallet.bitcoin;
                     txid = yield Okx.sendBitcoin(options.address, options.amount);
+                    setResult(txid);
                     break;
                 case "Phantom":
                     throw new Error("Phantom wallet BTC payment not implemented");
                 default:
                     throw new Error("Unsupported wallet");
             }
-            setResult(txid);
         }
         catch (err) {
             handleError(err);
