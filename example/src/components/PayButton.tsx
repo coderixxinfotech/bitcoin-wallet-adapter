@@ -44,7 +44,7 @@ function TestMintButton() {
     try {
       await payBTC({
         network,
-        address: network === "testnet" ? testnet_recipient : mainnet_recipient,
+        address: network == "testnet" ? testnet_recipient : mainnet_recipient,
         amount: 2_000,
       });
     } catch (err) {
