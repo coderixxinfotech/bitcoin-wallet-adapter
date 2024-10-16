@@ -1,12 +1,10 @@
 "use client";
 import {
   ConnectMultiButton,
-  PayButton,
   Notification,
   useWalletAddress,
   useXverseSign,
 } from "../../../dist";
-import Link from "next/link";
 import { useEffect } from "react";
 import {
   FaDiscord,
@@ -20,6 +18,7 @@ import {
 } from "react-icons/fa6";
 
 import Popover from "@mui/material/Popover";
+import PayButton from "@/components/PayButton";
 
 const XverseListingUnsignedPsbt = `cHNidP8BAFMCAAAAAY2eAJfNX305iLS3wcoAydSV3fLlswhTOSnzauI4ifaJAAAAAAD/////AQAGAAAAAAAAF6kUaCZjDq3CEhgAUJgHq4l+MlIpLE6HAAAAAAABAP04AQIAAAAAAQKCZJHc5/82iQQLBIHwTadgrr39ldYYP7oQ7WBUVPIZsQIAAAAA/////8TKUqFN+i6clUthqwHTNKoN86U7s4Iuczoriu2hRCSwAAAAAAD/////AiICAAAAAAAAIlEgwamNg/SRfxhid+iPbO5aaTYRwwH44Wj8KsAVHnC0s6UhhAEAAAAAACJRIBL2sGjymEcmEx43URFfN125o87nIsYtoisohjZsr6oZAUCffKRpcm9qKUyTeKmjrtumKD4cjhBkbypE2Z5Y/naaZkG6lfbIBsy/Gcz5SD4LBeTpmcNvD3JmlfZ8+dNCkdl+AUBxSjJPgeUsk6r4Yy4RI+W1L/INM6V6jMfL97LVTyhFpAVEGBbU+khU1Pje2KdhJ6MFTBmbiVbC9Xf6g+srKLq1AAAAAAEBKyICAAAAAAAAIlEgwamNg/SRfxhid+iPbO5aaTYRwwH44Wj8KsAVHnC0s6UBAwSDAAAAARcgs/+suUVx8rIh8UZRFajDjzxJ7oujixupMPNuRHpgWbwAAA==`;
 
@@ -75,16 +74,14 @@ export default function Home() {
             InnerMenu={InnerMenu}
             // icon="https://2254859395-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F41U87FfDFo2dIKYr0ZNX%2Ficon%2FeTdVHpsUrKNqnuPPi4Bo%2FSize128.svg?alt=media&token=61d284cf-2884-418f-9af3-2ab5cf94c7f4"
             iconClass="w-[100px] pb-2"
+            network="testnet"
           />
         </div>
         {walletDetails &&
           walletDetails.cardinal_address &&
           walletDetails.connected && (
             <div className="py-6">
-              <PayButton
-                amount={5000}
-                receipient={"bc1qrwtu9ec4sl6txnxqhvgmuavm72gv32jsaz2mks"}
-              />
+              <PayButton />
             </div>
           )}
 

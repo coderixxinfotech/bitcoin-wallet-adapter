@@ -5,6 +5,7 @@ import { useWallets } from "@wallet-standard/react";
 import type { WalletWithFeatures } from "@wallet-standard/base";
 import { addNotification } from "../stores/reducers/notificationReducers";
 import { RootState } from "../stores";
+import Wallet from "sats-connect-v2";
 
 type CustomWindow = Window & {
   LeatherProvider?: any;
@@ -37,6 +38,10 @@ export const usePayBTC = () => {
     (state: RootState) => state.general.walletDetails
   );
 
+  const SetResult = (response: any) => {
+    setResult(response);
+  };
+
   const handleError = (err: unknown) => {
     console.error("PAY ERROR:", err);
     const errorMessage =
@@ -64,6 +69,8 @@ export const usePayBTC = () => {
         return;
       }
 
+      console.log({ options });
+
       try {
         let txid: string;
 
@@ -77,6 +84,17 @@ export const usePayBTC = () => {
             break;
 
           case "Xverse":
+            const response: any = await Wallet.request("sendTransfer", {
+              recipients: [
+                {
+                  address: options.address,
+                  amount: Number(options.amount),
+                },
+              ],
+            });
+            console.log({ response });
+            txid = response.result.txid;
+            break;
           case "MagicEden":
             const wallet =
               walletDetails.wallet === "MagicEden"
@@ -105,14 +123,28 @@ export const usePayBTC = () => {
                 ],
                 senderAddress: walletDetails.cardinal,
               },
-              onFinish: (response: any) => response,
+              onFinish: (response: any) => {
+                console.log({ response });
+                SetResult(response);
+                setLoading(false);
+                if (typeof response === "string") {
+                  txid = response;
+                } else if (response && typeof response.txid === "string") {
+                  txid = response.txid;
+                } else {
+                  throw new Error("Invalid response format");
+                }
+              },
               onCancel: () => {
-                throw new Error("Transaction cancelled");
+                // throw new Error("Transaction cancelled");
+                console.log("Cancelled ");
               },
             };
 
-            // @ts-ignore
-            txid = await sendBtcTransaction(sendBtcOptions);
+            txid = (await sendBtcTransaction(
+              sendBtcOptions
+            )) as unknown as string;
+            console.log({ txid });
             break;
 
           case "Unisat":

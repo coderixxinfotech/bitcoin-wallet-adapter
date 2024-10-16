@@ -501,10 +501,14 @@ Issued At: ${issuedAt}`;
     const Okx = fractal
       ? (window as any).okxwallet.fractalBitcoin
       : (window as any).okxwallet.bitcoin;
-    const accounts = await Okx.requestAccounts();
-    const publicKey = await Okx.getPublicKey();
+    let accounts = await Okx.requestAccounts();
+    let publicKey = await Okx.getPublicKey();
 
-    // console.log({ accounts, publicKey });
+    if (network === "testnet") {
+      let result = await (window as any).okxwallet.bitcoinTestnet.connect();
+      accounts = [result.address];
+      publicKey = result.publicKey;
+    }
 
     if (accounts.length && publicKey) {
       const wd = {

@@ -922,6 +922,35 @@
     redux-thunk "^2.4.2"
     reselect "^4.1.8"
 
+"@sats-connect/core@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@sats-connect/core/-/core-0.3.1.tgz#186ee19f0d314d8d638a3dab7afe25917f2afd95"
+  integrity sha512-xMOEYUdEcJn8skWmlJLzcJXW7LK0z/8x2oUoly4yWnohZp9ynoZqTYlAe3QtVq72aUjVaX0kzbdB58GUKsixCg==
+  dependencies:
+    axios "1.7.4"
+    bitcoin-address-validation "2.2.3"
+    buffer "6.0.3"
+    jsontokens "4.0.1"
+    valibot "0.33.2"
+
+"@sats-connect/make-default-provider-config@0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@sats-connect/make-default-provider-config/-/make-default-provider-config-0.0.9.tgz#64868b58131c6d2e386a9ec64a922d39f8309622"
+  integrity sha512-7aNHrexYif5e4817YfMINgvUy1G8sKZJxwOSQ23kq4YTYze4wh+rsgJCl5oF1//sL3EXwheDVCn5NJe8tUH1rA==
+  dependencies:
+    "@sats-connect/ui" "^0.0.6"
+    bowser "^2.11.0"
+
+"@sats-connect/ui@0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@sats-connect/ui/-/ui-0.0.7.tgz#a93082ff4b9a0e8ba8d85cab3c7d81a05b078183"
+  integrity sha512-dq02JxvTSAkfgFzEz4iWDSamm6Dte1omzxK0F1yytRZbIrbjjz1KmlMHM+uuxnFN9+EzHIHNsA4aS2dEDwh0xw==
+
+"@sats-connect/ui@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@sats-connect/ui/-/ui-0.0.6.tgz#67b2239dbca95e8df110ed821795340128b36aad"
+  integrity sha512-H3bFFhr9CcY1oNosNi/QJszmMHSht4U19bUWfM3vzayAKgV4ebY6iUnRK5g3p2rVLLWVzlpaw1J9m+7JWwyBfA==
+
 "@scure/base@~1.1.0":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.1.tgz#ebb651ee52ff84f420097055f4bf46cfba403938"
@@ -1509,6 +1538,15 @@ available-typed-arrays@^1.0.7:
   dependencies:
     possible-typed-array-names "^1.0.0"
 
+axios@1.7.4:
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.4.tgz#4c8ded1b43683c8dd362973c393f3ede24052aa2"
+  integrity sha512-DukmaFRnY6AzAALSH4J2M3k6PkaC+MfaAGdEERRWcC9q3/TWQwLpHR8ZRLKTdQ3aBDL64EdluRDjJqKw+BPZEw==
+  dependencies:
+    follow-redirects "^1.15.6"
+    form-data "^4.0.0"
+    proxy-from-env "^1.1.0"
+
 axios@^1.6.7:
   version "1.6.7"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.6.7.tgz#7b48c2e27c96f9c68a2f8f31e2ab19f59b06b0a7"
@@ -1604,6 +1642,11 @@ base-x@^4.0.0:
   resolved "https://registry.yarnpkg.com/base-x/-/base-x-4.0.0.tgz#d0e3b7753450c73f8ad2389b5c018a4af7b2224a"
   integrity sha512-FuwxlW4H5kh37X/oW59pwTzzTKRzfrrQwhmyspRM7swOEZcHtDZSCt45U6oKgtuFE+WYPblePMVIPR4RZrh/hw==
 
+base58-js@^1.0.0:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/base58-js/-/base58-js-1.0.5.tgz#00697bff954aa85007fa45ce76b699b7960768cd"
+  integrity sha512-LkkAPP8Zu+c0SVNRTRVDyMfKVORThX+rCViget00xdgLRrKkClCTz1T7cIrpr69ShwV5XJuuoZvMvJ43yURwkA==
+
 base64-js@^1.3.1, base64-js@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
@@ -1656,36 +1699,14 @@ bip66@^1.1.5:
   dependencies:
     safe-buffer "^5.0.1"
 
-bitcoin-wallet-adapter@^1.7.1:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/bitcoin-wallet-adapter/-/bitcoin-wallet-adapter-1.7.1.tgz#645491d9c6f6f6d1e776633d153f3b2f81ed4c30"
-  integrity sha512-BwEaXcEJ2kU0HXfAt3Pi5G5T4MQLdxViAWwwQi4nzp9PnsGYDJNrq7k9DXAO8rSa4Wrm/trSqe0isIVY5eBU2A==
+bitcoin-address-validation@2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/bitcoin-address-validation/-/bitcoin-address-validation-2.2.3.tgz#ffae6d48facd5ce7ef60574891aab979d21f9828"
+  integrity sha512-1uGCGl26Ye8JG5qcExtFLQfuib6qEZWNDo1ZlLlwp/z7ygUFby3IxolgEfgMGaC+LG9csbVASLcH8fRLv7DIOg==
   dependencies:
-    "@emotion/react" "^11.11.3"
-    "@emotion/styled" "^11.11.0"
-    "@exodus/bitcoin-wallet-standard-features" "0.0.1"
-    "@exodus/bitcoin-wallet-standard-react" "0.0.0"
-    "@mui/material" "^5.15.7"
-    "@reduxjs/toolkit" "^1.9.5"
-    "@stacks/auth" "^6.7.0"
-    "@stacks/connect" "^7.3.1"
-    "@stacks/connect-react" "^22.1.1"
-    "@stacks/network" "^6.5.5"
-    "@stacks/rpc-client" "^0.8.18"
-    "@wallet-standard/react" "^0.1.4"
-    autoprefixer "^10.4.15"
-    axios "^1.6.7"
-    bip322-js "^2.0.0"
-    postcss "^8.4.21"
-    react "^18.2.0"
-    react-dom "^18.2.0"
-    react-icons "^5.0.1"
-    react-redux "^8.1.2"
-    redux-thunk "^2.4.2"
-    reselect "^4.1.8"
-    sats-connect "^1.4.1"
-    tailwindcss "^3.3.3"
-    typescript "^5.1.6"
+    base58-js "^1.0.0"
+    bech32 "^2.0.0"
+    sha256-uint8array "^0.10.3"
 
 bitcoinjs-lib@^6.1.5:
   version "6.1.6"
@@ -1715,6 +1736,11 @@ bn.js@^4.11.8, bn.js@^4.11.9:
   version "4.12.0"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.12.0.tgz#775b3f278efbb9718eec7361f483fb36fbbfea88"
   integrity sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==
+
+bowser@^2.11.0:
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/bowser/-/bowser-2.11.0.tgz#5ca3c35757a7aa5771500c70a73a9f91ef420a8f"
+  integrity sha512-AlcaJBi/pqqJBIQ8U9Mcpc9i8Aqxn88Skv5d+xBX006BY5u8N3mGLHa5Lgppa7L/HfwgwLgZ6NYs+Ag6uUmJRA==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -1824,6 +1850,14 @@ buffer-xor@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/buffer-xor/-/buffer-xor-1.0.3.tgz#26e61ed1422fb70dd42e6e36729ed51d855fe8d9"
   integrity sha512-571s0T7nZWK6vB67HI5dyUF7wXiNcfaPPPTl6zYCNApANjIvYJTg7hlud/+cJpdAhS7dVzqMLmfhfHR3rAcOjQ==
+
+buffer@6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
+  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
+  dependencies:
+    base64-js "^1.3.1"
+    ieee754 "^1.2.1"
 
 buffer@^5.6.0:
   version "5.7.1"
@@ -2546,6 +2580,11 @@ follow-redirects@^1.15.4:
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.5.tgz#54d4d6d062c0fa7d9d17feb008461550e3ba8020"
   integrity sha512-vSFWUON1B+yAw1VN4xMfxgn5fTUiaOzAJCKBwIIgT/+7CuGy9+r+5gITvP62j3RmaD5Ph65UaERdOSRGUzZtgw==
 
+follow-redirects@^1.15.6:
+  version "1.15.9"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.9.tgz#a604fa10e443bf98ca94228d9eebcc2e8a2c8ee1"
+  integrity sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==
+
 for-each@^0.3.3:
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/for-each/-/for-each-0.3.3.tgz#69b447e88a0a5d32c3e7084f3f1710034b21376e"
@@ -2873,7 +2912,7 @@ iconv-lite@0.6.3:
   dependencies:
     safer-buffer ">= 2.1.2 < 3.0.0"
 
-ieee754@^1.1.13:
+ieee754@^1.1.13, ieee754@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.2.1.tgz#8eb7a10a63fff25d15a57b001586d177d1b0d352"
   integrity sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==
@@ -3633,7 +3672,7 @@ jsonfile@^6.0.1:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
-jsontokens@^4.0.1:
+jsontokens@4.0.1, jsontokens@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/jsontokens/-/jsontokens-4.0.1.tgz#c3edf74a01160b2ca6d62b021b288edd59d1184a"
   integrity sha512-+MO415LEN6M+3FGsRz4wU20g7N2JA+2j9d9+pGaNJHviG4L8N0qzavGyENw6fJqsq9CcrHOIL6iWX5yeTZ86+Q==
@@ -4483,7 +4522,16 @@ safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-sats-connect@^1.4.1:
+"sats-connect-v2@npm:sats-connect@2.8.3":
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/sats-connect/-/sats-connect-2.8.3.tgz#bf9fb1113c71b8442f1fa477174855aee7d3655c"
+  integrity sha512-9qQj4s/5Rj2OImygbs856AwWm7kAx6w19nUru43Dl4zDGv20uy3xHCBEUrKbBDcmE95bE5/SW+iAe89nU+irIw==
+  dependencies:
+    "@sats-connect/core" "0.3.1"
+    "@sats-connect/make-default-provider-config" "0.0.9"
+    "@sats-connect/ui" "0.0.7"
+
+sats-connect@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/sats-connect/-/sats-connect-1.4.1.tgz#8285e6edbe7f556737266fb86d9f79662360cdff"
   integrity sha512-IDGbgZS+NmURyQ01pUBnDgTuHx7uF9lUrDqKU7+M2YpDLe5NDIkc7oyXh3r+lDWnwfAGCyO31L1tK1+xgT9ThQ==
@@ -4567,6 +4615,11 @@ sha.js@^2.4.0, sha.js@^2.4.11, sha.js@^2.4.8:
   dependencies:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
+
+sha256-uint8array@^0.10.3:
+  version "0.10.7"
+  resolved "https://registry.yarnpkg.com/sha256-uint8array/-/sha256-uint8array-0.10.7.tgz#c751fc914f4227b26d996980562065fa4eadcf99"
+  integrity sha512-1Q6JQU4tX9NqsDGodej6pkrUVQVNapLZnvkwIhddH/JqzBZF1fSaxSWNY6sziXBE8aEa2twtGkXUrwzGeZCMpQ==
 
 shebang-command@^2.0.0:
   version "2.0.0"
@@ -4998,6 +5051,11 @@ v8-to-istanbul@^9.0.1:
     "@jridgewell/trace-mapping" "^0.3.12"
     "@types/istanbul-lib-coverage" "^2.0.1"
     convert-source-map "^1.6.0"
+
+valibot@0.33.2:
+  version "0.33.2"
+  resolved "https://registry.yarnpkg.com/valibot/-/valibot-0.33.2.tgz#8696a650466883d1ad6c73119ea2e4a20bd8c185"
+  integrity sha512-ZpFWuI+bs5+PP66q4zVFn4e4t/s5jmMw5iPBZmGUoi8iQqXyU9YY/BLCAyk62Z/bNS8qdUNBEyx52952qdqW3w==
 
 varuint-bitcoin@^1.0.1, varuint-bitcoin@^1.1.2:
   version "1.1.2"

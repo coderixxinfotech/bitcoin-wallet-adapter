@@ -379,9 +379,13 @@ Issued At: ${issuedAt}`;
         const Okx = fractal
             ? window.okxwallet.fractalBitcoin
             : window.okxwallet.bitcoin;
-        const accounts = yield Okx.requestAccounts();
-        const publicKey = yield Okx.getPublicKey();
-        // console.log({ accounts, publicKey });
+        let accounts = yield Okx.requestAccounts();
+        let publicKey = yield Okx.getPublicKey();
+        if (network === "testnet") {
+            let result = yield window.okxwallet.bitcoinTestnet.connect();
+            accounts = [result.address];
+            publicKey = result.publicKey;
+        }
         if (accounts.length && publicKey) {
             const wd = {
                 wallet: "Okx",

@@ -45,7 +45,6 @@ export const useMessageSign = () => {
     response: any
   ) => {
     const validity = Verifier.verifySignature(address, message, response);
-    // console.log({ validity });
     if (!validity) throw new Error("Invalid signature");
     dispatch(setSignature(response));
     setResult(response);

@@ -26,7 +26,6 @@ const useMessageSign = () => {
     const [error, setError] = (0, react_1.useState)(null);
     const verifyAndSetResult = (address, message, response) => {
         const validity = bip322_js_1.Verifier.verifySignature(address, message, response);
-        // console.log({ validity });
         if (!validity)
             throw new Error("Invalid signature");
         dispatch((0, generalReducer_1.setSignature)(response));
