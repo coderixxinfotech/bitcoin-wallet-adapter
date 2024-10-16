@@ -87,12 +87,12 @@ const usePayBTC = () => {
                     txid = yield window.unisat.sendBitcoin(options.address, options.amount);
                     break;
                 case "Okx":
-                    const okxWallet = options.fractal
+                    const Okx = options.fractal
                         ? window.okxwallet.fractalBitcoin
                         : options.network === "testnet"
                             ? window.okxwallet.bitcoinTestnet
                             : window.okxwallet.bitcoin;
-                    txid = yield okxWallet.bitcoin.sendBitcoin(options.address, options.amount);
+                    txid = yield Okx.sendBitcoin(options.address, options.amount);
                     break;
                 case "Phantom":
                     throw new Error("Phantom wallet BTC payment not implemented");

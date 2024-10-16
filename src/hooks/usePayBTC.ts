@@ -123,16 +123,13 @@ export const usePayBTC = () => {
             break;
 
           case "Okx":
-            const okxWallet = options.fractal
+            const Okx = options.fractal
               ? window.okxwallet.fractalBitcoin
               : options.network === "testnet"
               ? window.okxwallet.bitcoinTestnet
               : window.okxwallet.bitcoin;
 
-            txid = await okxWallet.bitcoin.sendBitcoin(
-              options.address,
-              options.amount
-            );
+            txid = await Okx.sendBitcoin(options.address, options.amount);
             break;
 
           case "Phantom":
