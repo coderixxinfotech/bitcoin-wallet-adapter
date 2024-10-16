@@ -1,12 +1,14 @@
+type PaymentOptions = {
+    network: "testnet" | "mainnet";
+    address: string;
+    amount: number;
+    wallet: string;
+    fractal?: boolean;
+};
 export declare const usePayBTC: () => {
-    payBTC: (options: {
-        network: string;
-        address: string;
-        amount: number;
-        wallet: string;
-        fractal?: boolean | undefined;
-    }) => Promise<void>;
+    payBTC: (options: PaymentOptions) => Promise<void>;
     loading: boolean;
-    result: any;
+    result: string | null;
     error: Error | null;
 };
+export {};

@@ -23,9 +23,19 @@ const usePayBTC = () => {
     const [result, setResult] = (0, react_1.useState)(null);
     const [error, setError] = (0, react_1.useState)(null);
     const walletDetails = (0, react_redux_1.useSelector)((state) => state.general.walletDetails);
-    const lastWallet = (0, react_redux_1.useSelector)((state) => state.general.lastWallet);
+    const handleError = (err) => {
+        console.error("PAY ERROR:", err);
+        const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+        dispatch((0, notificationReducers_1.addNotification)({
+            id: Date.now(),
+            message: errorMessage,
+            open: true,
+            severity: "error",
+        }));
+        setError(new Error(errorMessage));
+    };
     const payBTC = (0, react_1.useCallback)((options) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b;
+        var _a;
         setLoading(true);
         setResult(null);
         setError(null);
@@ -38,7 +48,6 @@ const usePayBTC = () => {
             let txid;
             switch (options.wallet) {
                 case "Leather":
-                    //@ts-ignore
                     const resp = yield ((_a = window.btc) === null || _a === void 0 ? void 0 : _a.request("sendTransfer", {
                         address: options.address,
                         amount: options.amount,
@@ -46,40 +55,18 @@ const usePayBTC = () => {
                     txid = resp === null || resp === void 0 ? void 0 : resp.id;
                     break;
                 case "Xverse":
-                    const sendBtcOptions = {
-                        payload: {
-                            network: {
-                                type: options.network === "mainnet" ? "Mainnet" : "Testnet",
-                            },
-                            recipients: [
-                                {
-                                    address: options.address,
-                                    amountSats: options.amount,
-                                },
-                            ],
-                            senderAddress: walletDetails.cardinal,
-                        },
-                        onFinish: (response) => {
-                            return response;
-                        },
-                        onCancel: () => {
-                            throw Error("Cancelled");
-                        },
-                    };
-                    //@ts-ignore
-                    txid = yield (0, sats_connect_1.sendBtcTransaction)(sendBtcOptions);
-                    break;
                 case "MagicEden":
-                    const wallet = testWallets.filter((a) => a.name === "Magic Eden")[0];
-                    // TODO: Implement Magic Eden wallet BTC payment
-                    const sendBtcMEOptions = {
+                    const wallet = options.wallet === "MagicEden"
+                        ? testWallets.find((a) => a.name === "Magic Eden")
+                        : undefined;
+                    const sendBtcOptions = Object.assign(Object.assign({}, (options.wallet === "MagicEden" && {
                         getProvider: () => __awaiter(void 0, void 0, void 0, function* () {
-                            var _c;
-                            return (_c = wallet.features[SatsConnectNamespace]) === null || _c === void 0 ? void 0 : _c.provider;
+                            var _b;
+                            return (_b = wallet.features[SatsConnectNamespace]) === null || _b === void 0 ? void 0 : _b.provider;
                         }),
-                        payload: {
+                    })), { payload: {
                             network: {
-                                type: options.network.toLowerCase() === "mainnet"
+                                type: options.network === "mainnet"
                                     ? sats_connect_1.BitcoinNetworkType.Mainnet
                                     : sats_connect_1.BitcoinNetworkType.Testnet,
                             },
@@ -90,52 +77,37 @@ const usePayBTC = () => {
                                 },
                             ],
                             senderAddress: walletDetails.cardinal,
-                        },
-                        onFinish: (response) => {
-                            return response;
-                        },
-                        onCancel: () => {
-                            throw Error("Cancelled");
-                        },
-                    };
-                    //@ts-ignore
-                    txid = yield (0, sats_connect_1.sendBtcTransaction)(sendBtcMEOptions);
+                        }, onFinish: (response) => response, onCancel: () => {
+                            throw new Error("Transaction cancelled");
+                        } });
+                    // @ts-ignore
+                    txid = yield (0, sats_connect_1.sendBtcTransaction)(sendBtcOptions);
                     break;
                 case "Unisat":
-                    //@ts-ignore
                     txid = yield window.unisat.sendBitcoin(options.address, options.amount);
                     break;
-                case "Phantom":
-                    // TODO: Implement Phantom wallet BTC payment
-                    throw new Error("Phantom wallet BTC payment not implemented");
                 case "Okx":
-                    const Okx = options.fractal
+                    const okxWallet = options.fractal
                         ? window.okxwallet.fractalBitcoin
                         : options.network === "testnet"
                             ? window.okxwallet.bitcoinTestnet
                             : window.okxwallet.bitcoin;
-                    txid = yield Okx.bitcoin.sendBitcoin(options.address, options.amount);
-                    // TODO: Implement OKX wallet BTC payment
+                    txid = yield okxWallet.bitcoin.sendBitcoin(options.address, options.amount);
                     break;
+                case "Phantom":
+                    throw new Error("Phantom wallet BTC payment not implemented");
                 default:
                     throw new Error("Unsupported wallet");
             }
             setResult(txid);
         }
         catch (err) {
-            console.log("PAY ERROR:", err);
-            dispatch((0, notificationReducers_1.addNotification)({
-                id: new Date().valueOf(),
-                message: ((_b = err === null || err === void 0 ? void 0 : err.error) === null || _b === void 0 ? void 0 : _b.message) || (err === null || err === void 0 ? void 0 : err.message) || err,
-                open: true,
-                severity: "error",
-            }));
-            setError(err instanceof Error ? err : new Error("An unknown error occurred"));
+            handleError(err);
         }
         finally {
             setLoading(false);
         }
-    }), [dispatch, walletDetails, lastWallet]);
+    }), [dispatch, walletDetails, testWallets]);
     return { payBTC, loading, result, error };
 };
 exports.usePayBTC = usePayBTC;
