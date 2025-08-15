@@ -607,19 +607,19 @@ function MyComponent() {
 - **🎛️ Configurable**: Filter by codes, severity, auto-clear options
 - **♻️ Recoverable**: Errors marked as recoverable allow retry mechanisms
 
-### 🎨 Integration with UI Components
+### 🎨 Seamless Error Integration
 
-The error handling system automatically integrates with the notification system:
+Built-in error handling with automatic UI notifications:
 
 ```typescript
 import { useErrorHandler } from 'bitcoin-wallet-adapter';
 
 function App() {
-  // This automatically handles errors and shows snackbar notifications
+  // Automatic error handling with professional snackbar notifications
   useErrorHandler({
     onError: (error) => {
-      // Errors are automatically dispatched to Redux notifications
-      // Snackbars appear automatically with proper styling
+      // Errors automatically appear as styled notifications
+      // No additional setup required
     }
   });
 
