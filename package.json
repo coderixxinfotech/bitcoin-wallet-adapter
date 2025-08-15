@@ -2,9 +2,28 @@
   "name": "bitcoin-wallet-adapter",
   "version": "1.8.2",
   "description": "Bitcoin wallet adapter using MUI components",
-  "repository": "https://github.com/coderixxinfotech/bitcoin-wallet-adapter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coderixxinfotech/bitcoin-wallet-adapter.git"
+  },
+  "homepage": "https://github.com/coderixxinfotech/bitcoin-wallet-adapter#readme",
+  "bugs": {
+    "url": "https://github.com/coderixxinfotech/bitcoin-wallet-adapter/issues"
+  },
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
   "scripts": {
     "build:css": "postcss src/styles.css -o dist/styles.css",
     "build:assets": "copyfiles -u 1 src/assets/* dist",
@@ -17,6 +36,10 @@
   },
   "author": "CrypticMeta - Coderixx",
   "license": "MIT",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/coderixxinfotech"
+  },
   "sideEffects": false,
   "keywords": [
     "bitcoin",
