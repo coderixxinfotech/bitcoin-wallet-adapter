@@ -627,28 +627,7 @@ function App() {
 }
 ```
 
-### 🔄 Migration from Legacy Error Handling
 
-**❌ Old Pattern (Deprecated):**
-```typescript
-// DON'T USE - Legacy patterns
-throw new Error("Something went wrong");
-setError(new Error("Manual error"));
-dispatch(addNotification({ message: "Error", severity: "error" }));
-```
-
-**✅ New Pattern (Recommended):**
-```typescript
-// USE THIS - Professional error handling
-throwBWAError(
-  BWAErrorCode.VALIDATION_ERROR,
-  "Invalid transaction parameters provided",
-  {
-    severity: BWAErrorSeverity.MEDIUM,
-    context: { operation: 'transaction_validation' }
-  }
-);
-```
 
 ## 👛 Supported Wallets
 
