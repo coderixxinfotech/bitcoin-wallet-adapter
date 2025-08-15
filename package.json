@@ -11,7 +11,9 @@
     "prebuild": "rimraf dist",
     "build": "tsc && yarn build:css && yarn build:assets",
     "test": "jest",
-    "dev": "cd example && yarn && yarn dev"
+    "dev": "cd example && yarn && yarn dev",
+    "semantic-release": "semantic-release",
+    "prepare": "yarn build"
   },
   "author": "CrypticMeta - Coderixx",
   "license": "MIT",
@@ -64,5 +66,16 @@
     "react-test-renderer": "^18.2.0",
     "rimraf": "^5.0.5",
     "ts-jest": "^29.1.1"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "release": {
+    "branches": ["main"]
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE.md"
+  ]
 }
