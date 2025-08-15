@@ -12,7 +12,7 @@
     "build": "tsc && yarn build:css && yarn build:assets",
     "test": "jest",
     "dev": "cd example && yarn && yarn dev",
-    "semantic-release": "semantic-release",
+    "semantic-release": "./node_modules/.bin/semantic-release",
     "prepare": "yarn build"
   },
   "author": "CrypticMeta - Coderixx",
