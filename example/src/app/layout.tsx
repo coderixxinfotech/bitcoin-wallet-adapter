@@ -1,6 +1,16 @@
 "use client";
 import "./globals.css";
-import { WalletProvider } from "../../../dist";
+import { WalletProvider, setupDevTools } from "../../../dist";
+import { useEffect } from "react";
+
+function DevToolsInitializer() {
+  useEffect(() => {
+    // Initialize Redux DevTools for development
+    setupDevTools();
+  }, []);
+  
+  return null;
+}
 
 export default function RootLayout({
   children,
@@ -10,7 +20,10 @@ export default function RootLayout({
   return (
     <WalletProvider>
       <html lang="en">
-        <body>{children}</body>
+        <body>
+          <DevToolsInitializer />
+          {children}
+        </body>
       </html>
     </WalletProvider>
   );

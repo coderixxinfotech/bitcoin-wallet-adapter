@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.useLeatherSign = void 0;
 const react_1 = require("react");
 const connect_react_1 = require("@stacks/connect-react");
+const errorHandler_1 = require("../utils/errorHandler");
 const utils_1 = require("../utils");
 const useLeatherSign = (defaultOptions = {}) => {
     const { signPsbt } = (0, connect_react_1.useConnect)();
@@ -22,9 +23,14 @@ const useLeatherSign = (defaultOptions = {}) => {
         setLoading(true);
         const { psbt, network, action, inputs } = commonOptions;
         if (!(0, utils_1.isHex)(psbt)) {
-            setError(new Error("The PSBT must be in HEX format"));
             setLoading(false);
-            return;
+            (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.PSBT_INVALID, "Leather wallet requires PSBT in HEX format", {
+                severity: errorHandler_1.BWAErrorSeverity.MEDIUM,
+                context: {
+                    walletType: 'Leather',
+                    operation: 'transaction_signing'
+                }
+            });
         }
         try {
             const signAtIndex = inputs.map((input) => input.index).flat();
@@ -39,7 +45,28 @@ const useLeatherSign = (defaultOptions = {}) => {
             setResult(base64Result);
         }
         catch (e) {
-            setError(e);
+            setLoading(false);
+            if (e instanceof Error && e.name === 'BWAError') {
+                // BWA errors are already handled by the error manager, just set error state
+                setError(e);
+            }
+            else {
+                // Wrap unexpected errors with professional context
+                try {
+                    (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.TRANSACTION_SIGNING_FAILED, (e === null || e === void 0 ? void 0 : e.message) || "Leather transaction signing failed", {
+                        severity: errorHandler_1.BWAErrorSeverity.HIGH,
+                        context: {
+                            walletType: 'Leather',
+                            operation: 'transaction_signing',
+                            network
+                        },
+                        originalError: e instanceof Error ? e : undefined
+                    });
+                }
+                catch (bwaError) {
+                    setError(bwaError);
+                }
+            }
         }
         finally {
             setLoading(false);

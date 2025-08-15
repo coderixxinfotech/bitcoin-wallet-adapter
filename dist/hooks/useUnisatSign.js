@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.useUnisatSign = void 0;
 const react_1 = require("react");
 const utils_1 = require("../utils");
+const errorHandler_1 = require("../utils/errorHandler");
 const useUnisatSign = () => {
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [result, setResult] = (0, react_1.useState)(null);
@@ -19,8 +20,13 @@ const useUnisatSign = () => {
     const sign = (0, react_1.useCallback)((options) => __awaiter(void 0, void 0, void 0, function* () {
         const { psbt, network, action, inputs } = options;
         if (!(0, utils_1.isHex)(psbt)) {
-            setError(new Error("Unisat requires hexPsbt"));
-            return;
+            (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.PSBT_INVALID, "Unisat wallet requires PSBT in hex format", {
+                severity: errorHandler_1.BWAErrorSeverity.MEDIUM,
+                context: {
+                    walletType: 'Unisat',
+                    operation: 'transaction_signing'
+                }
+            });
         }
         setLoading(true);
         try {
@@ -35,7 +41,28 @@ const useUnisatSign = () => {
             setResult((0, utils_1.hexToBase64)(signedPsbt));
         }
         catch (e) {
-            setError(e);
+            setLoading(false);
+            if (e instanceof Error && e.name === 'BWAError') {
+                // BWA errors are already handled by the error manager, just set error state
+                setError(e);
+            }
+            else {
+                // Wrap unexpected errors with professional context
+                try {
+                    (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.TRANSACTION_SIGNING_FAILED, (e === null || e === void 0 ? void 0 : e.message) || "Unisat transaction signing failed", {
+                        severity: errorHandler_1.BWAErrorSeverity.HIGH,
+                        context: {
+                            walletType: 'Unisat',
+                            operation: 'transaction_signing',
+                            network
+                        },
+                        originalError: e instanceof Error ? e : undefined
+                    });
+                }
+                catch (bwaError) {
+                    setError(bwaError);
+                }
+            }
         }
         finally {
             setLoading(false);

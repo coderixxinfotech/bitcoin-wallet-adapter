@@ -4,8 +4,8 @@ import { convertSatToBtc } from "../../utils";
 import { FaBtc } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../stores";
-import { addNotification } from "../../stores/reducers/notificationReducers";
 import { sendBtcTransaction } from "sats-connect";
+import { throwBWAError, BWAErrorCode, BWAErrorSeverity } from "../../utils/errorHandler";
 
 function PayButton({
   amount,
@@ -29,7 +29,17 @@ function PayButton({
     try {
       e.preventDefault();
       if (!walletDetails?.connected) {
-        throw Error("Wallet not connected");
+        throwBWAError(
+          BWAErrorCode.WALLET_NOT_CONNECTED,
+          "No wallet is currently connected. Please connect a wallet to make payments.",
+          {
+            severity: BWAErrorSeverity.HIGH,
+            context: {
+              operation: 'btc_payment',
+              additionalData: { amount, receipient }
+            }
+          }
+        );
       }
       if (lastWallet === "Leather") {
         //@ts-ignore
@@ -57,7 +67,18 @@ function PayButton({
             return response;
           },
           onCancel: () => {
-            throw Error("Cancelled");
+            throwBWAError(
+              BWAErrorCode.USER_REJECTED,
+              "Payment was cancelled by the user.",
+              {
+                severity: BWAErrorSeverity.LOW,
+                recoverable: true,
+                context: {
+                  operation: 'btc_payment',
+                  walletType: 'Xverse'
+                }
+              }
+            );
           },
         };
         //@ts-ignore
@@ -68,19 +89,22 @@ function PayButton({
 
         return txid;
       } else {
-        throw Error("Wallet Not Supported!");
+        throwBWAError(
+          BWAErrorCode.UNSUPPORTED_WALLET,
+          `${lastWallet} wallet does not support BTC payments yet.`,
+          {
+            severity: BWAErrorSeverity.HIGH,
+            context: {
+              operation: 'btc_payment',
+              walletType: lastWallet
+            }
+          }
+        );
       }
     } catch (e: any) {
-      console.log(e, "PAY ERROR");
-      dispatch(
-        addNotification({
-          id: new Date().valueOf(),
-          message: e?.error?.message || e?.message || e,
-          open: true,
-          severity: "error",
-        })
-      );
-      return e;
+      // BWA errors are already handled by the error manager
+      // Re-throw to let the system handle them properly
+      throw e;
     }
   };
   return (

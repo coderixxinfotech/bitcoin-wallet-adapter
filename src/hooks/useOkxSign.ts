@@ -1,6 +1,11 @@
 import { useState, useCallback } from "react";
 import { CommonSignOptions, CommonSignResponse } from "../types";
 import { hexToBase64, isHex } from "../utils";
+import { 
+  throwBWAError, 
+  BWAErrorCode,
+  BWAErrorSeverity 
+} from "../utils/errorHandler";
 
 export const useOkxSign = (): CommonSignResponse => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -13,8 +18,17 @@ export const useOkxSign = (): CommonSignResponse => {
     // console.log({ options });
 
     if (!isHex(psbt)) {
-      setError(new Error("Okx wallet requires hexPsbt"));
-      return;
+      throwBWAError(
+        BWAErrorCode.PSBT_INVALID,
+        "OKX wallet requires hex PSBT",
+        {
+          severity: BWAErrorSeverity.MEDIUM,
+          context: { 
+            walletType: 'OKX', 
+            operation: 'transaction_signing' 
+          }
+        }
+      );
     }
 
     setLoading(true);
@@ -45,7 +59,31 @@ export const useOkxSign = (): CommonSignResponse => {
       // console.log({ signedPsbt });
       setResult(hexToBase64(signedPsbt));
     } catch (e: any) {
-      setError(e);
+      setLoading(false);
+      if (e instanceof Error && e.name === 'BWAError') {
+        // BWA errors are already handled by the error manager, just set error state
+        setError(e);
+      } else {
+        // Wrap unexpected errors with professional context
+        try {
+          throwBWAError(
+            BWAErrorCode.TRANSACTION_SIGNING_FAILED,
+            e?.message || "OKX transaction signing failed",
+            {
+              severity: BWAErrorSeverity.HIGH,
+              context: { 
+                walletType: 'OKX', 
+                operation: 'transaction_signing', 
+                network,
+                additionalData: { fractal }
+              },
+              originalError: e instanceof Error ? e : undefined
+            }
+          );
+        } catch (bwaError) {
+          setError(bwaError as Error);
+        }
+      }
     } finally {
       setLoading(false);
     }

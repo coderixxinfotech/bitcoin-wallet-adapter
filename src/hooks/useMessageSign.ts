@@ -10,6 +10,12 @@ import type { WalletWithFeatures } from "@wallet-standard/base";
 
 import { Verifier } from "bip322-js";
 import { bytesToBase64 } from "..";
+import { 
+  throwBWAError, 
+  BWAError,
+  BWAErrorCode,
+  BWAErrorSeverity 
+} from "../utils/errorHandler";
 
 interface CustomWindow extends Window {
   LeatherProvider?: any;
@@ -45,7 +51,22 @@ export const useMessageSign = () => {
     response: any
   ) => {
     const validity = Verifier.verifySignature(address, message, response);
-    if (!validity) throw new Error("Invalid signature");
+    if (!validity) {
+      throwBWAError(
+        BWAErrorCode.SIGNATURE_VERIFICATION_FAILED,
+        "Invalid signature verification failed",
+        {
+          severity: BWAErrorSeverity.HIGH,
+          context: { 
+            operation: 'message_signing_verification',
+            additionalData: {
+              address,
+              message: message.substring(0, 50) + '...' // Truncate for security
+            }
+          }
+        }
+      );
+    }
     dispatch(setSignature(response));
     setResult(response);
   };
@@ -57,8 +78,18 @@ export const useMessageSign = () => {
       setError(null);
 
       if (!options.wallet) {
-        setError(new Error("Wallet Not Connected"));
-        setLoading(false);
+        throwBWAError(
+          BWAErrorCode.WALLET_NOT_CONNECTED,
+          "Wallet must be connected to sign messages",
+          {
+            severity: BWAErrorSeverity.HIGH,
+            context: {
+              walletType: 'unknown',
+              operation: 'message_signing',
+              network: options.network
+            }
+          }
+        );
         return;
       }
 
@@ -76,8 +107,16 @@ export const useMessageSign = () => {
               message: options.message,
             },
             onFinish: (response: any) => {
-              verifyAndSetResult(options.address, options.message, response);
-              setLoading(false);
+              try {
+                verifyAndSetResult(options.address, options.message, response);
+              } catch (err) {
+                console.log({ err });
+                setError(
+                  err instanceof Error ? err : new Error("An unknown error occurred")
+                );
+              } finally {
+                setLoading(false);
+              }
             },
             onCancel: () => {
               setError(new Error("User canceled the operation"));
@@ -158,8 +197,16 @@ export const useMessageSign = () => {
               message: options.message,
             },
             onFinish: (response: any) => {
-              verifyAndSetResult(options.address, options.message, response);
-              setLoading(false);
+              try {
+                verifyAndSetResult(options.address, options.message, response);
+              } catch (err) {
+                console.log({ err });
+                setError(
+                  err instanceof Error ? err : new Error("An unknown error occurred")
+                );
+              } finally {
+                setLoading(false);
+              }
             },
             onCancel: () => {
               setError(new Error("User canceled the operation"));
@@ -169,13 +216,39 @@ export const useMessageSign = () => {
           //@ts-ignore
           await signMessageApi(signMessageOptions);
         } else {
-          throw new Error("Unsupported wallet");
+          throwBWAError(
+            BWAErrorCode.UNSUPPORTED_WALLET,
+            `Unsupported wallet: ${options.wallet}`,
+            {
+              severity: BWAErrorSeverity.HIGH,
+              context: {
+                walletType: options.wallet,
+                operation: 'message_signing',
+                network: options.network,
+                additionalData: {
+                  supportedWallets: ['Xverse', 'Unisat', 'Leather', 'Phantom', 'Okx', 'MagicEden']
+                }
+              },
+              recoverable: true
+            }
+          );
         }
       } catch (err) {
         console.log({ err });
-        setError(
-          err instanceof Error ? err : new Error("An unknown error occurred")
+        const wrappedError = err instanceof BWAError ? err : new BWAError(
+          BWAErrorCode.MESSAGE_SIGNING_FAILED,
+          err instanceof Error ? err.message : "An unknown error occurred during message signing",
+          {
+            severity: BWAErrorSeverity.HIGH,
+            context: { 
+              walletType: options.wallet, 
+              operation: 'message_signing',
+              network: options.network 
+            },
+            originalError: err instanceof Error ? err : undefined
+          }
         );
+        setError(wrappedError);
       } finally {
         setLoading(false);
       }

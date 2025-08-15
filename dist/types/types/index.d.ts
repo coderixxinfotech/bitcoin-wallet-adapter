@@ -49,6 +49,10 @@ export interface IInstalledWallets {
     label: string;
     logo: string;
 }
+export interface IAvailableWallet extends IInstalledWallets {
+    connector: string;
+    installed: boolean;
+}
 export interface CommonSignOptions {
     psbt: string;
     network: "mainnet" | "testnet";

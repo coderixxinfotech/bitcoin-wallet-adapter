@@ -54,6 +54,12 @@ export interface IInstalledWallets {
   logo: string;
 }
 
+// Extended interface for headless hooks
+export interface IAvailableWallet extends IInstalledWallets {
+  connector: string;
+  installed: boolean;
+}
+
 export interface CommonSignOptions {
   psbt: string;
   network: "mainnet" | "testnet";

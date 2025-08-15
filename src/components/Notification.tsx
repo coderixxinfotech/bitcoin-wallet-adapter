@@ -23,6 +23,8 @@ const Notification = () => {
           autoHideDuration={6000}
           onClose={() => handleCloseNotification(notification.id)}
           sx={{
+            // Ensure notifications appear above all other components
+            zIndex: 10000,
             "& .MuiSnackbarContent-root": {
               backgroundColor:
                 notification.severity === "success"
@@ -37,6 +39,9 @@ const Notification = () => {
               color: "#fff",
               fontWeight: 600,
               fontSize: "1rem",
+              // Additional styling for better visibility
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+              borderRadius: "8px",
             },
           }}
         >

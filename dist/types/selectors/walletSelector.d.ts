@@ -1,6 +1,7 @@
 export declare const walletAddressSelector: ((state: import("redux").EmptyObject & {
     notifications: import("../stores/reducers/notificationReducers").NotificationsState;
     general: import("../stores/reducers/generalReducer").GeneralState;
+    bitcoinPrice: import("../stores/reducers/bitcoinPriceReducer").BitcoinPriceState;
 }) => {
     ordinal_address: string;
     cardinal_address: string;

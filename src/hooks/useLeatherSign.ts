@@ -1,6 +1,11 @@
 import { useCallback, useState } from "react";
 import { PsbtRequestOptions, useConnect } from "@stacks/connect-react";
 import { CommonSignOptions, CommonSignResponse } from "../types"; // Import your CommonSignOptions
+import { 
+  throwBWAError, 
+  BWAErrorCode,
+  BWAErrorSeverity 
+} from "../utils/errorHandler";
 
 import { hexToBase64, isHex } from "../utils";
 
@@ -18,9 +23,18 @@ export const useLeatherSign = (
       const { psbt, network, action, inputs } = commonOptions;
 
       if (!isHex(psbt)) {
-        setError(new Error("The PSBT must be in HEX format"));
         setLoading(false);
-        return;
+        throwBWAError(
+          BWAErrorCode.PSBT_INVALID,
+          "Leather wallet requires PSBT in HEX format",
+          {
+            severity: BWAErrorSeverity.MEDIUM,
+            context: { 
+              walletType: 'Leather', 
+              operation: 'transaction_signing' 
+            }
+          }
+        );
       }
 
       try {
@@ -45,7 +59,30 @@ export const useLeatherSign = (
         const base64Result = hexToBase64(result.hex);
         setResult(base64Result);
       } catch (e: any) {
-        setError(e);
+        setLoading(false);
+        if (e instanceof Error && e.name === 'BWAError') {
+          // BWA errors are already handled by the error manager, just set error state
+          setError(e);
+        } else {
+          // Wrap unexpected errors with professional context
+          try {
+            throwBWAError(
+              BWAErrorCode.TRANSACTION_SIGNING_FAILED,
+              e?.message || "Leather transaction signing failed",
+              {
+                severity: BWAErrorSeverity.HIGH,
+                context: { 
+                  walletType: 'Leather', 
+                  operation: 'transaction_signing',
+                  network 
+                },
+                originalError: e instanceof Error ? e : undefined
+              }
+            );
+          } catch (bwaError) {
+            setError(bwaError as Error);
+          }
+        }
       } finally {
         setLoading(false);
       }

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.countDummyUtxos = exports.isBase64 = exports.isHex = exports.hexToBase64 = exports.BytesFromHex = exports.shortenString = exports.getBTCPriceInDollars = exports.base64ToHex = exports.convertBtcToSat = exports.convertSatToBtc = void 0;
 const axios_1 = __importDefault(require("axios"));
+const errorHandler_1 = require("./errorHandler");
 // Function to convert price from satoshi to Bitcoin
 function convertSatToBtc(priceInSat) {
     return priceInSat / 1e8; // 1 BTC = 100,000,000 SAT
@@ -59,11 +60,29 @@ const BytesFromHex = (hexString) => {
     var _a, _b;
     const cleanHexString = hexString.replace(/[^0-9A-Fa-f]/g, "");
     if (cleanHexString.length % 2 !== 0) {
-        throw new Error("Invalid hex string length");
+        (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.VALIDATION_ERROR, "Invalid hex string length - must be even number of characters", {
+            severity: errorHandler_1.BWAErrorSeverity.HIGH,
+            context: {
+                operation: 'hex_conversion',
+                additionalData: {
+                    hexString: cleanHexString,
+                    length: cleanHexString.length
+                }
+            }
+        });
     }
     const bytes = (_b = (_a = cleanHexString.match(/.{2}/g)) === null || _a === void 0 ? void 0 : _a.map((byte) => parseInt(byte, 16))) !== null && _b !== void 0 ? _b : [];
     if (bytes.some(isNaN)) {
-        throw new Error("Invalid hex string");
+        (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.VALIDATION_ERROR, "Invalid hex string - contains non-hexadecimal characters", {
+            severity: errorHandler_1.BWAErrorSeverity.HIGH,
+            context: {
+                operation: 'hex_conversion',
+                additionalData: {
+                    hexString: cleanHexString,
+                    reason: 'invalid_hex_characters'
+                }
+            }
+        });
     }
     return new Uint8Array(bytes);
 };

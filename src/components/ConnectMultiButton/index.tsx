@@ -21,7 +21,6 @@ import { Account, WalletDetails } from "../../types";
 import WalletButton from "./WalletButton";
 import WalletModal from "./WalletModal";
 import { getBTCPriceInDollars } from "../../utils";
-import { setBTCPrice } from "../../stores/reducers/generalReducer";
 import { IInstalledWallets } from "../../types";
 
 // ME Wallet
@@ -212,16 +211,11 @@ Issued At: ${issuedAt}`;
     setWallets(checkWallets);
   }
 
-  const getBTCPrice = useCallback(async () => {
-    const price = await getBTCPriceInDollars();
-    dispatch(setBTCPrice(price));
-  }, [dispatch]);
-
   // Use effect hook to run getInstalledWalletName function on component mount
   useEffect(() => {
     getInstalledWalletName();
-    getBTCPrice();
-  }, [dispatch, getBTCPrice, open]);
+    // Bitcoin price is now managed centrally by the useBitcoinPrice hook
+  }, [dispatch, open]);
 
   // Use effect hook to check if last wallet is in local storage and set selected wallet accordingly
   useEffect(() => {

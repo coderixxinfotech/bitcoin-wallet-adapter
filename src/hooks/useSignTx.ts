@@ -6,6 +6,11 @@ import { base64ToHex } from "../utils";
 import { useMESign } from "./useMESign";
 import { useOkxSign } from "./useOkxSign";
 import { usePhantomSign } from "./usePhantomSign";
+import { 
+  throwBWAError, 
+  BWAErrorCode,
+  BWAErrorSeverity 
+} from "../utils/errorHandler";
 
 export const useSignTx = () => {
   const walletDetails = useWalletAddress();
@@ -44,7 +49,18 @@ export const useSignTx = () => {
       setResult(null);
 
       try {
-        if (!walletDetails) throw Error("Wallet Not Connected");
+        if (!walletDetails) {
+          throwBWAError(
+            BWAErrorCode.WALLET_NOT_CONNECTED,
+            "No wallet is currently connected",
+            {
+              severity: BWAErrorSeverity.HIGH,
+              context: { 
+                operation: 'transaction_signing' 
+              }
+            }
+          );
+        }
         const options = {
           psbt:
             walletDetails.wallet === "Xverse" ||

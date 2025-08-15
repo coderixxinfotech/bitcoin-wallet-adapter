@@ -1,6 +1,11 @@
 import { useState, useCallback } from "react";
 import { CommonSignOptions, CommonSignResponse } from "../types";
 import { hexToBase64, isHex } from "../utils";
+import { 
+  throwBWAError, 
+  BWAErrorCode,
+  BWAErrorSeverity 
+} from "../utils/errorHandler";
 
 export const useUnisatSign = (): CommonSignResponse => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -11,8 +16,17 @@ export const useUnisatSign = (): CommonSignResponse => {
     const { psbt, network, action, inputs } = options;
 
     if (!isHex(psbt)) {
-      setError(new Error("Unisat requires hexPsbt"));
-      return;
+      throwBWAError(
+        BWAErrorCode.PSBT_INVALID,
+        "Unisat wallet requires PSBT in hex format",
+        {
+          severity: BWAErrorSeverity.MEDIUM,
+          context: { 
+            walletType: 'Unisat', 
+            operation: 'transaction_signing' 
+          }
+        }
+      );
     }
 
     setLoading(true);
@@ -34,7 +48,30 @@ export const useUnisatSign = (): CommonSignResponse => {
 
       setResult(hexToBase64(signedPsbt));
     } catch (e: any) {
-      setError(e);
+      setLoading(false);
+      if (e instanceof Error && e.name === 'BWAError') {
+        // BWA errors are already handled by the error manager, just set error state
+        setError(e);
+      } else {
+        // Wrap unexpected errors with professional context
+        try {
+          throwBWAError(
+            BWAErrorCode.TRANSACTION_SIGNING_FAILED,
+            e?.message || "Unisat transaction signing failed",
+            {
+              severity: BWAErrorSeverity.HIGH,
+              context: { 
+                walletType: 'Unisat', 
+                operation: 'transaction_signing',
+                network 
+              },
+              originalError: e instanceof Error ? e : undefined
+            }
+          );
+        } catch (bwaError) {
+          setError(bwaError as Error);
+        }
+      }
     } finally {
       setLoading(false);
     }

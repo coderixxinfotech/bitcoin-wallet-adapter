@@ -17,18 +17,24 @@ const CustomButton_1 = __importDefault(require("../CustomButton"));
 const utils_1 = require("../../utils");
 const fa_1 = require("react-icons/fa");
 const react_redux_1 = require("react-redux");
-const notificationReducers_1 = require("../../stores/reducers/notificationReducers");
 const sats_connect_1 = require("sats-connect");
+const errorHandler_1 = require("../../utils/errorHandler");
 function PayButton({ amount, receipient, buttonClassname, }) {
     const dispatch = (0, react_redux_1.useDispatch)();
     const walletDetails = (0, react_redux_1.useSelector)((state) => state.general.walletDetails);
     const lastWallet = (0, react_redux_1.useSelector)((state) => state.general.lastWallet);
     const handleSubmit = (e) => __awaiter(this, void 0, void 0, function* () {
-        var _a, _b;
+        var _a;
         try {
             e.preventDefault();
             if (!(walletDetails === null || walletDetails === void 0 ? void 0 : walletDetails.connected)) {
-                throw Error("Wallet not connected");
+                (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_CONNECTED, "No wallet is currently connected. Please connect a wallet to make payments.", {
+                    severity: errorHandler_1.BWAErrorSeverity.HIGH,
+                    context: {
+                        operation: 'btc_payment',
+                        additionalData: { amount, receipient }
+                    }
+                });
             }
             if (lastWallet === "Leather") {
                 //@ts-ignore
@@ -57,7 +63,14 @@ function PayButton({ amount, receipient, buttonClassname, }) {
                         return response;
                     },
                     onCancel: () => {
-                        throw Error("Cancelled");
+                        (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.USER_REJECTED, "Payment was cancelled by the user.", {
+                            severity: errorHandler_1.BWAErrorSeverity.LOW,
+                            recoverable: true,
+                            context: {
+                                operation: 'btc_payment',
+                                walletType: 'Xverse'
+                            }
+                        });
                     },
                 };
                 //@ts-ignore
@@ -69,18 +82,19 @@ function PayButton({ amount, receipient, buttonClassname, }) {
                 return txid;
             }
             else {
-                throw Error("Wallet Not Supported!");
+                (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.UNSUPPORTED_WALLET, `${lastWallet} wallet does not support BTC payments yet.`, {
+                    severity: errorHandler_1.BWAErrorSeverity.HIGH,
+                    context: {
+                        operation: 'btc_payment',
+                        walletType: lastWallet
+                    }
+                });
             }
         }
         catch (e) {
-            console.log(e, "PAY ERROR");
-            dispatch((0, notificationReducers_1.addNotification)({
-                id: new Date().valueOf(),
-                message: ((_b = e === null || e === void 0 ? void 0 : e.error) === null || _b === void 0 ? void 0 : _b.message) || (e === null || e === void 0 ? void 0 : e.message) || e,
-                open: true,
-                severity: "error",
-            }));
-            return e;
+            // BWA errors are already handled by the error manager
+            // Re-throw to let the system handle them properly
+            throw e;
         }
     });
     return (react_1.default.createElement("div", null,

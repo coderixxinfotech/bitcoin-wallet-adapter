@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { BitcoinNetworkType, sendBtcTransaction } from "sats-connect";
 import { useWallets } from "@wallet-standard/react";
 import type { WalletWithFeatures } from "@wallet-standard/base";
-import { addNotification } from "../stores/reducers/notificationReducers";
 import { RootState } from "../stores";
 import Wallet from "sats-connect-v2";
+import { throwBWAError, wrapAndThrowError, BWAErrorCode, BWAErrorSeverity } from "../utils/errorHandler";
 
 type CustomWindow = Window & {
   LeatherProvider?: any;
@@ -28,7 +28,6 @@ type PaymentOptions = {
 };
 
 export const usePayBTC = () => {
-  const dispatch = useDispatch();
   const { wallets: testWallets } = useWallets();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -42,20 +41,7 @@ export const usePayBTC = () => {
     setResult(response);
   };
 
-  const handleError = (err: unknown) => {
-    console.error("PAY ERROR:", err);
-    const errorMessage =
-      err instanceof Error ? err.message : "An unknown error occurred";
-    dispatch(
-      addNotification({
-        id: Date.now(),
-        message: errorMessage,
-        open: true,
-        severity: "error",
-      })
-    );
-    setError(new Error(errorMessage));
-  };
+  // Remove handleError - we'll use throwBWAError directly
 
   const payBTC = useCallback(
     async (options: PaymentOptions) => {
@@ -64,9 +50,17 @@ export const usePayBTC = () => {
       setError(null);
 
       if (!walletDetails?.connected) {
-        setError(new Error("Wallet not connected"));
-        setLoading(false);
-        return;
+        throwBWAError(
+          BWAErrorCode.WALLET_NOT_CONNECTED,
+          "No wallet is currently connected. Please connect a wallet to make BTC payments.",
+          {
+            severity: BWAErrorSeverity.HIGH,
+            context: {
+              operation: 'btc_payment',
+              additionalData: { address: options.address, amount: options.amount }
+            }
+          }
+        );
       }
 
       console.log({ options });
@@ -76,13 +70,71 @@ export const usePayBTC = () => {
 
         switch (walletDetails.wallet) {
           case "Leather":
-            const resp = await window.btc?.request("sendTransfer", {
-              address: options.address,
-              amount: options.amount,
-            });
-            txid = resp?.result.txid;
+            if (!window.LeatherProvider) {
+              throwBWAError(
+                BWAErrorCode.WALLET_NOT_FOUND,
+                "Leather wallet is not available for BTC payments",
+                {
+                  severity: BWAErrorSeverity.HIGH,
+                  context: {
+                    operation: 'btc_payment',
+                    walletType: 'Leather'
+                  }
+                }
+              );
+            }
 
-            setResult(txid);
+            try {
+              const resp = await window.LeatherProvider.request("sendTransfer", {
+                recipients: [
+                  {
+                    address: options.address,
+                    amount: options.amount.toString(), // Leather expects string
+                  },
+                ],
+                network: options.network,
+              });
+              
+              if (!resp?.result?.txid) {
+                throwBWAError(
+                  BWAErrorCode.PAYMENT_FAILED,
+                  "Invalid response from Leather wallet - no transaction ID returned",
+                  {
+                    severity: BWAErrorSeverity.HIGH,
+                    context: {
+                      operation: 'btc_payment',
+                      walletType: 'Leather',
+                      additionalData: { response: resp }
+                    }
+                  }
+                );
+              }
+              
+              txid = resp.result.txid;
+              setResult(txid);
+            } catch (leatherError: any) {
+              // Handle Leather-specific errors
+              if (leatherError?.error?.code) {
+                throwBWAError(
+                  BWAErrorCode.PAYMENT_FAILED,
+                  `Leather wallet error: ${leatherError.error.message || 'Unknown error'}`,
+                  {
+                    severity: BWAErrorSeverity.HIGH,
+                    context: {
+                      operation: 'btc_payment',
+                      walletType: 'Leather',
+                      additionalData: { 
+                        leatherErrorCode: leatherError.error.code,
+                        leatherErrorMessage: leatherError.error.message 
+                      }
+                    }
+                  }
+                );
+              } else {
+                // Re-throw if it's already a BWA error
+                throw leatherError;
+              }
+            }
             break;
 
           case "Xverse":
@@ -140,12 +192,22 @@ export const usePayBTC = () => {
                   setResult(response.txid);
                   setLoading(false);
                 } else {
-                  throw new Error("Invalid response format");
+                  throwBWAError(
+                    BWAErrorCode.PAYMENT_FAILED,
+                    "Invalid payment response format from MagicEden wallet",
+                    {
+                      severity: BWAErrorSeverity.HIGH,
+                      context: {
+                        operation: 'btc_payment',
+                        walletType: 'MagicEden',
+                        additionalData: { response }
+                      }
+                    }
+                  );
                 }
               },
               onCancel: () => {
-                // throw new Error("Transaction cancelled");
-                console.log("Cancelled ");
+                  console.log("Cancelled ");
               },
             };
 
@@ -175,18 +237,55 @@ export const usePayBTC = () => {
             break;
 
           case "Phantom":
-            throw new Error("Phantom wallet BTC payment not implemented");
+            throwBWAError(
+              BWAErrorCode.UNSUPPORTED_OPERATION,
+              "Phantom wallet does not support BTC payments yet.",
+              {
+                severity: BWAErrorSeverity.HIGH,
+                context: {
+                  operation: 'btc_payment',
+                  walletType: 'Phantom'
+                }
+              }
+            );
 
           default:
-            throw new Error("Unsupported wallet");
+            throwBWAError(
+              BWAErrorCode.UNSUPPORTED_WALLET,
+              `${walletDetails.wallet} wallet is not supported for BTC payments.`,
+              {
+                severity: BWAErrorSeverity.HIGH,
+                context: {
+                  operation: 'btc_payment',
+                  walletType: walletDetails.wallet
+                }
+              }
+            );
         }
       } catch (err) {
-        handleError(err);
+        setLoading(false);
+        if (err instanceof Error && err.name === 'BWAError') {
+          // BWA errors are already handled by the error manager, just re-throw
+          throw err;
+        } else {
+          // Wrap unexpected errors with professional context
+          const errorToWrap = err instanceof Error ? err : new Error(String(err));
+          wrapAndThrowError(
+            errorToWrap,
+            BWAErrorCode.PAYMENT_FAILED,
+            `BTC payment failed with ${walletDetails.wallet} wallet`,
+            {
+              operation: 'btc_payment',
+              walletType: walletDetails.wallet,
+              network: options.network
+            }
+          );
+        }
       } finally {
         setLoading(false);
       }
     },
-    [dispatch, walletDetails, testWallets]
+    [walletDetails, testWallets]
   );
 
   return { payBTC, loading, result, error };

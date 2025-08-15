@@ -1,4 +1,5 @@
 import axios from "axios";
+import { throwBWAError, BWAErrorCode, BWAErrorSeverity } from "./errorHandler";
 
 // Function to convert price from satoshi to Bitcoin
 export function convertSatToBtc(priceInSat: number): number {
@@ -43,12 +44,38 @@ export function shortenString(str: string, length = 4): string {
 export const BytesFromHex = (hexString: string): Uint8Array => {
   const cleanHexString = hexString.replace(/[^0-9A-Fa-f]/g, "");
   if (cleanHexString.length % 2 !== 0) {
-    throw new Error("Invalid hex string length");
+    throwBWAError(
+      BWAErrorCode.VALIDATION_ERROR,
+      "Invalid hex string length - must be even number of characters",
+      {
+        severity: BWAErrorSeverity.HIGH,
+        context: { 
+          operation: 'hex_conversion',
+          additionalData: { 
+            hexString: cleanHexString,
+            length: cleanHexString.length
+          }
+        }
+      }
+    );
   }
   const bytes =
     cleanHexString.match(/.{2}/g)?.map((byte) => parseInt(byte, 16)) ?? [];
   if (bytes.some(isNaN)) {
-    throw new Error("Invalid hex string");
+    throwBWAError(
+      BWAErrorCode.VALIDATION_ERROR,
+      "Invalid hex string - contains non-hexadecimal characters",
+      {
+        severity: BWAErrorSeverity.HIGH,
+        context: { 
+          operation: 'hex_conversion',
+          additionalData: { 
+            hexString: cleanHexString,
+            reason: 'invalid_hex_characters'
+          }
+        }
+      }
+    );
   }
   return new Uint8Array(bytes);
 };

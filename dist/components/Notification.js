@@ -14,6 +14,8 @@ const Notification = () => {
         dispatch((0, notificationReducers_1.removeNotification)(id));
     };
     return (react_1.default.createElement(react_1.default.Fragment, null, notifications.map((notification) => (react_1.default.createElement(material_1.Snackbar, { key: notification.id, anchorOrigin: { vertical: "bottom", horizontal: "left" }, open: notification.open, autoHideDuration: 6000, onClose: () => handleCloseNotification(notification.id), sx: {
+            // Ensure notifications appear above all other components
+            zIndex: 10000,
             "& .MuiSnackbarContent-root": {
                 backgroundColor: notification.severity === "success"
                     ? "#43a047"
@@ -27,6 +29,9 @@ const Notification = () => {
                 color: "#fff",
                 fontWeight: 600,
                 fontSize: "1rem",
+                // Additional styling for better visibility
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                borderRadius: "8px",
             },
         } },
         react_1.default.createElement(material_1.SnackbarContent, { message: notification.message }))))));

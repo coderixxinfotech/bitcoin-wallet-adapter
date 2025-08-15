@@ -2,6 +2,11 @@ import { useState, useCallback } from "react";
 import { CommonSignOptions, CommonSignResponse } from "../types";
 import { BytesFromHex, hexToBase64, isHex } from "../utils";
 import { bytesToBase64 } from "..";
+import { 
+  throwBWAError, 
+  BWAErrorCode,
+  BWAErrorSeverity 
+} from "../utils/errorHandler";
 
 export const usePhantomSign = (): CommonSignResponse => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -12,8 +17,17 @@ export const usePhantomSign = (): CommonSignResponse => {
     const { psbt, network, action, inputs } = options;
 
     if (!isHex(psbt)) {
-      setError(new Error("Phantom requires hexPsbt"));
-      return;
+      throwBWAError(
+        BWAErrorCode.PSBT_INVALID,
+        "Phantom wallet requires PSBT in hex format",
+        {
+          severity: BWAErrorSeverity.MEDIUM,
+          context: { 
+            walletType: 'Phantom', 
+            operation: 'transaction_signing' 
+          }
+        }
+      );
     }
 
     setLoading(true);
@@ -38,7 +52,30 @@ export const usePhantomSign = (): CommonSignResponse => {
 
       setResult(bytesToBase64(signedPsbt));
     } catch (e: any) {
-      setError(e);
+      setLoading(false);
+      if (e instanceof Error && e.name === 'BWAError') {
+        // BWA errors are already handled by the error manager, just set error state
+        setError(e);
+      } else {
+        // Wrap unexpected errors with professional context
+        try {
+          throwBWAError(
+            BWAErrorCode.TRANSACTION_SIGNING_FAILED,
+            e?.message || "Phantom transaction signing failed",
+            {
+              severity: BWAErrorSeverity.HIGH,
+              context: { 
+                walletType: 'Phantom', 
+                operation: 'transaction_signing',
+                network 
+              },
+              originalError: e instanceof Error ? e : undefined
+            }
+          );
+        } catch (bwaError) {
+          setError(bwaError as Error);
+        }
+      }
     } finally {
       setLoading(false);
     }

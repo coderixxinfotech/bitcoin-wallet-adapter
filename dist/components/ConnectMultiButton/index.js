@@ -45,8 +45,6 @@ const notificationReducers_1 = require("../../stores/reducers/notificationReduce
 const generalReducer_1 = require("../../stores/reducers/generalReducer");
 const WalletButton_1 = __importDefault(require("./WalletButton"));
 const WalletModal_1 = __importDefault(require("./WalletModal"));
-const utils_1 = require("../../utils");
-const generalReducer_2 = require("../../stores/reducers/generalReducer");
 // ME Wallet
 const SatsConnectNamespace = "sats-connect:";
 const react_2 = require("@wallet-standard/react");
@@ -144,15 +142,11 @@ Issued At: ${issuedAt}`;
             checkWallets = checkWallets.filter((wallet) => supportedWallets.includes(wallet.label.toLowerCase()));
         setWallets(checkWallets);
     }
-    const getBTCPrice = (0, react_1.useCallback)(() => __awaiter(this, void 0, void 0, function* () {
-        const price = yield (0, utils_1.getBTCPriceInDollars)();
-        dispatch((0, generalReducer_2.setBTCPrice)(price));
-    }), [dispatch]);
     // Use effect hook to run getInstalledWalletName function on component mount
     (0, react_1.useEffect)(() => {
         getInstalledWalletName();
-        getBTCPrice();
-    }, [dispatch, getBTCPrice, open]);
+        // Bitcoin price is now managed centrally by the useBitcoinPrice hook
+    }, [dispatch, open]);
     // Use effect hook to check if last wallet is in local storage and set selected wallet accordingly
     (0, react_1.useEffect)(() => {
         const localWD = localStorage.getItem("wallet-detail") || "";

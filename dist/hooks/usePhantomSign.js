@@ -13,6 +13,7 @@ exports.usePhantomSign = void 0;
 const react_1 = require("react");
 const utils_1 = require("../utils");
 const __1 = require("..");
+const errorHandler_1 = require("../utils/errorHandler");
 const usePhantomSign = () => {
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [result, setResult] = (0, react_1.useState)(null);
@@ -21,8 +22,13 @@ const usePhantomSign = () => {
         var _a, _b;
         const { psbt, network, action, inputs } = options;
         if (!(0, utils_1.isHex)(psbt)) {
-            setError(new Error("Phantom requires hexPsbt"));
-            return;
+            (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.PSBT_INVALID, "Phantom wallet requires PSBT in hex format", {
+                severity: errorHandler_1.BWAErrorSeverity.MEDIUM,
+                context: {
+                    walletType: 'Phantom',
+                    operation: 'transaction_signing'
+                }
+            });
         }
         setLoading(true);
         try {
@@ -39,7 +45,28 @@ const usePhantomSign = () => {
             setResult((0, __1.bytesToBase64)(signedPsbt));
         }
         catch (e) {
-            setError(e);
+            setLoading(false);
+            if (e instanceof Error && e.name === 'BWAError') {
+                // BWA errors are already handled by the error manager, just set error state
+                setError(e);
+            }
+            else {
+                // Wrap unexpected errors with professional context
+                try {
+                    (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.TRANSACTION_SIGNING_FAILED, (e === null || e === void 0 ? void 0 : e.message) || "Phantom transaction signing failed", {
+                        severity: errorHandler_1.BWAErrorSeverity.HIGH,
+                        context: {
+                            walletType: 'Phantom',
+                            operation: 'transaction_signing',
+                            network
+                        },
+                        originalError: e instanceof Error ? e : undefined
+                    });
+                }
+                catch (bwaError) {
+                    setError(bwaError);
+                }
+            }
         }
         finally {
             setLoading(false);

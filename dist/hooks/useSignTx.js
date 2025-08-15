@@ -17,6 +17,7 @@ const utils_1 = require("../utils");
 const useMESign_1 = require("./useMESign");
 const useOkxSign_1 = require("./useOkxSign");
 const usePhantomSign_1 = require("./usePhantomSign");
+const errorHandler_1 = require("../utils/errorHandler");
 const useSignTx = () => {
     const walletDetails = (0, index_2.useWalletAddress)();
     const [loading, setLoading] = (0, react_1.useState)(false);
@@ -33,8 +34,14 @@ const useSignTx = () => {
         setError(null);
         setResult(null);
         try {
-            if (!walletDetails)
-                throw Error("Wallet Not Connected");
+            if (!walletDetails) {
+                (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_CONNECTED, "No wallet is currently connected", {
+                    severity: errorHandler_1.BWAErrorSeverity.HIGH,
+                    context: {
+                        operation: 'transaction_signing'
+                    }
+                });
+            }
             const options = {
                 psbt: walletDetails.wallet === "Xverse" ||
                     walletDetails.wallet === "MagicEden"

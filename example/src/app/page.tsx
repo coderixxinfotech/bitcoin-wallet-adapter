@@ -1,271 +1,283 @@
 "use client";
 import {
-  ConnectMultiButton,
   Notification,
   useWalletAddress,
-  useXverseSign,
+  useErrorHandler,
+  BWAError,
+  addNotification,
+  ConnectMultiButton,
 } from "../../../dist";
-import { useEffect } from "react";
-import {
-  FaDiscord,
-  FaFaceFrown,
-  FaFaceGrinStars,
-  FaFaceMeh,
-  FaFaceSadCry,
-  FaFaceSmile,
-  FaFaceSmileWink,
-  FaXTwitter,
-} from "react-icons/fa6";
+import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
-import Popover from "@mui/material/Popover";
-import PayButton from "@/components/PayButton";
 
-const XverseListingUnsignedPsbt = `cHNidP8BAFMCAAAAAY2eAJfNX305iLS3wcoAydSV3fLlswhTOSnzauI4ifaJAAAAAAD/////AQAGAAAAAAAAF6kUaCZjDq3CEhgAUJgHq4l+MlIpLE6HAAAAAAABAP04AQIAAAAAAQKCZJHc5/82iQQLBIHwTadgrr39ldYYP7oQ7WBUVPIZsQIAAAAA/////8TKUqFN+i6clUthqwHTNKoN86U7s4Iuczoriu2hRCSwAAAAAAD/////AiICAAAAAAAAIlEgwamNg/SRfxhid+iPbO5aaTYRwwH44Wj8KsAVHnC0s6UhhAEAAAAAACJRIBL2sGjymEcmEx43URFfN125o87nIsYtoisohjZsr6oZAUCffKRpcm9qKUyTeKmjrtumKD4cjhBkbypE2Z5Y/naaZkG6lfbIBsy/Gcz5SD4LBeTpmcNvD3JmlfZ8+dNCkdl+AUBxSjJPgeUsk6r4Yy4RI+W1L/INM6V6jMfL97LVTyhFpAVEGBbU+khU1Pje2KdhJ6MFTBmbiVbC9Xf6g+srKLq1AAAAAAEBKyICAAAAAAAAIlEgwamNg/SRfxhid+iPbO5aaTYRwwH44Wj8KsAVHnC0s6UBAwSDAAAAARcgs/+suUVx8rIh8UZRFajDjzxJ7oujixupMPNuRHpgWbwAAA==`;
+import DebugWindow from "@/components/DebugWindow";
+import WalletConnectDemo from "../components/WalletConnectDemo";
+import MessageSignDemo from "../components/MessageSignDemo";
+import BalanceDemo from "../components/BalanceDemo";
+import PaymentDemo from "../components/PaymentDemo";
 
-export default function Home() {
-  const { loading, result, error, sign } = useXverseSign();
+
+
+function HomeContent() {
+  const dispatch = useDispatch();
   const walletDetails = useWalletAddress();
-
-  const handleClick = async () => {
-    try {
-      if (walletDetails) {
-        const { cardinal_address, ordinal_address } = walletDetails;
-        if (!cardinal_address) return;
-        const options: any = {
-          psbt: XverseListingUnsignedPsbt,
-          network: "Mainnet",
-          // action: "sell",
-          inputs: [
-            {
-              address: ordinal_address,
-              sighash: 131,
-              index: [0],
-            },
-          ],
-        };
-
-        await sign(options);
+  const [debugWindowOpen, setDebugWindowOpen] = useState(false);
+  // Load last active tab from localStorage, default to 'connect'
+  const [activeTab, setActiveTab] = useState<'connect' | 'signing' | 'balance' | 'payment'>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTab = localStorage.getItem('bitcoinWalletAdapter_activeTab');
+      if (savedTab && ['connect', 'signing', 'balance', 'payment'].includes(savedTab)) {
+        return savedTab as 'connect' | 'signing' | 'balance' | 'payment';
       }
-    } catch (e) {
-      console.error("An error occurred:", error);
     }
+    return 'connect';
+  });
+
+  // Save active tab to localStorage when it changes
+  const handleTabChange = (tab: 'connect' | 'signing' | 'balance' | 'payment') => {
+    setActiveTab(tab);
+    localStorage.setItem('bitcoinWalletAdapter_activeTab', tab);
   };
 
+  // Professional error handling
+  const { errors, clearErrors } = useErrorHandler({
+    onError: (bwaError: InstanceType<typeof BWAError>) => {
+      console.error('BWA Error:', bwaError);
+      dispatch(addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        message: `${bwaError.context?.walletType || 'Wallet'} Error: ${bwaError.message}`,
+        duration: 5000,
+      }));
+    }
+  });
+
+  // Global error boundary for wallet adapter errors
   useEffect(() => {
-    console.log({ result, error });
-    // console.log("Signing successful:", result);
-  }, [result, error]);
+    const handleUnhandledError = (event: ErrorEvent) => {
+      // Check if it's a wallet adapter error
+      if (event.error instanceof BWAError) {
+        console.error('Unhandled BWA Error:', event.error);
+        dispatch(addNotification({
+          id: Date.now().toString(),
+          type: 'error',
+          message: `Unhandled Error: ${event.error.message}`,
+          duration: 5000,
+        }));
+      }
+    };
+
+    window.addEventListener('error', handleUnhandledError);
+    return () => window.removeEventListener('error', handleUnhandledError);
+  }, [dispatch]);
+
+
 
   return (
-    <main className="bg-primary flex min-h-screen flex-col items-center justify-between px-24 py-12">
-      <div className="w-full">
-        <div className="w-full flex justify-end">
-          <ConnectMultiButton
-            modalContentClass="bg-primary border rounded-xl border-accent overflow-hidden relative lg:p-16 md:p-12 p-6"
-            buttonClassname={` text-white rounded flex items-center px-4 py-1 ${
-              walletDetails
-                ? "  font-bold bg-accent_dark "
-                : " font-light bg-accent"
-            }`}
-            headingClass="text-center text-white pt-2 pb-2 text-3xl capitalize font-bold mb-4"
-            walletItemClass="w-full bg-accent_dark my-3 hover:border-accent border border-transparent cursor-pointer"
-            walletLabelClass="text-lg text-white capitalize tracking-wider"
-            walletImageClass="w-[30px]"
-            InnerMenu={InnerMenu}
-            // icon="https://2254859395-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F41U87FfDFo2dIKYr0ZNX%2Ficon%2FeTdVHpsUrKNqnuPPi4Bo%2FSize128.svg?alt=media&token=61d284cf-2884-418f-9af3-2ab5cf94c7f4"
-            iconClass="w-[100px] pb-2"
-            network="testnet"
-          />
-        </div>
-        {walletDetails &&
-          walletDetails.cardinal_address &&
-          walletDetails.connected && (
-            <div className="py-6">
-              <PayButton />
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 text-black py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+            Bitcoin Wallet Adapter
+          </h1>
+          <p className="text-xl text-slate-600 mb-2 font-medium">
+            Wallet Connection Demo
+          </p>
+          <p className="text-slate-500 max-w-2xl mx-auto">
+            Connect and manage Bitcoin wallets with professional-grade integration
+          </p>
+
+          {/* Primary Connect Button - Recommended Default Sign-in Method */}
+          <div className="bg-white rounded-2xl px-8 py-6 shadow-sm border border-slate-200 mb-8">
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-semibold text-slate-800 mb-2">Connect Your Bitcoin Wallet</h3>
+              <p className="text-slate-600 text-sm mb-4">Recommended sign-in method - persists wallet data after page refresh</p>
+              <ConnectMultiButton network="mainnet" />
             </div>
-          )}
+            
+            {/* Connection Status */}
+            <div className="flex items-center justify-center gap-4 pt-4 border-t border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className={`w-3 h-3 rounded-full ${
+                  walletDetails?.connected ? 'bg-emerald-500 shadow-sm shadow-emerald-500/50' : 'bg-slate-300'
+                }`} />
+                <span className={`text-sm font-semibold ${
+                  walletDetails?.connected ? 'text-emerald-700' : 'text-slate-500'
+                }`}>
+                  {walletDetails?.connected ? 'Connected' : 'Disconnected'}
+                </span>
+              </div>
+              {walletDetails?.connected && (
+                <div className="text-sm text-slate-700 font-medium bg-slate-100 px-3 py-1 rounded-lg">
+                  {walletDetails.wallet}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-        {loading && <p>Loading...</p>}
 
-        {walletDetails &&
-          walletDetails.ordinal_address &&
-          walletDetails.connected && (
-            <div className="py-6">
+
+        {/* Tab-Based Demo Interface */}
+        <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 overflow-hidden mb-8">
+          {/* Tab Navigation */}
+          <div className="border-b border-slate-200 bg-slate-50">
+            <div className="flex">
               <button
-                className="bg-blue-500 px-4 py-4 rounded shadow hover:bg-blue-700"
-                onClick={handleClick}
-                disabled={loading}
+                onClick={() => handleTabChange('connect')}
+                className={`px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 ${activeTab === 'connect'
+                    ? 'border-blue-500 text-blue-600 bg-white'
+                    : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+                  }`}
               >
-                Sign Transaction
+                🔗 Wallet Connect
+              </button>
+              <button
+                onClick={() => handleTabChange('signing')}
+                className={`px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 ${activeTab === 'signing'
+                    ? 'border-blue-500 text-blue-600 bg-white'
+                    : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+                  }`}
+              >
+                ✍️ Message Signing
+              </button>
+              <button
+                onClick={() => handleTabChange('balance')}
+                className={`px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 ${activeTab === 'balance'
+                    ? 'border-blue-500 text-blue-600 bg-white'
+                    : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+                  }`}
+              >
+                💰 Balance Check
+              </button>
+              <button
+                onClick={() => handleTabChange('payment')}
+                className={`px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 ${activeTab === 'payment'
+                    ? 'border-blue-500 text-blue-600 bg-white'
+                    : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+                  }`}
+              >
+                💸 Payment Demo
+              </button>
+
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-8">
+            {/* Wallet Connect Tab */}
+            {activeTab === 'connect' && (
+              <div>
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-slate-900 mb-3">
+                    Wallet Connect Demo
+                  </h2>
+                  <p className="text-slate-600 text-lg">
+                    Test wallet connection functionality and management features
+                  </p>
+                </div>
+                <WalletConnectDemo />
+              </div>
+            )}
+
+            {/* Message Signing Tab */}
+            {activeTab === 'signing' && (
+              <div>
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-slate-900 mb-3">
+                    Message Signing Demo
+                  </h2>
+                  <p className="text-slate-600 text-lg">
+                    Sign messages with your Bitcoin wallet to prove ownership and authenticate actions
+                  </p>
+                </div>
+                <MessageSignDemo />
+              </div>
+            )}
+
+
+
+            {/* Balance Check Tab */}
+            {activeTab === 'balance' && (
+              <div>
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-slate-900 mb-3">
+                    Balance Check Demo
+                  </h2>
+                  <p className="text-slate-600 text-lg">
+                    Check your Bitcoin wallet balance using the built-in balance fetching capabilities
+                  </p>
+                </div>
+                <BalanceDemo />
+              </div>
+            )}
+
+            {/* Payment Demo Tab */}
+            {activeTab === 'payment' && (
+              <div>
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-slate-900 mb-3">
+                    Payment Demo
+                  </h2>
+                  <p className="text-slate-600 text-lg">
+                    Demonstrate Bitcoin payment capabilities with the PayButton component
+                  </p>
+                </div>
+                <PaymentDemo />
+              </div>
+            )}
+
+
+          </div>
+        </div>
+
+        {/* Error Summary */}
+        {errors.length > 0 && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-red-600 text-sm">⚠️</span>
+                </div>
+                <h4 className="text-red-900 font-bold text-lg">Recent Errors ({errors.length})</h4>
+              </div>
+              <button
+                onClick={clearErrors}
+                className="bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-200"
+              >
+                Clear All
               </button>
             </div>
-          )}
-        {result && (
-          <p className="text-xs bwa-overflow-scroll px-4 py-1 bg-green-200 text-green-700 rounded shadow">
-            Success
-          </p>
+            <div className="space-y-3">
+              {errors.slice(-3).map((error, index) => (
+                <div key={index} className="text-red-800 text-sm bg-red-100 p-4 rounded-xl border border-red-200">
+                  <div className="font-semibold text-red-900 mb-1">
+                    {(error as any).context?.walletType || 'Wallet'} Error:
+                  </div>
+                  <div className="text-red-700">{(error as any).message}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
-        {error && (
-          <span className="py-1 px-4 bg-red-200 text-red-700 rounded shadow">
-            Error: {error.message}
-          </span>
-        )}
+
+
       </div>
+
+      {/* Notification System */}
       <Notification />
+
+      {/* Debug Window */}
+      <DebugWindow
+        isOpen={debugWindowOpen}
+        onToggle={() => setDebugWindowOpen(!debugWindowOpen)}
+      />
     </main>
   );
 }
 
-const Face = ({ balance }: { balance: number }) => {
-  let balInBTC = balance / 100_000_000;
-
-  // console.log({ balInBTC }, "BTCBAL");
-
-  // Check from the highest threshold down to the lowest
-  if (balInBTC >= 0.01) {
-    return <FaFaceSmileWink />;
-  } else if (balInBTC >= 0.001) {
-    return <FaFaceSmile />;
-  } else if (balInBTC >= 0.0005) {
-    return <FaFaceMeh />;
-  } else if (balInBTC >= 0.0001) {
-    return <FaFaceFrown />;
-  } else if (balInBTC <= 0) {
-    return <FaFaceSadCry />;
-  } else {
-    // For any case not covered above, though technically this branch might never be reached with the current logic
-    return <FaFaceGrinStars />;
-  }
-};
-
-const InnerMenu = ({ anchorEl, open, onClose, disconnect }: any) => {
-  const walletDetails = useWalletAddress();
-  const balance = 100000000;
-  // console.log({ walletDetails });
-  if (walletDetails)
-    return (
-      <Popover
-        anchorEl={anchorEl}
-        onClose={onClose}
-        open={open}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <div className="p-6 bg-primary-dark min-w-[300px] max-w-[400px] relative">
-          <div className="intro flex items-center pb-6">
-            {balance && (
-              <div className="mr-2 text-3xl">
-                <Face balance={balance} />
-              </div>
-            )}
-            <p className="uppercase font-bold text-sm">
-              {shortenString(walletDetails.cardinal_address, 4)}
-            </p>
-          </div>
-          <div className="BTCWallet flex items-center pb-6 w-full">
-            <div className="mr-2">
-              <img
-                alt=""
-                src="https://pngimg.com/uploads/bitcoin/bitcoin_PNG48.png"
-                width={35}
-              />{" "}
-            </div>
-            <div className="flex-1 flex justify-between items-center text-sm">
-              <div>
-                <p className="font-bold tracking-wider text-white">
-                  BTC Wallet
-                </p>
-                <p className="uppercase">
-                  {shortenString(walletDetails.cardinal_address, 5)}
-                </p>
-              </div>
-              <div>
-                <p className="font-bold tracking-wider text-white">
-                  {(balance / 100_000_000).toFixed(5)} BTC
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="OrdinalsWallet flex items-center pb-6 w-full">
-            <div className="mr-2">
-              <img
-                alt=""
-                src="https://pngimg.com/uploads/bitcoin/bitcoin_PNG48.png"
-                width={35}
-              />{" "}
-            </div>
-            <div className="flex-1 flex justify-between items-center text-sm">
-              <div>
-                <p className="font-bold tracking-wider text-white">
-                  Ordinals Wallet
-                </p>
-                <p className="uppercase">
-                  {shortenString(walletDetails.ordinal_address, 5)}
-                </p>
-              </div>
-              <div>
-                {/* <p className="font-bold tracking-wider text-white">
-                  {(walletDetails.balance / 100_000_000).toFixed(3)} BTC
-                </p> */}
-                {/* <p className="uppercase font-bold text-sm">
-                {shortenString(walletDetails.cardinal_address, 5)}
-              </p> */}
-              </div>
-            </div>
-          </div>
-          <div className="relative ">
-            <div className="bg-primary rounded cursor-pointer styled-button-wrapper my-2">
-              <button
-                className="accent_transition p-2 w-full"
-                onClick={onClose}
-              >
-                Dashboard
-              </button>
-            </div>
-          </div>
-          <div className="relative ">
-            <div className="bg-primary rounded cursor-pointer styled-button-wrapper my-2">
-              <button
-                className="red_transition p-2 w-full"
-                onClick={() => disconnect()}
-              >
-                Disconnect
-              </button>
-            </div>
-          </div>
-          <div className="socials flex space-x-3 text-xl relative">
-            <div className="relative ">
-              <div className="bg-primary rounded cursor-pointer styled-button-wrapper">
-                <button className="accent_transition p-2">
-                  <FaXTwitter />
-                </button>
-              </div>
-            </div>
-            <div className="relative ">
-              <button className="bg-primary rounded cursor-pointer  styled-button-wrapper">
-                <button className="accent_transition p-2">
-                  <FaDiscord />
-                </button>
-              </button>
-            </div>
-          </div>
-        </div>
-      </Popover>
-    );
-  else <></>;
-};
-
-function shortenString(str: string, length = 4): string {
-  if (str.length <= 8) {
-    return str;
-  }
-  const start = str.slice(0, length);
-  const end = str.slice(-length);
-  return `${start}...${end}`;
+export default function Home() {
+  return <HomeContent />;
 }

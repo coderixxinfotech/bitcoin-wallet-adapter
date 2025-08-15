@@ -4,7 +4,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export interface GeneralState {
   walletDetails: WalletDetails | null;
   lastWallet: string;
-  btc_price_in_dollar: number;
   signature: string;
   network: "mainnet" | "testnet";
 }
@@ -12,7 +11,6 @@ export interface GeneralState {
 const initialState: GeneralState = {
   walletDetails: null,
   lastWallet: "",
-  btc_price_in_dollar: 0,
   signature: "",
   network: "mainnet",
 };
@@ -27,9 +25,7 @@ const walletSlice = createSlice({
     setLastWallet: (state, action: PayloadAction<string>) => {
       state.lastWallet = action.payload;
     },
-    setBTCPrice: (state, action: PayloadAction<number>) => {
-      state.btc_price_in_dollar = action.payload;
-    },
+
     setNetwork: (state, action: PayloadAction<"mainnet" | "testnet">) => {
       state.network = action.payload;
     },
@@ -42,7 +38,6 @@ const walletSlice = createSlice({
 export const {
   setWalletDetails,
   setLastWallet,
-  setBTCPrice,
   setNetwork,
   setSignature,
 } = walletSlice.actions;

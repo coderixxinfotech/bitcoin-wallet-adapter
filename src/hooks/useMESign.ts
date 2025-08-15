@@ -2,7 +2,12 @@ import { useState, useCallback } from "react";
 import { CommonSignOptions, CommonSignResponse } from "../types";
 import { BitcoinNetworkType, signTransaction } from "sats-connect";
 import { isBase64 } from "../utils";
-import { useWallet, useWallets } from "@wallet-standard/react";
+import { useWallets } from "@wallet-standard/react";
+import { 
+  throwBWAError, 
+  BWAErrorCode,
+  BWAErrorSeverity 
+} from "../utils/errorHandler";
 
 import type { WalletWithFeatures } from "@wallet-standard/base";
 
@@ -18,29 +23,62 @@ export const useMESign = (): CommonSignResponse => {
 
     // Check if the action is provided
     if (!action) {
-      setError(
-        new Error("Action must be provided: buy | sell | dummy | other")
+      throwBWAError(
+        BWAErrorCode.VALIDATION_ERROR,
+        "Action must be provided: buy | sell | dummy | other",
+        {
+          severity: BWAErrorSeverity.MEDIUM,
+          context: { 
+            walletType: 'MagicEden', 
+            operation: 'transaction_signing' 
+          }
+        }
       );
-      return;
     }
 
     // Check if the inputs are provided and are not empty
     if (!inputs || inputs.length === 0) {
-      setError(new Error("Inputs must be provided and cannot be empty"));
-      return;
+      throwBWAError(
+        BWAErrorCode.VALIDATION_ERROR,
+        "Inputs must be provided and cannot be empty",
+        {
+          severity: BWAErrorSeverity.MEDIUM,
+          context: { 
+            walletType: 'MagicEden', 
+            operation: 'transaction_signing' 
+          }
+        }
+      );
     }
 
     // Check if the network is provided
     if (!network) {
-      setError(new Error("Network must be provided"));
-      return;
+      throwBWAError(
+        BWAErrorCode.NETWORK_ERROR,
+        "Network must be provided",
+        {
+          severity: BWAErrorSeverity.MEDIUM,
+          context: { 
+            walletType: 'MagicEden', 
+            operation: 'transaction_signing' 
+          }
+        }
+      );
     }
 
     // Make sure psbt is base64
     if (!isBase64(psbt)) {
-      console.warn("Xverse requires base64 PSBT");
-      setError(new Error("Xverse requires base64 PSBT"));
-      return;
+      throwBWAError(
+        BWAErrorCode.PSBT_INVALID,
+        "MagicEden requires base64 PSBT",
+        {
+          severity: BWAErrorSeverity.MEDIUM,
+          context: { 
+            walletType: 'MagicEden', 
+            operation: 'transaction_signing' 
+          }
+        }
+      );
     }
 
     setLoading(true);
@@ -72,11 +110,51 @@ export const useMESign = (): CommonSignResponse => {
           inputsToSign: xverseInputs,
         },
         onFinish: (response: any) => setResult(response.psbtBase64),
-        onCancel: () => setError(new Error("Operation cancelled by user")),
+        onCancel: () => {
+          try {
+            throwBWAError(
+              BWAErrorCode.USER_CANCELLED,
+              "Transaction signing was cancelled by the user",
+              {
+                severity: BWAErrorSeverity.LOW,
+                recoverable: true,
+                context: { 
+                  walletType: 'MagicEden', 
+                  operation: 'transaction_signing',
+                  network 
+                }
+              }
+            );
+          } catch (e) {
+            setError(e as Error);
+          }
+        },
       });
     } catch (e: any) {
-      console.log({ e }, "ME_SIGN_TX_ERROR");
-      setError(e);
+      setLoading(false);
+      if (e instanceof Error && e.name === 'BWAError') {
+        // BWA errors are already handled by the error manager, just set error state
+        setError(e);
+      } else {
+        // Wrap unexpected errors with professional context
+        try {
+          throwBWAError(
+            BWAErrorCode.TRANSACTION_SIGNING_FAILED,
+            e?.message || "MagicEden transaction signing failed",
+            {
+              severity: BWAErrorSeverity.HIGH,
+              context: { 
+                walletType: 'MagicEden', 
+                operation: 'transaction_signing', 
+                network 
+              },
+              originalError: e instanceof Error ? e : undefined
+            }
+          );
+        } catch (bwaError) {
+          setError(bwaError as Error);
+        }
+      }
     } finally {
       setLoading(false);
     }
