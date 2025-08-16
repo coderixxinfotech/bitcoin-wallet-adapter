@@ -61,21 +61,21 @@ const WalletButton: React.FC<WalletButtonProps> = ({
 
   const isDark = currentTheme === 'dark';
 
-  // Theme-aware classes matching WalletPopup design
+  // Theme-aware classes matching WalletPopup design with bwa- prefix
   const themes = {
     light: {
-      connectButton: 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border border-blue-600 focus:ring-4 focus:ring-blue-200',
-      connectedButton: 'bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 border border-emerald-600 focus:ring-4 focus:ring-emerald-200',
-      menu: 'bg-white shadow-2xl border border-gray-200',
-      menuItem: 'text-gray-900 hover:bg-gray-50',
-      menuItemIcon: 'text-gray-600',
+      connectButton: 'bwa-bg-blue-600 hover:bwa-bg-blue-700 bwa-text-white bwa-shadow-lg hover:bwa-shadow-xl bwa-transition-all bwa-duration-200 bwa-border bwa-border-blue-600 focus:bwa-ring-4 focus:bwa-ring-blue-200',
+      connectedButton: 'bwa-bg-gradient-to-r from-bwa-emerald-600 to-bwa-emerald-700 hover:from-bwa-emerald-700 hover:to-bwa-emerald-800 bwa-text-white bwa-shadow-lg hover:bwa-shadow-xl bwa-transition-all bwa-duration-200 bwa-border bwa-border-emerald-600 focus:bwa-ring-4 focus:bwa-ring-emerald-200',
+      menu: 'bwa-bg-white bwa-shadow-2xl bwa-border bwa-border-gray-200',
+      menuItem: 'bwa-text-gray-900 hover:bwa-bg-gray-50',
+      menuItemIcon: 'bwa-text-gray-600',
     },
     dark: {
-      connectButton: 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border border-blue-500 focus:ring-4 focus:ring-blue-800',
-      connectedButton: 'bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 border border-emerald-500 focus:ring-4 focus:ring-emerald-800',
-      menu: 'bg-gray-900 shadow-2xl border border-gray-700',
-      menuItem: 'text-white hover:bg-gray-800',
-      menuItemIcon: 'text-gray-400',
+      connectButton: 'bwa-bg-blue-600 hover:bwa-bg-blue-700 bwa-text-white bwa-shadow-lg hover:bwa-shadow-xl bwa-transition-all bwa-duration-200 bwa-border bwa-border-blue-500 focus:bwa-ring-4 focus:bwa-ring-blue-800',
+      connectedButton: 'bwa-bg-gradient-to-r from-bwa-emerald-600 to-bwa-emerald-700 hover:from-bwa-emerald-700 hover:to-bwa-emerald-800 bwa-text-white bwa-shadow-lg hover:bwa-shadow-xl bwa-transition-all bwa-duration-200 bwa-border bwa-border-emerald-500 focus:bwa-ring-4 focus:bwa-ring-emerald-800',
+      menu: 'bwa-bg-gray-900 bwa-shadow-2xl bwa-border bwa-border-gray-700',
+      menuItem: 'bwa-text-white hover:bwa-bg-gray-800',
+      menuItemIcon: 'bwa-text-gray-400',
     }
   };
 
@@ -86,14 +86,14 @@ const WalletButton: React.FC<WalletButtonProps> = ({
         onClick={(e) => (menuOpen ? handleMenuClose() : handleMenuOpen(e))}
         className={`
         ${currentThemes.connectButton}
-        px-8 py-4 rounded-xl font-bold text-base flex items-center gap-3
-        transform hover:scale-105 active:scale-95 transition-all duration-200
-        min-w-[200px] justify-center
+        bwa-px-8 bwa-py-4 bwa-rounded-xl bwa-font-bold bwa-text-base bwa-flex bwa-items-center bwa-gap-3
+        bwa-transform hover:bwa-scale-105 active:bwa-scale-95 bwa-transition-all bwa-duration-200
+        bwa-min-w-[200px] bwa-justify-center
         ${classname || ''}
       `}
       >
-        <RiAccountCircleFill className="text-xl" />
-        <span className="font-medium">
+        <RiAccountCircleFill className="bwa-text-xl" />
+        <span className="bwa-font-medium">
           {balance
             ? `${(balance / 100_000_000).toFixed(5)} ${fractal ? " FB" : " BTC"}`
             : shortenString(walletDetails.cardinal, 5)
@@ -174,14 +174,14 @@ const WalletButton: React.FC<WalletButtonProps> = ({
       onClick={handleOpen}
       className={`
         ${currentThemes.connectButton}
-        px-8 py-4 rounded-xl font-bold text-base flex items-center gap-3
-        transform hover:scale-105 active:scale-95 transition-all duration-200
-        min-w-[200px] justify-center
+        bwa-px-8 bwa-py-4 bwa-rounded-xl bwa-font-bold bwa-text-base bwa-flex bwa-items-center bwa-gap-3
+        bwa-transform hover:bwa-scale-105 active:bwa-scale-95 bwa-transition-all bwa-duration-200
+        bwa-min-w-[200px] bwa-justify-center
         ${classname || ''}
       `}
     >
-      <FaWallet className="text-lg" />
-      <span>Connect Wallet</span>
+      <FaWallet className="bwa-text-lg" />
+      <span className="bwa-font-medium">Connect Wallet</span>
     </button>
   );
 };
