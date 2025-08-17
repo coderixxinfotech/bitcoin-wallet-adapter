@@ -23,6 +23,13 @@ function HomeContent() {
   const dispatch = useDispatch();
   const walletDetails = useWalletAddress();
   const [debugWindowOpen, setDebugWindowOpen] = useState(false);
+  const [capturedSignature, setCapturedSignature] = useState<{
+    signature: string;
+    message: string;
+    address: string;
+    wallet: string;
+    network: string;
+  } | null>(null);
   // Load last active tab from localStorage, default to 'connect'
   const [activeTab, setActiveTab] = useState<'connect' | 'signing' | 'balance' | 'payment'>(() => {
     if (typeof window !== 'undefined') {
@@ -94,7 +101,20 @@ function HomeContent() {
             <div className="text-center mb-6">
               <h3 className="text-xl font-semibold text-slate-800 mb-2">Connect Your Bitcoin Wallet</h3>
               <p className="text-slate-600 text-sm mb-4">Recommended sign-in method - persists wallet data after page refresh</p>
-              <ConnectMultiButton network="mainnet" />
+              <p className="text-blue-600 text-xs mb-4 font-medium">💡 Connection signatures are automatically captured and displayed below</p>
+              <ConnectMultiButton 
+                network="mainnet" 
+                onSignatureCapture={(signatureData) => {
+                  console.log('Signature captured during wallet connection:', signatureData);
+                  setCapturedSignature(signatureData);
+                  dispatch(addNotification({
+                    id: Date.now().toString(),
+                    type: 'success',
+                    message: `Signature captured from ${signatureData.wallet} wallet!`,
+                    duration: 4000,
+                  }));
+                }}
+              />
             </div>
             
             {/* Connection Status */}
@@ -115,6 +135,53 @@ function HomeContent() {
                 </div>
               )}
             </div>
+            
+            {/* Signature Capture Display */}
+            {capturedSignature && (
+              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 text-sm">✍️</span>
+                  </div>
+                  <h4 className="text-blue-900 font-bold text-sm">Connection Signature Captured</h4>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div className="flex gap-2">
+                    <span className="font-semibold text-blue-800 min-w-[60px]">Wallet:</span>
+                    <span className="text-blue-700 bg-blue-100 px-2 py-1 rounded font-medium">{capturedSignature.wallet}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="font-semibold text-blue-800 min-w-[60px]">Network:</span>
+                    <span className="text-blue-700">{capturedSignature.network}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="font-semibold text-blue-800 min-w-[60px]">Address:</span>
+                    <span className="text-blue-700 font-mono break-all">{capturedSignature.address}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="font-semibold text-blue-800 min-w-[60px]">Signature:</span>
+                    <span className="text-blue-700 font-mono break-all text-[10px] leading-tight">
+                      {capturedSignature.signature.length > 100 
+                        ? `${capturedSignature.signature.substring(0, 50)}...${capturedSignature.signature.substring(capturedSignature.signature.length - 50)}`
+                        : capturedSignature.signature
+                      }
+                    </span>
+                  </div>
+                  <div className="pt-2 border-t border-blue-200">
+                    <span className="font-semibold text-blue-800">Message:</span>
+                    <div className="text-blue-700 mt-1 p-2 bg-blue-100 rounded text-[10px] leading-tight max-h-20 overflow-y-auto">
+                      {capturedSignature.message}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setCapturedSignature(null)}
+                  className="mt-3 text-blue-600 hover:text-blue-800 text-xs font-medium underline"
+                >
+                  Clear Signature Data
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

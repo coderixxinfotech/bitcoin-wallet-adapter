@@ -57,6 +57,15 @@ interface InnerMenuProps {
 // Type for the InnerMenu prop in the WalletButton component
 type InnerMenuType = React.ComponentType<InnerMenuProps>;
 
+// Type for signature capture callback
+type SignatureCaptureCallback = (signatureData: {
+  signature: string;
+  message: string;
+  address: string;
+  wallet: string;
+  network: string;
+}) => void;
+
 function ConnectMultiWallet({
   buttonClassname,
   modalContainerClass,
@@ -74,6 +83,7 @@ function ConnectMultiWallet({
   connectionMessage,
   fractal,
   supportedWallets,
+  onSignatureCapture,
 }: {
   buttonClassname?: string;
   modalContainerClass?: string;
@@ -91,6 +101,7 @@ function ConnectMultiWallet({
   connectionMessage?: string;
   fractal?: boolean;
   supportedWallets?: string[];
+  onSignatureCapture?: SignatureCaptureCallback;
 }) {
   const { loading, result, error, signMessage } = useMessageSign();
   //for notification
@@ -599,9 +610,22 @@ Issued At: ${issuedAt}`;
       updateWalletDetails(tempWD);
       updateLastWallet(tempWD.wallet);
       localStorage.setItem("lastWallet", tempWD.wallet);
+      
+      // Call the signature capture callback if provided
+      if (onSignatureCapture) {
+        const signatureData = {
+          signature: result,
+          message: connectionMessage || getMessage(tempWD.ordinal),
+          address: tempWD.ordinal,
+          wallet: tempWD.wallet,
+          network: network?.toLowerCase() || redux_network.toLowerCase() || "mainnet"
+        };
+        onSignatureCapture(signatureData);
+      }
+      
       handleClose();
     }
-  }, [tempWD, result]);
+  }, [tempWD, result, onSignatureCapture, connectionMessage, network, redux_network]);
 
   return (
     <>

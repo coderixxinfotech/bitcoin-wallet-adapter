@@ -63,7 +63,7 @@ const hooks_1 = require("../../hooks");
 const useWalletEffect_1 = __importDefault(require("../../hooks/useWalletEffect"));
 const useDisconnect_1 = __importDefault(require("../../hooks/useDisconnect"));
 const purposes = ["ordinals", "payment"];
-function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, fractal, supportedWallets, }) {
+function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, fractal, supportedWallets, onSignatureCapture, }) {
     const { loading, result, error, signMessage } = (0, hooks_1.useMessageSign)();
     //for notification
     const disconnectFunc = (0, useDisconnect_1.default)();
@@ -469,9 +469,20 @@ Issued At: ${issuedAt}`;
             updateWalletDetails(tempWD);
             updateLastWallet(tempWD.wallet);
             localStorage.setItem("lastWallet", tempWD.wallet);
+            // Call the signature capture callback if provided
+            if (onSignatureCapture) {
+                const signatureData = {
+                    signature: result,
+                    message: connectionMessage || getMessage(tempWD.ordinal),
+                    address: tempWD.ordinal,
+                    wallet: tempWD.wallet,
+                    network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || redux_network.toLowerCase() || "mainnet"
+                };
+                onSignatureCapture(signatureData);
+            }
             handleClose();
         }
-    }, [tempWD, result]);
+    }, [tempWD, result, onSignatureCapture, connectionMessage, network, redux_network]);
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement("div", null,
             react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, InnerMenu: InnerMenu, balance: balance, fractal: fractal }),

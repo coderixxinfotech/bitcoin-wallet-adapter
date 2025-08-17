@@ -415,6 +415,7 @@ function WalletConnect() {
 | connectionMessage   | string (optional)                              | Custom message for wallet connection/signing authentication  |
 | fractal             | boolean (optional)                             | Show only fractal supporting wallets (Unisat                 | OKX) |
 | supportedWallets    | string[] (optional)                            | Array of wallet names to be supported in the dApp            |
+| onSignatureCapture  | function (optional)                            | Callback function to capture wallet signature data after successful connection |
 
 The `supportedWallets` prop allows you to specify which wallets you want to support in your dApp. Pass an array of wallet names (in lowercase) to filter the available wallets. For example:
 
@@ -423,6 +424,39 @@ supportedWallets={["unisat", "xverse", "leather"]}
 ```
 
 This will only show the Unisat, Xverse, and Leather wallet options in the connect modal, even if other wallets are installed in the user's browser.
+
+### 🔐 Signature Capture Callback
+
+The `onSignatureCapture` prop allows you to capture wallet signature data after successful wallet connection and authentication. This is useful for applications that need to store or process the signature for additional verification or backend authentication.
+
+#### Signature Capture Example
+```jsx
+<ConnectMultiWallet
+  onSignatureCapture={(signatureData) => {
+    console.log('Signature captured:', signatureData);
+    // Process signature data for your application
+    // signatureData contains: signature, message, address, wallet, network
+  }}
+/>
+```
+
+#### Signature Data Structure
+The callback receives a signature data object with the following properties:
+
+```typescript
+interface SignatureData {
+  signature: string;    // The BIP-322 signature string
+  message: string;      // The signed message
+  address: string;      // Bitcoin address used for signing
+  wallet: string;       // Wallet type (e.g., "Unisat", "Xverse", "Leather")
+  network: string;      // Network used ("mainnet" or "testnet")
+}
+```
+
+#### Security Notes
+- The signature is only captured after successful BIP-322 verification
+- All signatures are verified before the callback is invoked
+- The callback is only called once per successful wallet connection
 
 ### Custom Sign-In Messages
 
