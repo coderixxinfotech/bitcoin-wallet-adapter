@@ -153,7 +153,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
           </div>
 
           {/* Wallet List */}
-          <div className="bwa-space-y-3">
+          <div className="bwa-space-y-4 bwa-max-h-[300px] bwa-overflow-y-auto bwa-px-4 bwa-py-2 bwa-custom-scrollbar">
             {wallets && wallets?.length > 0 ? (
               wallets.map((item: IInstalledWallets, idx: number) => (
                 <button
@@ -177,7 +177,7 @@ const WalletModal: React.FC<WalletModalProps> = ({
                     }
                   }}
                   key={item.label + idx}
-                  className={`bwa-w-full bwa-p-4 bwa-rounded-xl bwa-transition-all bwa-duration-200 bwa-transform hover:bwa-scale-105 active:bwa-scale-95 ${currentThemes.walletCard} ${walletItemClass || ''}`}
+                  className={`bwa-w-full bwa-p-4 bwa-mx-2 bwa-rounded-xl bwa-transition-all bwa-duration-200 bwa-transform hover:bwa-scale-105 active:bwa-scale-95 ${currentThemes.walletCard} ${walletItemClass || ''}`}
                 >
                   <div className="bwa-flex bwa-items-center bwa-justify-between">
                     <div className="bwa-flex bwa-items-center bwa-gap-4">
@@ -227,5 +227,6 @@ const WalletModal: React.FC<WalletModalProps> = ({
     </Modal>
   );
 };
+
 
 export default WalletModal;

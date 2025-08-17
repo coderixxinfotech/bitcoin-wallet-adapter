@@ -121,8 +121,8 @@ const usePayBTC = () => {
                         : undefined;
                     const sendBtcOptions = Object.assign(Object.assign({}, (walletDetails.wallet === "MagicEden" && {
                         getProvider: () => __awaiter(void 0, void 0, void 0, function* () {
-                            var _c;
-                            return (_c = wallet.features[SatsConnectNamespace]) === null || _c === void 0 ? void 0 : _c.provider;
+                            var _a;
+                            return (_a = wallet.features[SatsConnectNamespace]) === null || _a === void 0 ? void 0 : _a.provider;
                         }),
                     })), { payload: {
                             network: {

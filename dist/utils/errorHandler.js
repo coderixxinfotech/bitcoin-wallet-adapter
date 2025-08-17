@@ -13,7 +13,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.errorManager = exports.withErrorHandling = exports.wrapAndThrowError = exports.throwBWAError = exports.bwaErrorManager = exports.BWAError = exports.BWAErrorSeverity = exports.BWAErrorCode = void 0;
+exports.errorManager = exports.bwaErrorManager = exports.BWAError = exports.BWAErrorSeverity = exports.BWAErrorCode = void 0;
+exports.throwBWAError = throwBWAError;
+exports.wrapAndThrowError = wrapAndThrowError;
+exports.withErrorHandling = withErrorHandling;
 // Custom Error Types
 var BWAErrorCode;
 (function (BWAErrorCode) {
@@ -166,7 +169,6 @@ function throwBWAError(code, message, options = {}) {
     exports.bwaErrorManager.emitError(error);
     throw error;
 }
-exports.throwBWAError = throwBWAError;
 // Helper function to wrap and throw existing errors
 function wrapAndThrowError(originalError, code, message, context) {
     const error = new BWAError(code, message || originalError.message, {
@@ -177,7 +179,6 @@ function wrapAndThrowError(originalError, code, message, context) {
     exports.bwaErrorManager.emitError(error);
     throw error;
 }
-exports.wrapAndThrowError = wrapAndThrowError;
 // Helper to handle async operations with error wrapping
 function withErrorHandling(operation, errorCode, context) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -189,4 +190,3 @@ function withErrorHandling(operation, errorCode, context) {
         }
     });
 }
-exports.withErrorHandling = withErrorHandling;

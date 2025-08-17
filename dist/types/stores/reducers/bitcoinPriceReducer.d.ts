@@ -8,7 +8,7 @@ export interface BitcoinPriceState {
 }
 export declare const fetchBitcoinPrice: import("@reduxjs/toolkit").AsyncThunk<BitcoinPriceResponse, void, {
     state?: unknown;
-    dispatch?: import("redux").Dispatch<import("redux").AnyAction> | undefined;
+    dispatch?: import("redux").Dispatch;
     extra?: unknown;
     rejectValue?: unknown;
     serializedErrorType?: unknown;
@@ -18,7 +18,7 @@ export declare const fetchBitcoinPrice: import("@reduxjs/toolkit").AsyncThunk<Bi
 }>;
 export declare const getCachedBitcoinPrice: import("@reduxjs/toolkit").AsyncThunk<BitcoinPriceResponse, void, {
     state?: unknown;
-    dispatch?: import("redux").Dispatch<import("redux").AnyAction> | undefined;
+    dispatch?: import("redux").Dispatch;
     extra?: unknown;
     rejectValue?: unknown;
     serializedErrorType?: unknown;

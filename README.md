@@ -387,7 +387,7 @@ function WalletConnect() {
       iconClass="custom-icon-class"
       balance={1000}
       network="mainnet"
-      connectionMessage="Custom connection message"
+      connectionMessage="Please sign this message to authenticate your wallet ownership"
       fractal={true}
       supportedWallets={["unisat", "xverse", "leather"]}
     />
@@ -412,7 +412,7 @@ function WalletConnect() {
 | iconClass           | string (optional)                              | Custom class for the icon                                    |
 | balance             | number (optional)                              | Wallet balance to display                                    |
 | network             | "mainnet" \| "testnet" (optional)              | Bitcoin network to use                                       |
-| connectionMessage   | string (optional)                              | Custom message for wallet connection                         |
+| connectionMessage   | string (optional)                              | Custom message for wallet connection/signing authentication  |
 | fractal             | boolean (optional)                             | Show only fractal supporting wallets (Unisat                 | OKX) |
 | supportedWallets    | string[] (optional)                            | Array of wallet names to be supported in the dApp            |
 
@@ -423,6 +423,27 @@ supportedWallets={["unisat", "xverse", "leather"]}
 ```
 
 This will only show the Unisat, Xverse, and Leather wallet options in the connect modal, even if other wallets are installed in the user's browser.
+
+### Custom Sign-In Messages
+
+The `connectionMessage` prop allows you to customize the message that users sign when connecting their wallet for authentication. This is particularly useful for branding or providing specific context about the sign-in process.
+
+#### Default Message
+If no `connectionMessage` is provided, a default message is generated that includes:
+- The user's Bitcoin address
+- Welcome text with your application name
+- URI and version information
+- Timestamp
+
+#### Custom Message Example
+```jsx
+<ConnectMultiWallet
+  connectionMessage="Welcome to MyApp! Please sign this message to verify wallet ownership and authenticate your session."
+/>
+```
+
+#### Security Note
+The connection message is used for wallet authentication and signature verification. Ensure your custom message is clear about its purpose and maintains security best practices.
 
 > 📝 Note: If `supportedWallets` is not provided, all available wallets will be shown.
 

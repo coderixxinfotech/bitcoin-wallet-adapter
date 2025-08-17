@@ -15,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -99,7 +109,7 @@ const WalletModal = ({ open, handleClose, wallets, getLeatherAddress, getPhantom
               ${headingClass || ''}
             ` }, "Connect Your Wallet"),
                     react_1.default.createElement("p", { className: `bwa-text-sm ${currentThemes.noWalletText}` }, "Choose your preferred Bitcoin wallet to continue")),
-                react_1.default.createElement("div", { className: "bwa-space-y-3" }, wallets && (wallets === null || wallets === void 0 ? void 0 : wallets.length) > 0 ? (wallets.map((item, idx) => (react_1.default.createElement("button", { onClick: (e) => __awaiter(void 0, void 0, void 0, function* () {
+                react_1.default.createElement("div", { className: "bwa-space-y-4 bwa-max-h-[300px] bwa-overflow-y-auto bwa-px-4 bwa-py-2 bwa-custom-scrollbar" }, wallets && (wallets === null || wallets === void 0 ? void 0 : wallets.length) > 0 ? (wallets.map((item, idx) => (react_1.default.createElement("button", { onClick: (e) => __awaiter(void 0, void 0, void 0, function* () {
                         const selectedItem = item.label;
                         if (selectedItem === "Leather") {
                             yield getLeatherAddress();
@@ -120,7 +130,7 @@ const WalletModal = ({ open, handleClose, wallets, getLeatherAddress, getPhantom
                             const wallet = meWallets.filter((a) => a.name === "Magic Eden")[0];
                             yield setWallet(wallet);
                         }
-                    }), key: item.label + idx, className: `bwa-w-full bwa-p-4 bwa-rounded-xl bwa-transition-all bwa-duration-200 bwa-transform hover:bwa-scale-105 active:bwa-scale-95 ${currentThemes.walletCard} ${walletItemClass || ''}` },
+                    }), key: item.label + idx, className: `bwa-w-full bwa-p-4 bwa-mx-2 bwa-rounded-xl bwa-transition-all bwa-duration-200 bwa-transform hover:bwa-scale-105 active:bwa-scale-95 ${currentThemes.walletCard} ${walletItemClass || ''}` },
                     react_1.default.createElement("div", { className: "bwa-flex bwa-items-center bwa-justify-between" },
                         react_1.default.createElement("div", { className: "bwa-flex bwa-items-center bwa-gap-4" },
                             react_1.default.createElement("img", { className: `bwa-w-10 bwa-h-10 bwa-rounded-lg ${walletImageClass || ''}`, src: item.logo, alt: `${item.label} logo` }),

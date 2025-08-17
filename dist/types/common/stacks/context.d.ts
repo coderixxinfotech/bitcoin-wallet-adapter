@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { UserData } from "@stacks/auth";
 export interface AppState {
     userData: UserData | null;

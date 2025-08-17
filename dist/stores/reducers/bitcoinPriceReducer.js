@@ -21,7 +21,7 @@ const initialState = {
     lastFetchTimestamp: 0,
 };
 // Async thunk for fetching bitcoin price
-exports.fetchBitcoinPrice = (0, toolkit_1.createAsyncThunk)('bitcoinPrice/fetchPrice', (_, { rejectWithValue }) => __awaiter(void 0, void 0, void 0, function* () {
+exports.fetchBitcoinPrice = (0, toolkit_1.createAsyncThunk)('bitcoinPrice/fetchPrice', (_1, _a) => __awaiter(void 0, [_1, _a], void 0, function* (_, { rejectWithValue }) {
     try {
         const priceData = yield bitcoinPriceService_1.bitcoinPriceService.fetchAllPrices();
         return priceData;
@@ -31,7 +31,7 @@ exports.fetchBitcoinPrice = (0, toolkit_1.createAsyncThunk)('bitcoinPrice/fetchP
     }
 }));
 // Async thunk for getting cached price data
-exports.getCachedBitcoinPrice = (0, toolkit_1.createAsyncThunk)('bitcoinPrice/getCachedPrice', (_, { rejectWithValue }) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getCachedBitcoinPrice = (0, toolkit_1.createAsyncThunk)('bitcoinPrice/getCachedPrice', (_1, _a) => __awaiter(void 0, [_1, _a], void 0, function* (_, { rejectWithValue }) {
     try {
         const cachedData = bitcoinPriceService_1.bitcoinPriceService.getCachedData();
         if (cachedData) {

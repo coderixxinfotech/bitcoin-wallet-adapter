@@ -16,3 +16,13 @@
 .bwa_modalHeading {
   @apply bwa-text-2xl xl:bwa-text-4xl 2xl:bwa-text-6xl bwa-capitalize bwa-font-bold;
 }
+
+/* Custom scrollbar styles - hidden but functional */
+.bwa-custom-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.bwa-custom-scrollbar::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}

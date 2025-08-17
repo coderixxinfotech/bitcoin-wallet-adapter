@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clearPriceData = exports.clearError = exports.setAutoRefresh = exports.getCachedBitcoinPrice = exports.fetchBitcoinPrice = exports.useBitcoinPrice = exports.useWalletSigning = exports.useWalletBalance = exports.useWalletConnect = exports.usePayBTC = exports.useDisconnect = exports.useMessageSign = exports.useSignTx = exports.useLeatherSign = exports.useUnisatSign = exports.useXverseSign = exports.useWalletAddress = exports.useCriticalErrors = exports.useTransactionErrors = exports.useWalletErrors = exports.useErrorHandler = exports.errorManager = exports.withErrorHandling = exports.wrapAndThrowError = exports.throwBWAError = exports.bwaErrorManager = exports.BWAErrorSeverity = exports.BWAErrorCode = exports.BWAError = exports.useDevTools = exports.setupDevTools = exports.DevToolsUtils = exports.bytesToBase64 = exports.removeNotification = exports.addNotification = exports.PayButton = exports.Notification = exports.ConnectMultiButton = exports.WalletProvider = void 0;
+exports.clearPriceData = exports.clearError = exports.setAutoRefresh = exports.getCachedBitcoinPrice = exports.fetchBitcoinPrice = exports.useBitcoinPrice = exports.useWalletSigning = exports.useWalletBalance = exports.useWalletConnect = exports.usePayBTC = exports.useDisconnect = exports.useMessageSign = exports.useSignTx = exports.useLeatherSign = exports.useUnisatSign = exports.useXverseSign = exports.useWalletAddress = exports.useCriticalErrors = exports.useTransactionErrors = exports.useWalletErrors = exports.useErrorHandler = exports.errorManager = exports.withErrorHandling = exports.wrapAndThrowError = exports.throwBWAError = exports.bwaErrorManager = exports.BWAErrorSeverity = exports.BWAErrorCode = exports.BWAError = exports.useDevTools = exports.setupDevTools = exports.DevToolsUtils = exports.removeNotification = exports.addNotification = exports.PayButton = exports.Notification = exports.ConnectMultiButton = exports.WalletProvider = void 0;
+exports.bytesToBase64 = bytesToBase64;
 // Styles
 require("./styles.css");
 // Providers
@@ -38,7 +39,6 @@ function bytesToBase64(bytes) {
     const binString = String.fromCodePoint(...bytes);
     return btoa(binString);
 }
-exports.bytesToBase64 = bytesToBase64;
 // Export Redux DevTools utilities for development
 var devtools_1 = require("./utils/devtools");
 Object.defineProperty(exports, "DevToolsUtils", { enumerable: true, get: function () { return devtools_1.DevToolsUtils; } });

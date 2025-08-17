@@ -126,7 +126,7 @@ const useWalletBalance = () => {
         }
         const balance = yield window.unisat.getBalance();
         return {
-            btc: balance.total / 100000000,
+            btc: balance.total / 100000000, // Convert satoshis to BTC
             confirmed: balance.confirmed / 100000000,
             unconfirmed: balance.unconfirmed / 100000000,
             total: balance.total / 100000000,
@@ -153,7 +153,7 @@ const useWalletBalance = () => {
                         return {
                             btc: btcAmount,
                             total: btcAmount,
-                            confirmed: btcAmount,
+                            confirmed: btcAmount, // Leather doesn't separate confirmed/unconfirmed
                             unconfirmed: 0,
                         };
                     }
@@ -188,8 +188,8 @@ const useWalletBalance = () => {
         }
     });
     const fetchPhantomBalance = () => __awaiter(void 0, void 0, void 0, function* () {
-        var _b;
-        if (!((_b = window.phantom) === null || _b === void 0 ? void 0 : _b.bitcoin)) {
+        var _a;
+        if (!((_a = window.phantom) === null || _a === void 0 ? void 0 : _a.bitcoin)) {
             (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "Phantom wallet is not available for balance fetch", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
                 context: {
@@ -216,8 +216,8 @@ const useWalletBalance = () => {
         }
     });
     const fetchOKXBalance = () => __awaiter(void 0, void 0, void 0, function* () {
-        var _c;
-        if (!((_c = window.okxwallet) === null || _c === void 0 ? void 0 : _c.bitcoin)) {
+        var _a;
+        if (!((_a = window.okxwallet) === null || _a === void 0 ? void 0 : _a.bitcoin)) {
             (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "OKX wallet is not available for balance fetch", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
                 context: {
@@ -272,7 +272,7 @@ const useWalletBalance = () => {
             }
             const data = yield response.json();
             return {
-                btc: data.balance / 100000000,
+                btc: data.balance / 100000000, // Convert satoshis to BTC
                 confirmed: data.balance / 100000000,
                 unconfirmed: data.unconfirmed_balance / 100000000,
                 total: (data.balance + data.unconfirmed_balance) / 100000000,
