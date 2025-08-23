@@ -1,3 +1,6 @@
+// What happens in this file:
+// - Subscribes to wallet provider events to auto-disconnect on account/network changes
+// - Relies solely on Redux network (redux_network) instead of a separate network prop
 import { useEffect } from "react";
 
 interface WalletDetails {
@@ -7,7 +10,6 @@ interface WalletDetails {
 const useWalletEffect = (
   walletDetails: WalletDetails | null,
   disconnect: () => void,
-  network?: string,
   redux_network?: string
 ) => {
   useEffect(() => {
@@ -32,10 +34,7 @@ const useWalletEffect = (
           addListener(bitcoin, ["accountsChanged", "accountChanged"]);
         if (fractalBitcoin)
           addListener(fractalBitcoin, ["accountsChanged", "accountChanged"]);
-        if (
-          (network === "testnet" || redux_network === "testnet") &&
-          bitcoinTestnet
-        ) {
+        if (redux_network === "testnet" && bitcoinTestnet) {
           addListener(bitcoinTestnet, ["accountsChanged", "accountChanged"]);
         }
       } else if (wallet === "unisat") {
@@ -48,7 +47,7 @@ const useWalletEffect = (
     return () => {
       listeners.forEach((listener) => listener.remove());
     };
-  }, [walletDetails, network, redux_network, disconnect]);
+  }, [walletDetails, redux_network, disconnect]);
 };
 
 export default useWalletEffect;

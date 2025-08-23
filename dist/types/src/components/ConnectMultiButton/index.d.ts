@@ -13,7 +13,7 @@ type SignatureCaptureCallback = (signatureData: {
     wallet: string;
     network: string;
 }) => void;
-declare function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, fractal, supportedWallets, onSignatureCapture, }: {
+declare function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, connectionMessage, fractal, supportedWallets, onSignatureCapture, }: {
     buttonClassname?: string;
     modalContainerClass?: string;
     modalContentClass?: string;
@@ -26,7 +26,6 @@ declare function ConnectMultiWallet({ buttonClassname, modalContainerClass, moda
     icon?: string;
     iconClass?: string;
     balance?: number;
-    network?: "mainnet" | "testnet";
     connectionMessage?: string;
     fractal?: boolean;
     supportedWallets?: string[];

@@ -1,7 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// What happens in this file:
+// - Subscribes to wallet provider events to auto-disconnect on account/network changes
+// - Relies solely on Redux network (redux_network) instead of a separate network prop
 const react_1 = require("react");
-const useWalletEffect = (walletDetails, disconnect, network, redux_network) => {
+const useWalletEffect = (walletDetails, disconnect, redux_network) => {
     (0, react_1.useEffect)(() => {
         const listeners = [];
         const addListener = (obj, events) => {
@@ -21,8 +24,7 @@ const useWalletEffect = (walletDetails, disconnect, network, redux_network) => {
                     addListener(bitcoin, ["accountsChanged", "accountChanged"]);
                 if (fractalBitcoin)
                     addListener(fractalBitcoin, ["accountsChanged", "accountChanged"]);
-                if ((network === "testnet" || redux_network === "testnet") &&
-                    bitcoinTestnet) {
+                if (redux_network === "testnet" && bitcoinTestnet) {
                     addListener(bitcoinTestnet, ["accountsChanged", "accountChanged"]);
                 }
             }
@@ -36,6 +38,6 @@ const useWalletEffect = (walletDetails, disconnect, network, redux_network) => {
         return () => {
             listeners.forEach((listener) => listener.remove());
         };
-    }, [walletDetails, network, redux_network, disconnect]);
+    }, [walletDetails, redux_network, disconnect]);
 };
 exports.default = useWalletEffect;

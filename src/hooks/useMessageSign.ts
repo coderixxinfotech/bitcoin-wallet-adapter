@@ -1,5 +1,10 @@
+// What happens in this file:
+// - Exposes `useMessageSign` hook to sign messages with connected wallets
+// - Reads selected network from Redux (no network param accepted)
+// - Validates address/network mismatch and throws structured BWA errors
+// - Uses centralized network mapping helpers for wallet SDKs
 import { useCallback, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   BitcoinNetworkType,
   signMessage as signMessageApi,
@@ -16,6 +21,12 @@ import {
   BWAErrorCode,
   BWAErrorSeverity 
 } from "../utils/errorHandler";
+import type { RootState } from "../stores";
+import { 
+  toSatsConnectNetwork, 
+  getOkxProvider, 
+  validateAddressesMatchNetwork 
+} from "../utils/network";
 
 interface CustomWindow extends Window {
   LeatherProvider?: any;
@@ -32,17 +43,17 @@ declare const window: CustomWindow;
 export const useMessageSign = () => {
   const dispatch = useDispatch();
   const { wallets: testWallets } = useWallets();
+  const reduxNetwork = useSelector((s: RootState) => s.general.network);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   type MessageOptions = {
-    network: string;
     address: string;
     message: string;
-    wallet: string;
-    fractal?: boolean;
+    wallet: string; // e.g., "Xverse" | "Unisat" | "Leather" | "Phantom" | "OKX" | "MagicEden"
+    fractal?: boolean; // OKX fractal toggle
   };
 
   const verifyAndSetResult = (
@@ -86,23 +97,37 @@ export const useMessageSign = () => {
             context: {
               walletType: 'unknown',
               operation: 'message_signing',
-              network: options.network
+              network: reduxNetwork
             }
           }
         );
         return;
       }
 
+      // Validate address vs selected network
+      if (!validateAddressesMatchNetwork([options.address], reduxNetwork)) {
+        throwBWAError(
+          BWAErrorCode.NETWORK_MISMATCH,
+          "Selected network and address network do not match",
+          {
+            severity: BWAErrorSeverity.MEDIUM,
+            context: {
+              walletType: options.wallet,
+              operation: 'message_signing',
+              network: reduxNetwork,
+              additionalData: { address: options.address }
+            },
+            recoverable: true
+          }
+        );
+      }
+
       try {
-        if (options.wallet === "Xverse") {
+        const walletKey = options.wallet.toLowerCase();
+        if (walletKey === "xverse") {
           const signMessageOptions = {
             payload: {
-              network: {
-                type:
-                  options.network.toLowerCase() === "mainnet"
-                    ? "Mainnet"
-                    : "Testnet",
-              },
+              network: { type: toSatsConnectNetwork(reduxNetwork) },
               address: options.address,
               message: options.message,
             },
@@ -127,18 +152,18 @@ export const useMessageSign = () => {
           await signMessageApi(signMessageOptions);
         } else if (
           typeof window.unisat !== "undefined" &&
-          options.wallet === "Unisat"
+          walletKey === "unisat"
         ) {
           const sign = await window.unisat.signMessage(options.message);
           verifyAndSetResult(options.address, options.message, sign);
         } else if (
           typeof window.btc !== "undefined" &&
-          options.wallet === "Leather"
+          walletKey === "leather"
         ) {
           const sign = await window.btc.request("signMessage", {
             message: options.message,
             paymentType: "p2tr",
-            network: options.network.toLowerCase(),
+            network: reduxNetwork.toLowerCase(),
           });
           verifyAndSetResult(
             options.address,
@@ -147,7 +172,7 @@ export const useMessageSign = () => {
           );
         } else if (
           typeof window?.phantom !== "undefined" &&
-          options.wallet === "Phantom"
+          walletKey === "phantom"
         ) {
           const message = new TextEncoder().encode(options.message);
           const { signature } = await window?.phantom?.bitcoin?.signMessage(
@@ -162,22 +187,21 @@ export const useMessageSign = () => {
             new TextDecoder().decode(message),
             base64
           );
-        }
-
-        // okx wallett
-        else if (
+        } else if (
           typeof window?.okxwallet !== "undefined" &&
-          options.wallet === "Okx"
+          walletKey === "okx"
         ) {
-          const Okx = options.fractal
-            ? (window as any).okxwallet.fractalBitcoin
-            : options.network === "testnet"
-            ? (window as any).okxwallet.bitcoinTestnet
-            : (window as any).okxwallet.bitcoin;
+          const Okx = getOkxProvider(window as any, reduxNetwork, { fractal: options.fractal });
+          if (!Okx) {
+            throwBWAError(
+              BWAErrorCode.WALLET_NOT_FOUND,
+              "OKX provider for selected network is not available",
+              { context: { walletType: options.wallet, operation: 'message_signing', network: reduxNetwork } }
+            );
+          }
           const signature = await Okx.signMessage(options.message, "ecdsa");
-
           verifyAndSetResult(options.address, options.message, signature);
-        } else if (options.wallet === "MagicEden") {
+        } else if (walletKey === "magiceden") {
           const wallet = testWallets.filter(
             (a: any) => a.name === "Magic Eden"
           )[0];
@@ -187,12 +211,7 @@ export const useMessageSign = () => {
                 SatsConnectNamespace
               ]?.provider,
             payload: {
-              network: {
-                type:
-                  options.network.toLowerCase() === "mainnet"
-                    ? BitcoinNetworkType.Mainnet
-                    : BitcoinNetworkType.Testnet,
-              },
+              network: { type: toSatsConnectNetwork(reduxNetwork) },
               address: options.address,
               message: options.message,
             },
@@ -224,7 +243,7 @@ export const useMessageSign = () => {
               context: {
                 walletType: options.wallet,
                 operation: 'message_signing',
-                network: options.network,
+                network: reduxNetwork,
                 additionalData: {
                   supportedWallets: ['Xverse', 'Unisat', 'Leather', 'Phantom', 'Okx', 'MagicEden']
                 }
@@ -243,7 +262,7 @@ export const useMessageSign = () => {
             context: { 
               walletType: options.wallet, 
               operation: 'message_signing',
-              network: options.network 
+              network: reduxNetwork 
             },
             originalError: err instanceof Error ? err : undefined
           }
@@ -253,7 +272,7 @@ export const useMessageSign = () => {
         setLoading(false);
       }
     },
-    [dispatch, testWallets]
+    [dispatch, testWallets, reduxNetwork]
   );
 
   return { signMessage, loading, result, error };

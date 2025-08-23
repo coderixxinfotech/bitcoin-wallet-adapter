@@ -15,6 +15,7 @@ A **production-ready** React library for Bitcoin wallet integration with profess
 - 🔒 **Professional Error Handling** - Comprehensive error management with detailed feedback
 - 📱 **6+ Wallet Support** - Unisat, Xverse, Leather, MagicEden, Phantom, OKX
 - 🌐 **Mainnet Ready** - Optimized for production Bitcoin mainnet usage
+- 🔌 **Auto-disconnect on Network Change** - When you switch between mainnet/testnet, any connected wallet is automatically disconnected to prevent cross-network mismatches
 
 ## 🧙‍♂️ Tech Stack
 
@@ -72,7 +73,6 @@ function App() {
           
           {/* 🔌 Connect Button - Always visible for persistence */}
           <ConnectMultiButton
-            network="mainnet"
             buttonClassname="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition-all"
             modalContainerClass="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             modalContentClass="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6"
@@ -206,8 +206,7 @@ function PaymentInterface() {
     try {
       const result = await payBTC({
         address: recipient,
-        amount: amount,
-        network: 'mainnet'
+        amount: amount
       });
       
       // Handle both string (txId) and object responses
@@ -311,9 +310,9 @@ export default App;
 - **Mainnet Optimization**: Optimized for production Bitcoin mainnet usage with proper network isolation
 
 #### 🔍 **Architectural Insights**
-- **Network Management**: Uses internal Redux state for network management; external apps cannot dynamically switch networks without library modifications
-- **Hook Design**: All hooks (`useWalletBalance`, `usePayBTC`, `useMessageSign`) read from internal Redux state, not parameters
-- **Module Boundaries**: Example apps are limited to initialization-time network selection via `ConnectMultiButton`
+- **Network Management**: Network is managed via the library's internal Redux store. Set an initial network with `WalletProvider`'s `customAuthOptions.network` and change it at runtime by dispatching the `setNetwork('mainnet'|'testnet')` action or using the `useNetwork()` hook.
+- **Hook Design**: All hooks (`useWalletBalance`, `usePayBTC`, `useMessageSign`, `useWalletConnect`) read the network from Redux and do not accept a network parameter.
+- **Module Boundaries**: Do not pass `network` props to components. Use the Redux-managed network only.
 - **Security**: Proper network isolation prevents cross-network transaction issues
 
 #### 🚀 **Production Ready Features**
@@ -354,7 +353,6 @@ The `AuthOptionsArgs` type includes:
 interface AuthOptionsArgs {
   manifestPath?: string;
   redirectTo?: string;
-  network?: "mainnet" | "testnet";
   appDetails?: {
     name?: string;
     icon?: string;
@@ -386,7 +384,6 @@ function WalletConnect() {
       icon="custom-icon.png"
       iconClass="custom-icon-class"
       balance={1000}
-      network="mainnet"
       connectionMessage="Please sign this message to authenticate your wallet ownership"
       fractal={true}
       supportedWallets={["unisat", "xverse", "leather"]}
@@ -411,7 +408,6 @@ function WalletConnect() {
 | icon                | string (optional)                              | Custom logo URL of your application                          |
 | iconClass           | string (optional)                              | Custom class for the icon                                    |
 | balance             | number (optional)                              | Wallet balance to display                                    |
-| network             | "mainnet" \| "testnet" (optional)              | Bitcoin network to use                                       |
 | connectionMessage   | string (optional)                              | Custom message for wallet connection/signing authentication  |
 | fractal             | boolean (optional)                             | Show only fractal supporting wallets (Unisat                 | OKX) |
 | supportedWallets    | string[] (optional)                            | Array of wallet names to be supported in the dApp            |
@@ -482,6 +478,48 @@ The connection message is used for wallet authentication and signature verificat
 > 📝 Note: If `supportedWallets` is not provided, all available wallets will be shown.
 
 
+### 🌐 Network Switching (Mainnet/Testnet)
+
+Use the `useNetwork()` hook to read and change the active network globally. All hooks automatically pick up the change from the Redux store.
+
+```tsx
+import { useNetwork } from 'bitcoin-wallet-adapter';
+
+export function NetworkSwitcher() {
+  const { network, setNetwork, toggle } = useNetwork();
+
+  return (
+    <div className="inline-flex rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
+      <button
+        onClick={() => setNetwork('mainnet')}
+        className={`px-3 py-2 text-sm font-semibold ${network === 'mainnet' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-700'}`}
+      >
+        Mainnet
+      </button>
+      <button
+        onClick={() => setNetwork('testnet')}
+        className={`px-3 py-2 text-sm font-semibold border-l border-slate-200 ${network === 'testnet' ? 'bg-blue-600 text-white' : 'bg-white text-slate-700'}`}
+      >
+        Testnet
+      </button>
+      <button onClick={toggle} className="px-3 py-2 text-xs text-blue-600 underline">
+        Toggle
+      </button>
+    </div>
+  );
+}
+```
+
+Recommended placement: near the wallet connect UI so users can switch before connecting. No `network` props are needed anywhere else.
+
+#### Behavior on Network Change
+- When the active network in Redux changes (via `useNetwork().setNetwork`, `toggle`, or initial `customAuthOptions.network`), the adapter will automatically disconnect the currently connected wallet.
+- This prevents accidental cross-network actions (e.g., signing on testnet with a mainnet session) and ensures a clean, explicit reconnection on the new network.
+
+#### Testnet Wallet Availability
+- On `testnet`, the Connect modal will hide wallets that are not supported in our testnet flow: **MagicEden**, **Phantom**, and **OKX**. 
+- Testnet usage is currently supported via the UI for: **Unisat**, **Xverse**, and **Leather**.
+
 
 ### 🔔 Notification
 
@@ -526,7 +564,6 @@ const { signMessage } = useMessageSign();
 const signature = await signMessage({
   message: "Hello Bitcoin!",
   address: walletDetails.cardinal,
-  network: "mainnet",
   wallet: walletDetails.wallet
 });
 
@@ -535,7 +572,6 @@ const { payBTC } = usePayBTC();
 const txId = await payBTC({
   address: "bc1q...",
   amount: 1000, // satoshis
-  network: "mainnet"
 });
 ```
 
@@ -856,7 +892,6 @@ function CustomSigning() {
     try {
       const result = await signTransaction({
         psbt: "your-psbt-here",
-        network: "mainnet",
         action: "sell"
       });
       console.log("Transaction signed:", result);

@@ -18,14 +18,14 @@
       "require": "./dist/index.js",
       "import": "./dist/index.js"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/src/styles.css"
   },
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=7.0.0"
   },
   "scripts": {
-    "build:css": "postcss src/styles.css -o dist/styles.css",
+    "build:css": "postcss src/styles.css -o dist/src/styles.css",
     "build:assets": "copyfiles -u 1 src/assets/* dist",
     "prebuild": "rimraf dist",
     "build": "tsc && yarn build:css && yarn build:assets",

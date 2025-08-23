@@ -13,6 +13,7 @@ import { useWalletConnect } from "./useWalletConnect";
 import { useWalletBalance } from "./useWalletBalance";
 import { useWalletSigning } from "./useWalletSigning";
 import { useBitcoinPrice } from "./useBitcoinPrice";
+import { useNetwork } from "./useNetwork";
 
 // Legacy exports (maintained for backward compatibility)
 export {
@@ -32,6 +33,7 @@ export {
   useWalletBalance,
   useWalletSigning,
   useBitcoinPrice,
+  useNetwork,
 };
 
 // Type exports
@@ -56,3 +58,5 @@ export type {
   BitcoinPriceResponse,
   PriceSourceError,
 } from './useBitcoinPrice';
+
+export type { Network } from './useNetwork';

@@ -36,6 +36,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// What happens in this file:
+// - UI for connecting to multiple Bitcoin wallets and capturing a connection signature
+// - Uses Redux store for network; no `network` prop is accepted or used
+// - Initiates address requests and message signing per wallet (Xverse, Unisat, Leather, OKX, Phantom, Magic Eden)
+// - Emits `onSignatureCapture` with signature, message, address, wallet, and redux network
 const react_1 = __importStar(require("react"));
 //xverse
 const sats_connect_1 = require("sats-connect");
@@ -53,7 +58,12 @@ const hooks_1 = require("../../hooks");
 const useWalletEffect_1 = __importDefault(require("../../hooks/useWalletEffect"));
 const useDisconnect_1 = __importDefault(require("../../hooks/useDisconnect"));
 const purposes = ["ordinals", "payment"];
-function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, network, connectionMessage, fractal, supportedWallets, onSignatureCapture, }) {
+function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContentClass, closeButtonClass, headingClass, walletItemClass, walletImageClass, walletLabelClass, InnerMenu, icon, iconClass, balance, connectionMessage, fractal, supportedWallets, onSignatureCapture, }) {
+    // Keep the latest onSignatureCapture without causing effect re-runs
+    const onSignatureCaptureRef = (0, react_1.useRef)(onSignatureCapture);
+    (0, react_1.useEffect)(() => {
+        onSignatureCaptureRef.current = onSignatureCapture;
+    }, [onSignatureCapture]);
     const { loading, result, error, signMessage } = (0, hooks_1.useMessageSign)();
     //for notification
     const disconnectFunc = (0, useDisconnect_1.default)();
@@ -137,6 +147,12 @@ Issued At: ${issuedAt}`;
                 logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-okx-logo.png",
             });
         }
+        // In testnet mode, hide wallets that don't support testnet flows in our adapter
+        // Currently hidden: MagicEden, Phantom, OKX
+        if (redux_network === "testnet") {
+            const excludeOnTestnet = new Set(["MagicEden", "Phantom", "OKX"]);
+            checkWallets = checkWallets.filter((w) => !excludeOnTestnet.has(w.label));
+        }
         if (supportedWallets && supportedWallets.length > 0)
             // Filter out wallets that are not in supportedWallets
             checkWallets = checkWallets.filter((wallet) => supportedWallets.includes(wallet.label.toLowerCase()));
@@ -146,7 +162,7 @@ Issued At: ${issuedAt}`;
     (0, react_1.useEffect)(() => {
         getInstalledWalletName();
         // Bitcoin price is now managed centrally by the useBitcoinPrice hook
-    }, [dispatch, open]);
+    }, [dispatch, open, redux_network]);
     // Use effect hook to check if last wallet is in local storage and set selected wallet accordingly
     (0, react_1.useEffect)(() => {
         const localWD = localStorage.getItem("wallet-detail") || "";
@@ -232,20 +248,15 @@ Issued At: ${issuedAt}`;
         handleMenuClose();
     }, []);
     // Use the custom hook
-    (0, useWalletEffect_1.default)(walletDetails, disconnect, network, redux_network);
+    (0, useWalletEffect_1.default)(walletDetails, disconnect, redux_network);
     //xVerse
     const getAddressOptions = {
         payload: {
             purposes: purposes.map((p) => p),
             message: "Address for receiving Ordinals and payments",
-            network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) === "testnet" ||
-                redux_network.toLowerCase() === "testnet"
-                ? {
-                    type: "Testnet",
-                }
-                : {
-                    type: "Mainnet",
-                },
+            network: redux_network.toLowerCase() === "testnet"
+                ? { type: "Testnet" }
+                : { type: "Mainnet" },
         },
         onFinish: (response) => __awaiter(this, void 0, void 0, function* () {
             // console.log(response, 'xverse wallet connect')
@@ -264,7 +275,6 @@ Issued At: ${issuedAt}`;
             };
             setTempWD(wd);
             yield signMessage({
-                network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || redux_network.toLowerCase() || "mainnet",
                 address: ordinal,
                 message: connectionMessage || getMessage(ordinal),
                 wallet: "Xverse",
@@ -297,7 +307,6 @@ Issued At: ${issuedAt}`;
             };
             // console.log("Sign MESSAGE");
             yield signMessage({
-                network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                 address: wd.ordinal,
                 message: connectionMessage || getMessage(wd.ordinal),
                 wallet: "Unisat",
@@ -325,7 +334,6 @@ Issued At: ${issuedAt}`;
                 connected: true,
             };
             yield signMessage({
-                network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                 address: wd.ordinal,
                 message: connectionMessage || getMessage(wd.ordinal),
                 wallet: "Leather",
@@ -363,7 +371,6 @@ Issued At: ${issuedAt}`;
             // Sign the message with the ordinal address if available
             if (wd.ordinal) {
                 yield signMessage({
-                    network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                     address: wd.ordinal,
                     message: connectionMessage || getMessage(wd.ordinal),
                     wallet: "Phantom",
@@ -391,7 +398,7 @@ Issued At: ${issuedAt}`;
             : window.okxwallet.bitcoin;
         let accounts = yield Okx.requestAccounts();
         let publicKey = yield Okx.getPublicKey();
-        if (network === "testnet") {
+        if (redux_network === "testnet") {
             let result = yield window.okxwallet.bitcoinTestnet.connect();
             accounts = [result.address];
             publicKey = result.publicKey;
@@ -406,7 +413,6 @@ Issued At: ${issuedAt}`;
                 connected: true,
             };
             yield signMessage({
-                network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) || "mainnet",
                 address: wd.ordinal,
                 message: connectionMessage || getMessage(wd.ordinal),
                 wallet: "Okx",
@@ -427,8 +433,7 @@ Issued At: ${issuedAt}`;
                         purposes: [sats_connect_1.AddressPurpose.Ordinals, sats_connect_1.AddressPurpose.Payment],
                         message: "Address for receiving Ordinals and payments",
                         network: {
-                            type: (network === null || network === void 0 ? void 0 : network.toLowerCase()) === "testnet" ||
-                                (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) === "testnet"
+                            type: (redux_network === null || redux_network === void 0 ? void 0 : redux_network.toLowerCase()) === "testnet"
                                 ? sats_connect_1.BitcoinNetworkType.Testnet
                                 : sats_connect_1.BitcoinNetworkType.Mainnet,
                         },
@@ -448,9 +453,6 @@ Issued At: ${issuedAt}`;
                             wallet: "MagicEden",
                         };
                         yield signMessage({
-                            network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) ||
-                                redux_network.toLowerCase() ||
-                                "mainnet",
                             address: cardinal,
                             message: connectionMessage || getMessage(cardinal),
                             wallet: "MagicEden",
@@ -469,6 +471,7 @@ Issued At: ${issuedAt}`;
         });
     }
     (0, react_1.useEffect)(() => {
+        var _a;
         // console.log({ tempWD, result });
         if (tempWD && result) {
             localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
@@ -476,19 +479,21 @@ Issued At: ${issuedAt}`;
             updateLastWallet(tempWD.wallet);
             localStorage.setItem("lastWallet", tempWD.wallet);
             // Call the signature capture callback if provided
-            if (onSignatureCapture) {
+            if (onSignatureCaptureRef.current) {
                 const signatureData = {
                     signature: result,
                     message: connectionMessage || getMessage(tempWD.ordinal),
                     address: tempWD.ordinal,
                     wallet: tempWD.wallet,
-                    network: (network === null || network === void 0 ? void 0 : network.toLowerCase()) || redux_network.toLowerCase() || "mainnet"
+                    network: redux_network.toLowerCase()
                 };
-                onSignatureCapture(signatureData);
+                (_a = onSignatureCaptureRef.current) === null || _a === void 0 ? void 0 : _a.call(onSignatureCaptureRef, signatureData);
             }
             handleClose();
+            // Prevent re-invocation on future re-renders or network changes
+            setTempWD(null);
         }
-    }, [tempWD, result, onSignatureCapture, connectionMessage, network, redux_network]);
+    }, [tempWD, result, connectionMessage, redux_network]);
     return (react_1.default.createElement(react_1.default.Fragment, null,
         react_1.default.createElement("div", null,
             react_1.default.createElement(WalletButton_1.default, { wallets: wallets, lastWallet: lastWallet, walletDetails: walletDetails, handleMenuOpen: handleMenuOpen, handleMenuClose: handleMenuClose, handleOpen: handleOpen, handleClose: handleClose, anchorEl: anchorEl, disconnect: disconnect, menuOpen: menuOpen, classname: buttonClassname, InnerMenu: InnerMenu, balance: balance, fractal: fractal }),

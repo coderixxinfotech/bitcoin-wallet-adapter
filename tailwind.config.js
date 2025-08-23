@@ -16,16 +16,12 @@ const customColors = {
 };
 
 module.exports = {
-  mode: "jit",
   prefix: "bwa-",
-  purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: customColors,
     },
-  },
-  variants: {
-    extend: {},
   },
   plugins: [],
 };

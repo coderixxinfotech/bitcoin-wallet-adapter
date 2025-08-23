@@ -17,14 +17,16 @@ const customColors = {
 
 module.exports = {
   mode: "jit",
-  purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
+  safelist: [
+    // Ensure these dynamic classes are never purged
+    "bg-green-500",
+    "bg-gray-600",
+  ],
   theme: {
     extend: {
       colors: customColors,
     },
-  },
-  variants: {
-    extend: {},
   },
   plugins: [],
 };

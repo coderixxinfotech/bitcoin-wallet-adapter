@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useContext } from "react";
+// What happens in this file:
+// - UI for connecting to multiple Bitcoin wallets and capturing a connection signature
+// - Uses Redux store for network; no `network` prop is accepted or used
+// - Initiates address requests and message signing per wallet (Xverse, Unisat, Leather, OKX, Phantom, Magic Eden)
+// - Emits `onSignatureCapture` with signature, message, address, wallet, and redux network
+
+import React, { useState, useEffect, useCallback, useContext, useRef } from "react";
 //xverse
 import {
   AddressPurpose,
@@ -20,7 +26,6 @@ import {
 import { Account, WalletDetails } from "../../types";
 import WalletButton from "./WalletButton";
 import WalletModal from "./WalletModal";
-import { getBTCPriceInDollars } from "../../utils";
 import { IInstalledWallets } from "../../types";
 
 // ME Wallet
@@ -79,7 +84,6 @@ function ConnectMultiWallet({
   icon,
   iconClass,
   balance,
-  network,
   connectionMessage,
   fractal,
   supportedWallets,
@@ -97,12 +101,17 @@ function ConnectMultiWallet({
   icon?: string;
   iconClass?: string;
   balance?: number;
-  network?: "mainnet" | "testnet";
   connectionMessage?: string;
   fractal?: boolean;
   supportedWallets?: string[];
   onSignatureCapture?: SignatureCaptureCallback;
 }) {
+  // Keep the latest onSignatureCapture without causing effect re-runs
+  const onSignatureCaptureRef = useRef<SignatureCaptureCallback | undefined>(onSignatureCapture);
+  useEffect(() => {
+    onSignatureCaptureRef.current = onSignatureCapture;
+  }, [onSignatureCapture]);
+
   const { loading, result, error, signMessage } = useMessageSign();
   //for notification
   const disconnectFunc = useDisconnect();
@@ -213,6 +222,13 @@ Issued At: ${issuedAt}`;
       });
     }
 
+    // In testnet mode, hide wallets that don't support testnet flows in our adapter
+    // Currently hidden: MagicEden, Phantom, OKX
+    if (redux_network === "testnet") {
+      const excludeOnTestnet = new Set(["MagicEden", "Phantom", "OKX"]);
+      checkWallets = checkWallets.filter((w: any) => !excludeOnTestnet.has(w.label));
+    }
+
     if (supportedWallets && supportedWallets.length > 0)
       // Filter out wallets that are not in supportedWallets
       checkWallets = checkWallets.filter((wallet: any) =>
@@ -226,7 +242,7 @@ Issued At: ${issuedAt}`;
   useEffect(() => {
     getInstalledWalletName();
     // Bitcoin price is now managed centrally by the useBitcoinPrice hook
-  }, [dispatch, open]);
+  }, [dispatch, open, redux_network]);
 
   // Use effect hook to check if last wallet is in local storage and set selected wallet accordingly
   useEffect(() => {
@@ -327,7 +343,7 @@ Issued At: ${issuedAt}`;
   }, []);
 
   // Use the custom hook
-  useWalletEffect(walletDetails, disconnect, network, redux_network);
+  useWalletEffect(walletDetails, disconnect, redux_network);
 
   //xVerse
 
@@ -336,14 +352,9 @@ Issued At: ${issuedAt}`;
       purposes: purposes.map((p) => p as AddressPurpose),
       message: "Address for receiving Ordinals and payments",
       network:
-        network?.toLowerCase() === "testnet" ||
         redux_network.toLowerCase() === "testnet"
-          ? ({
-              type: "Testnet",
-            } as BitcoinNetwork)
-          : ({
-              type: "Mainnet",
-            } as BitcoinNetwork),
+          ? ({ type: "Testnet" } as BitcoinNetwork)
+          : ({ type: "Mainnet" } as BitcoinNetwork),
     },
     onFinish: async (response: any) => {
       // console.log(response, 'xverse wallet connect')
@@ -372,8 +383,6 @@ Issued At: ${issuedAt}`;
       setTempWD(wd);
 
       await signMessage({
-        network:
-          network?.toLowerCase() || redux_network.toLowerCase() || "mainnet",
         address: ordinal,
         message: connectionMessage || getMessage(ordinal),
         wallet: "Xverse",
@@ -410,8 +419,6 @@ Issued At: ${issuedAt}`;
 
       // console.log("Sign MESSAGE");
       await signMessage({
-        network:
-          network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
         address: wd.ordinal,
         message: connectionMessage || getMessage(wd.ordinal),
         wallet: "Unisat",
@@ -451,8 +458,6 @@ Issued At: ${issuedAt}`;
       };
 
       await signMessage({
-        network:
-          network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
         address: wd.ordinal,
         message: connectionMessage || getMessage(wd.ordinal),
         wallet: "Leather",
@@ -498,8 +503,6 @@ Issued At: ${issuedAt}`;
       // Sign the message with the ordinal address if available
       if (wd.ordinal) {
         await signMessage({
-          network:
-            network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
           address: wd.ordinal,
           message: connectionMessage || getMessage(wd.ordinal),
           wallet: "Phantom",
@@ -530,7 +533,7 @@ Issued At: ${issuedAt}`;
     let accounts = await Okx.requestAccounts();
     let publicKey = await Okx.getPublicKey();
 
-    if (network === "testnet") {
+    if (redux_network === "testnet") {
       let result = await (window as any).okxwallet.bitcoinTestnet.connect();
       accounts = [result.address];
       publicKey = result.publicKey;
@@ -546,8 +549,6 @@ Issued At: ${issuedAt}`;
         connected: true,
       };
       await signMessage({
-        network:
-          network?.toLowerCase() || redux_network?.toLowerCase() || "mainnet",
         address: wd.ordinal,
         message: connectionMessage || getMessage(wd.ordinal),
         wallet: "Okx",
@@ -570,7 +571,6 @@ Issued At: ${issuedAt}`;
           message: "Address for receiving Ordinals and payments",
           network: {
             type:
-              network?.toLowerCase() === "testnet" ||
               redux_network?.toLowerCase() === "testnet"
                 ? BitcoinNetworkType.Testnet
                 : BitcoinNetworkType.Mainnet,
@@ -604,10 +604,6 @@ Issued At: ${issuedAt}`;
           };
 
           await signMessage({
-            network:
-              network?.toLowerCase() ||
-              redux_network.toLowerCase() ||
-              "mainnet",
             address: cardinal,
             message: connectionMessage || getMessage(cardinal),
             wallet: "MagicEden",
@@ -633,20 +629,22 @@ Issued At: ${issuedAt}`;
       localStorage.setItem("lastWallet", tempWD.wallet);
       
       // Call the signature capture callback if provided
-      if (onSignatureCapture) {
+      if (onSignatureCaptureRef.current) {
         const signatureData = {
           signature: result,
           message: connectionMessage || getMessage(tempWD.ordinal),
           address: tempWD.ordinal,
           wallet: tempWD.wallet,
-          network: network?.toLowerCase() || redux_network.toLowerCase() || "mainnet"
+          network: redux_network.toLowerCase()
         };
-        onSignatureCapture(signatureData);
+        onSignatureCaptureRef.current?.(signatureData);
       }
       
       handleClose();
+      // Prevent re-invocation on future re-renders or network changes
+      setTempWD(null);
     }
-  }, [tempWD, result, onSignatureCapture, connectionMessage, network, redux_network]);
+  }, [tempWD, result, connectionMessage, redux_network]);
 
   return (
     <>

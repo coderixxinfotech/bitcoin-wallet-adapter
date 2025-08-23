@@ -55,7 +55,6 @@ const MessageSignDemo: React.FC = () => {
 
         try {
             await signMessage({
-                network: 'Mainnet',
                 address: addressToUse,
                 message: messageText,
                 wallet: walletAddress?.wallet || '',

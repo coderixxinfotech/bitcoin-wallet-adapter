@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useBitcoinPrice = exports.useWalletSigning = exports.useWalletBalance = exports.useWalletConnect = exports.usePayBTC = exports.useDisconnect = exports.useMessageSign = exports.useSignTx = exports.useWalletAddress = exports.useUnisatSign = exports.useXverseSign = exports.useLeatherSign = void 0;
+exports.useNetwork = exports.useBitcoinPrice = exports.useWalletSigning = exports.useWalletBalance = exports.useWalletConnect = exports.usePayBTC = exports.useDisconnect = exports.useMessageSign = exports.useSignTx = exports.useWalletAddress = exports.useUnisatSign = exports.useXverseSign = exports.useLeatherSign = void 0;
 // Legacy wallet-specific hooks
 const useLeatherSign_1 = require("./useLeatherSign");
 Object.defineProperty(exports, "useLeatherSign", { enumerable: true, get: function () { return useLeatherSign_1.useLeatherSign; } });
@@ -30,3 +30,5 @@ const useWalletSigning_1 = require("./useWalletSigning");
 Object.defineProperty(exports, "useWalletSigning", { enumerable: true, get: function () { return useWalletSigning_1.useWalletSigning; } });
 const useBitcoinPrice_1 = require("./useBitcoinPrice");
 Object.defineProperty(exports, "useBitcoinPrice", { enumerable: true, get: function () { return useBitcoinPrice_1.useBitcoinPrice; } });
+const useNetwork_1 = require("./useNetwork");
+Object.defineProperty(exports, "useNetwork", { enumerable: true, get: function () { return useNetwork_1.useNetwork; } });

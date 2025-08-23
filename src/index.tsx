@@ -1,3 +1,7 @@
+// What happens in this file:
+// - Acts as the package entry point for all public exports
+// - Re-exports providers, components, hooks, types, and utilities
+// - Includes network switching hook `useNetwork` for global mainnet/testnet state
 // Styles
 import "./styles.css";
 
@@ -8,6 +12,9 @@ import WalletProvider from "./common/Provider";
 import ConnectMultiButton from "./components/ConnectMultiButton";
 import Notification from "./components/Notification";
 import PayButton from "./components/PayButton";
+
+// Backward-compatibility alias for tests and legacy imports
+export const ConnectButton = ConnectMultiButton;
 
 // Hooks
 import {
@@ -23,6 +30,7 @@ import {
   useWalletBalance,
   useWalletSigning,
   useBitcoinPrice,
+  useNetwork,
 } from "./hooks";
 
 // Export Providers
@@ -90,6 +98,7 @@ export {
   useWalletBalance,
   useWalletSigning,
   useBitcoinPrice,
+  useNetwork,
 };
 
 // Export Bitcoin Price functionality
@@ -107,3 +116,6 @@ export type {
   PriceSourceError,
   UseBitcoinPriceReturn,
 } from "./hooks/useBitcoinPrice";
+
+// Export network type
+export type { Network } from "./hooks";

@@ -1,4 +1,8 @@
 "use client";
+// What happens in this file:
+// - Renders the example app main page with tabs for connect, signing, balance, and payment demos
+// - Integrates a NetworkSwitcher that updates the Redux-managed network (mainnet | testnet)
+// - Displays connection status, captures signatures, and shows notifications
 import {
   Notification,
   useWalletAddress,
@@ -6,8 +10,8 @@ import {
   BWAError,
   addNotification,
   ConnectMultiButton,
-} from "../../../dist";
-import { useState, useEffect } from 'react';
+} from "../../../dist/src/index";
+import { useState, useEffect, SetStateAction } from 'react';
 import { useDispatch } from 'react-redux';
 
 
@@ -16,6 +20,7 @@ import WalletConnectDemo from "../components/WalletConnectDemo";
 import MessageSignDemo from "../components/MessageSignDemo";
 import BalanceDemo from "../components/BalanceDemo";
 import PaymentDemo from "../components/PaymentDemo";
+import NetworkSwitcher from "../components/NetworkSwitcher";
 
 
 
@@ -52,10 +57,10 @@ function HomeContent() {
     onError: (bwaError: InstanceType<typeof BWAError>) => {
       console.error('BWA Error:', bwaError);
       dispatch(addNotification({
-        id: Date.now().toString(),
-        type: 'error',
+        id: Date.now(),
         message: `${bwaError.context?.walletType || 'Wallet'} Error: ${bwaError.message}`,
-        duration: 5000,
+        severity: 'error',
+        open: true,
       }));
     }
   });
@@ -67,10 +72,10 @@ function HomeContent() {
       if (event.error instanceof BWAError) {
         console.error('Unhandled BWA Error:', event.error);
         dispatch(addNotification({
-          id: Date.now().toString(),
-          type: 'error',
+          id: Date.now(),
           message: `Unhandled Error: ${event.error.message}`,
-          duration: 5000,
+          severity: 'error',
+          open: true,
         }));
       }
     };
@@ -102,30 +107,35 @@ function HomeContent() {
               <h3 className="text-xl font-semibold text-slate-800 mb-2">Connect Your Bitcoin Wallet</h3>
               <p className="text-slate-600 text-sm mb-4">Recommended sign-in method - persists wallet data after page refresh</p>
               <p className="text-blue-600 text-xs mb-4 font-medium">💡 Connection signatures are automatically captured and displayed below</p>
-              <ConnectMultiButton 
-                network="mainnet" 
-                onSignatureCapture={(signatureData) => {
+              <div className="mb-4 flex items-center justify-center gap-3">
+                <span className="text-xs text-slate-600 font-medium">Network:</span>
+                <NetworkSwitcher />
+              </div>
+              <ConnectMultiButton
+                onSignatureCapture={(signatureData: SetStateAction<{ signature: string; message: string; address: string; wallet: string; network: string; } | null>) => {
                   console.log('Signature captured during wallet connection:', signatureData);
                   setCapturedSignature(signatureData);
                   dispatch(addNotification({
-                    id: Date.now().toString(),
-                    type: 'success',
-                    message: `Signature captured from ${signatureData.wallet} wallet!`,
-                    duration: 4000,
+                    id: Date.now(),
+                    message: `Signature captured from ${(
+                      typeof signatureData === 'object' && signatureData && 'wallet' in signatureData
+                        ? (signatureData as any).wallet
+                        : walletDetails?.wallet
+                    ) || 'wallet'}!`,
+                    severity: 'success',
+                    open: true,
                   }));
                 }}
               />
             </div>
-            
+
             {/* Connection Status */}
             <div className="flex items-center justify-center gap-4 pt-4 border-t border-slate-100">
               <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  walletDetails?.connected ? 'bg-emerald-500 shadow-sm shadow-emerald-500/50' : 'bg-slate-300'
-                }`} />
-                <span className={`text-sm font-semibold ${
-                  walletDetails?.connected ? 'text-emerald-700' : 'text-slate-500'
-                }`}>
+                <div className={`w-3 h-3 rounded-full ${walletDetails?.connected ? 'bg-emerald-500 shadow-sm shadow-emerald-500/50' : 'bg-slate-300'
+                  }`} />
+                <span className={`text-sm font-semibold ${walletDetails?.connected ? 'text-emerald-700' : 'text-slate-500'
+                  }`}>
                   {walletDetails?.connected ? 'Connected' : 'Disconnected'}
                 </span>
               </div>
@@ -135,7 +145,7 @@ function HomeContent() {
                 </div>
               )}
             </div>
-            
+
             {/* Signature Capture Display */}
             {capturedSignature && (
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
@@ -161,7 +171,7 @@ function HomeContent() {
                   <div className="flex gap-2">
                     <span className="font-semibold text-blue-800 min-w-[60px]">Signature:</span>
                     <span className="text-blue-700 font-mono break-all text-[10px] leading-tight">
-                      {capturedSignature.signature.length > 100 
+                      {capturedSignature.signature.length > 100
                         ? `${capturedSignature.signature.substring(0, 50)}...${capturedSignature.signature.substring(capturedSignature.signature.length - 50)}`
                         : capturedSignature.signature
                       }
@@ -195,8 +205,8 @@ function HomeContent() {
               <button
                 onClick={() => handleTabChange('connect')}
                 className={`px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 ${activeTab === 'connect'
-                    ? 'border-blue-500 text-blue-600 bg-white'
-                    : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+                  ? 'border-blue-500 text-blue-600 bg-white'
+                  : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
                   }`}
               >
                 🔗 Wallet Connect
@@ -204,8 +214,8 @@ function HomeContent() {
               <button
                 onClick={() => handleTabChange('signing')}
                 className={`px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 ${activeTab === 'signing'
-                    ? 'border-blue-500 text-blue-600 bg-white'
-                    : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+                  ? 'border-blue-500 text-blue-600 bg-white'
+                  : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
                   }`}
               >
                 ✍️ Message Signing
@@ -213,8 +223,8 @@ function HomeContent() {
               <button
                 onClick={() => handleTabChange('balance')}
                 className={`px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 ${activeTab === 'balance'
-                    ? 'border-blue-500 text-blue-600 bg-white'
-                    : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+                  ? 'border-blue-500 text-blue-600 bg-white'
+                  : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
                   }`}
               >
                 💰 Balance Check
@@ -222,8 +232,8 @@ function HomeContent() {
               <button
                 onClick={() => handleTabChange('payment')}
                 className={`px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 ${activeTab === 'payment'
-                    ? 'border-blue-500 text-blue-600 bg-white'
-                    : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+                  ? 'border-blue-500 text-blue-600 bg-white'
+                  : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
                   }`}
               >
                 💸 Payment Demo

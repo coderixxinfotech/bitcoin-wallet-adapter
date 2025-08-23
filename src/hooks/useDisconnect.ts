@@ -1,10 +1,14 @@
-// File: src/index.ts (or src/index.js if not using TypeScript)
+// What happens in this file:
+// - Defines `useDisconnect()` hook used to fully disconnect a wallet session
+// - Clears persisted wallet keys from localStorage (lastWallet, wallet-detail, wallet*)
+// - Resets Redux session state: lastWallet, walletDetails, and transient `signature`
 
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import {
   setLastWallet,
   setWalletDetails,
+  setSignature,
 } from "../stores/reducers/generalReducer";
 import { 
   wrapAndThrowError, 
@@ -28,6 +32,8 @@ const useDisconnect = () => {
       }
       dispatch(setLastWallet(""));
       dispatch(setWalletDetails(null));
+      // Clear transient signature captured from message/wallet connection
+      dispatch(setSignature(""));
     } catch (err) {
       wrapAndThrowError(
         err as Error,

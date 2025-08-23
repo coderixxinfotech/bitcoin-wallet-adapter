@@ -1,4 +1,9 @@
 "use strict";
+// What happens in this file:
+// - Exposes `WalletProvider` that wires Wallet Standard, MUI Theme, ConnectionStatus, and Redux store
+// - Applies initial network from `customAuthOptions.network` into Redux
+// - Automatically disconnects the connected wallet whenever the Redux `network` changes
+//   to prevent cross-network mismatches across all hooks and operations
 "use client";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -40,6 +45,8 @@ const context_1 = require("../common/stacks/context");
 const react_redux_1 = require("react-redux");
 const stores_1 = require("../stores");
 const generalReducer_1 = require("../stores/reducers/generalReducer");
+const useDisconnect_1 = __importDefault(require("../hooks/useDisconnect"));
+const notificationReducers_1 = require("../stores/reducers/notificationReducers");
 function WalletProvider({ children, customAuthOptions }) {
     const { authOptions, state } = (0, use_auth_1.useAuth)(customAuthOptions);
     // console.log({ customAuthOptions });
@@ -54,11 +61,34 @@ function WalletProvider({ children, customAuthOptions }) {
 }
 const SetNetwork = ({ customAuthOptions }) => {
     const dispatch = (0, react_redux_1.useDispatch)();
+    const network = (0, react_redux_1.useSelector)((s) => s.general.network);
+    const walletDetails = (0, react_redux_1.useSelector)((s) => s.general.walletDetails);
+    const disconnect = (0, useDisconnect_1.default)();
+    const prevNetworkRef = (0, react_1.useRef)(network !== null && network !== void 0 ? network : null);
+    // Apply initial network from customAuthOptions (if provided)
     (0, react_1.useEffect)(() => {
-        if (customAuthOptions === null || customAuthOptions === void 0 ? void 0 : customAuthOptions.network)
-            dispatch((0, generalReducer_1.setNetwork)(customAuthOptions === null || customAuthOptions === void 0 ? void 0 : customAuthOptions.network));
+        if (customAuthOptions === null || customAuthOptions === void 0 ? void 0 : customAuthOptions.network) {
+            dispatch((0, generalReducer_1.setNetwork)(customAuthOptions.network));
+        }
         return () => { };
-    }, [customAuthOptions === null || customAuthOptions === void 0 ? void 0 : customAuthOptions.network]);
+    }, [customAuthOptions === null || customAuthOptions === void 0 ? void 0 : customAuthOptions.network, dispatch]);
+    // Auto-disconnect wallet whenever Redux network changes
+    (0, react_1.useEffect)(() => {
+        const prev = prevNetworkRef.current;
+        if (prev && network && prev !== network) {
+            if (walletDetails) {
+                disconnect();
+                // Notify user about the enforced disconnect on network switch
+                dispatch((0, notificationReducers_1.addNotification)({
+                    id: Date.now(),
+                    message: `Network changed to ${network}. Wallet disconnected to prevent cross-network issues.`,
+                    open: true,
+                    severity: "info",
+                }));
+            }
+        }
+        prevNetworkRef.current = network !== null && network !== void 0 ? network : null;
+    }, [network, walletDetails, disconnect]);
     return react_1.default.createElement(react_1.default.Fragment, null);
 };
 exports.default = WalletProvider;
