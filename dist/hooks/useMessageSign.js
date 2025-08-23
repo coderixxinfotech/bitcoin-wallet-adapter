@@ -126,8 +126,8 @@ const useMessageSign = () => {
                 const wallet = testWallets.filter((a) => a.name === "Magic Eden")[0];
                 const signMessageOptions = {
                     getProvider: () => __awaiter(void 0, void 0, void 0, function* () {
-                        var _a;
-                        return (_a = wallet.features[SatsConnectNamespace]) === null || _a === void 0 ? void 0 : _a.provider;
+                        var _c;
+                        return (_c = wallet.features[SatsConnectNamespace]) === null || _c === void 0 ? void 0 : _c.provider;
                     }),
                     payload: {
                         network: {

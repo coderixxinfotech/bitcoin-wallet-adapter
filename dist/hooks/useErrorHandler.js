@@ -3,10 +3,7 @@
  * React Hook for Professional Error Handling in User Applications
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useErrorHandler = useErrorHandler;
-exports.useWalletErrors = useWalletErrors;
-exports.useTransactionErrors = useTransactionErrors;
-exports.useCriticalErrors = useCriticalErrors;
+exports.useCriticalErrors = exports.useTransactionErrors = exports.useWalletErrors = exports.useErrorHandler = void 0;
 const react_1 = require("react");
 const errorHandler_1 = require("../utils/errorHandler");
 function useErrorHandler(options = {}) {
@@ -80,6 +77,7 @@ function useErrorHandler(options = {}) {
         getErrorHistory
     };
 }
+exports.useErrorHandler = useErrorHandler;
 // Specialized hooks for common use cases
 function useWalletErrors(onError) {
     return useErrorHandler({
@@ -93,6 +91,7 @@ function useWalletErrors(onError) {
         ]
     });
 }
+exports.useWalletErrors = useWalletErrors;
 function useTransactionErrors(onError) {
     return useErrorHandler({
         onError,
@@ -106,6 +105,7 @@ function useTransactionErrors(onError) {
         ]
     });
 }
+exports.useTransactionErrors = useTransactionErrors;
 function useCriticalErrors(onError) {
     return useErrorHandler({
         onError,
@@ -113,3 +113,4 @@ function useCriticalErrors(onError) {
         autoClearTimeout: 10000 // Auto-clear critical errors after 10 seconds
     });
 }
+exports.useCriticalErrors = useCriticalErrors;

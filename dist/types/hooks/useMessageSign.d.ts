@@ -4,7 +4,7 @@ export declare const useMessageSign: () => {
         address: string;
         message: string;
         wallet: string;
-        fractal?: boolean;
+        fractal?: boolean | undefined;
     }) => Promise<void>;
     loading: boolean;
     result: any;

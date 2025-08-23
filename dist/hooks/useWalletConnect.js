@@ -265,7 +265,7 @@ const useWalletConnect = () => {
         dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
         localStorage.setItem("walletDetails", JSON.stringify(walletDetail));
     });
-    const connectXverse = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (options = {}) {
+    const connectXverse = (options = {}) => __awaiter(void 0, void 0, void 0, function* () {
         const getAddressOptions = {
             payload: {
                 purposes: purposes,
@@ -338,8 +338,8 @@ const useWalletConnect = () => {
         localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
     });
     const connectOKX = () => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
-        if (!((_a = window.okxwallet) === null || _a === void 0 ? void 0 : _a.bitcoin)) {
+        var _b;
+        if (!((_b = window.okxwallet) === null || _b === void 0 ? void 0 : _b.bitcoin)) {
             (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "OKX wallet is not available or not installed", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
                 context: {

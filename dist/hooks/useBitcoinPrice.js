@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useBitcoinPrice = useBitcoinPrice;
+exports.useBitcoinPrice = void 0;
 const react_1 = require("react");
 const react_redux_1 = require("react-redux");
 const bitcoinPriceReducer_1 = require("../stores/reducers/bitcoinPriceReducer");
@@ -61,3 +61,4 @@ function useBitcoinPrice(options = {}) {
         clearPriceError,
         clearPrice }, computed);
 }
+exports.useBitcoinPrice = useBitcoinPrice;

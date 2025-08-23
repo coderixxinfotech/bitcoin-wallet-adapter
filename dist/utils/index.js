@@ -12,29 +12,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isBase64 = exports.isHex = exports.hexToBase64 = exports.BytesFromHex = void 0;
-exports.convertSatToBtc = convertSatToBtc;
-exports.convertBtcToSat = convertBtcToSat;
-exports.base64ToHex = base64ToHex;
-exports.getBTCPriceInDollars = getBTCPriceInDollars;
-exports.shortenString = shortenString;
-exports.countDummyUtxos = countDummyUtxos;
+exports.countDummyUtxos = exports.isBase64 = exports.isHex = exports.hexToBase64 = exports.BytesFromHex = exports.shortenString = exports.getBTCPriceInDollars = exports.base64ToHex = exports.convertBtcToSat = exports.convertSatToBtc = void 0;
 const axios_1 = __importDefault(require("axios"));
 const errorHandler_1 = require("./errorHandler");
 // Function to convert price from satoshi to Bitcoin
 function convertSatToBtc(priceInSat) {
     return priceInSat / 1e8; // 1 BTC = 100,000,000 SAT
 }
+exports.convertSatToBtc = convertSatToBtc;
 // Function to convert price from satoshi to Bitcoin
 function convertBtcToSat(priceInSat) {
     return priceInSat * 1e8; // 1 BTC = 100,000,000 SAT
 }
+exports.convertBtcToSat = convertBtcToSat;
 function base64ToHex(str) {
     return atob(str)
         .split("")
         .map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
         .join("");
 }
+exports.base64ToHex = base64ToHex;
 function getBTCPriceInDollars() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -49,6 +46,7 @@ function getBTCPriceInDollars() {
         }
     });
 }
+exports.getBTCPriceInDollars = getBTCPriceInDollars;
 function shortenString(str, length = 4) {
     if (str.length <= 8) {
         return str;
@@ -57,6 +55,7 @@ function shortenString(str, length = 4) {
     const end = str.slice(-length);
     return `${start}...${end}`;
 }
+exports.shortenString = shortenString;
 const BytesFromHex = (hexString) => {
     var _a, _b;
     const cleanHexString = hexString.replace(/[^0-9A-Fa-f]/g, "");
@@ -161,3 +160,4 @@ function countDummyUtxos(address, mempool_url, ord_url) {
         return counter;
     });
 }
+exports.countDummyUtxos = countDummyUtxos;

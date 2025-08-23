@@ -176,7 +176,7 @@ const useWalletSigning = () => {
     /**
      * Sign a PSBT (Partially Signed Bitcoin Transaction)
      */
-    const signPSBT = (0, react_1.useCallback)((psbtHex_1, ...args_1) => __awaiter(void 0, [psbtHex_1, ...args_1], void 0, function* (psbtHex, options = {}) {
+    const signPSBT = (0, react_1.useCallback)((psbtHex, options = {}) => __awaiter(void 0, void 0, void 0, function* () {
         if (!(walletDetails === null || walletDetails === void 0 ? void 0 : walletDetails.wallet)) {
             (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_CONNECTED, "No wallet is currently connected for PSBT signing", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
@@ -317,8 +317,8 @@ const useWalletSigning = () => {
         return response.signature;
     });
     const signMessageOKX = (options) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
-        if (!((_a = window.okxwallet) === null || _a === void 0 ? void 0 : _a.bitcoin)) {
+        var _b;
+        if (!((_b = window.okxwallet) === null || _b === void 0 ? void 0 : _b.bitcoin)) {
             (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "OKX wallet is not available for message signing", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
                 context: {
@@ -412,8 +412,8 @@ const useWalletSigning = () => {
         });
     });
     const signTransactionPhantom = (options) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
-        if (!((_a = window.phantom) === null || _a === void 0 ? void 0 : _a.bitcoin)) {
+        var _c;
+        if (!((_c = window.phantom) === null || _c === void 0 ? void 0 : _c.bitcoin)) {
             (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "Phantom wallet is not available for transaction signing", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
                 context: {
@@ -435,8 +435,8 @@ const useWalletSigning = () => {
         });
     });
     const signTransactionOKX = (options) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
-        if (!((_a = window.okxwallet) === null || _a === void 0 ? void 0 : _a.bitcoin)) {
+        var _d;
+        if (!((_d = window.okxwallet) === null || _d === void 0 ? void 0 : _d.bitcoin)) {
             (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "OKX wallet is not available or not installed", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
                 context: {

@@ -463,22 +463,35 @@ Issued At: ${issuedAt}`;
   };
 
   const getPhantomAddress = async () => {
-    // Accessing the phantom Bitcoin object from the window
-    const phantom = (window as any).window?.phantom?.bitcoin;
+    // Access the Phantom Bitcoin provider correctly from window
+    const phantom = (window as any).phantom?.bitcoin;
+
+    // Guard: Provider not available
+    if (!phantom) {
+      dispatch(
+        addNotification({
+          id: new Date().valueOf(),
+          message: "Phantom wallet not found. Please install or enable Phantom.",
+          open: true,
+          severity: "error",
+        })
+      );
+      return;
+    }
 
     // Requesting accounts and awaiting the promise to resolve
     const accounts = await phantom.requestAccounts();
 
     const userAddresses = accounts;
-    const addresses = userAddresses[0];
+    const addresses = userAddresses?.[0];
 
     if (addresses) {
       const wd = {
         wallet: "Phantom",
-        ordinal: addresses ? addresses.address : null,
-        cardinal: addresses ? addresses.address : null,
-        ordinalPubkey: addresses ? addresses.publicKey : null,
-        cardinalPubkey: addresses ? addresses.publicKey : null,
+        ordinal: addresses?.address ?? null,
+        cardinal: addresses?.address ?? null,
+        ordinalPubkey: addresses?.publicKey ?? null,
+        cardinalPubkey: addresses?.publicKey ?? null,
         connected: true,
       };
 
@@ -499,6 +512,14 @@ Issued At: ${issuedAt}`;
       setTempWD(wd);
     } else {
       console.warn("No addresses found.");
+      dispatch(
+        addNotification({
+          id: new Date().valueOf(),
+          message: "No Phantom accounts returned.",
+          open: true,
+          severity: "warning",
+        })
+      );
     }
   };
 
