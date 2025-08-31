@@ -56,11 +56,6 @@
     "@exodus/bitcoin-wallet-standard-react": "0.0.0",
     "@mui/material": "^5.15.7",
     "@reduxjs/toolkit": "^1.9.5",
-    "@stacks/auth": "^6.7.0",
-    "@stacks/connect": "^7.3.1",
-    "@stacks/connect-react": "^22.1.1",
-    "@stacks/network": "^6.5.5",
-    "@stacks/rpc-client": "^0.8.18",
     "@wallet-standard/react": "^0.1.4",
     "autoprefixer": "^10.4.15",
     "axios": "^1.6.7",
@@ -92,13 +87,16 @@
     "react-test-renderer": "^18.2.0",
     "rimraf": "^5.0.5",
     "semantic-release": "^24.2.7",
+    "tiny-secp256k1": "^2.2.4",
     "ts-jest": "^29.1.1"
   },
   "publishConfig": {
     "access": "public"
   },
   "release": {
-    "branches": ["main"]
+    "branches": [
+      "main"
+    ]
   },
   "files": [
     "dist/**/*",
