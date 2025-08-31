@@ -3,6 +3,7 @@
 // - Applies initial network from `customAuthOptions.network` into Redux
 // - Automatically disconnects the connected wallet whenever the Redux `network` changes
 //   to prevent cross-network mismatches across all hooks and operations
+// - Removed Stacks Connect provider to avoid setImmediate postMessage conflicts with Leather inpage script
 "use client";
 import React, { ReactNode, useEffect, useRef } from "react";
 
@@ -11,11 +12,6 @@ import { ConnectionStatusProvider } from "./ConnectionStatus";
 
 //mui
 import ThemeWrapper from "./mui/ThemeProvider";
-
-//Leather Wallet
-import { Connect } from "@stacks/connect-react";
-import { useAuth } from "../common/stacks/use-auth";
-import { AppContext } from "../common/stacks/context";
 
 // Redux
 import { Provider, useDispatch, useSelector } from "react-redux";
@@ -33,26 +29,83 @@ interface WalletProviderProps {
 }
 
 function WalletProvider({ children, customAuthOptions }: WalletProviderProps) {
-  const { authOptions, state } = useAuth(customAuthOptions);
-  // console.log({ customAuthOptions });
-
   return (
     <ThemeWrapper>
       <WalletStandardProvider>
         <ConnectionStatusProvider>
           <Provider store={bwaStore}>
-            <Connect authOptions={authOptions}>
-              <AppContext.Provider value={state}>
-                <SetNetwork customAuthOptions={customAuthOptions} />
-                {children}
-              </AppContext.Provider>
-            </Connect>
+            <LeatherCompatPatches />
+            <SetNetwork customAuthOptions={customAuthOptions} />
+            {children}
           </Provider>
         </ConnectionStatusProvider>
       </WalletStandardProvider>
     </ThemeWrapper>
   );
 }
+
+// Small, safe runtime patch to avoid postMessage-based setImmediate polyfills
+// interfering with Leather's inpage message parsing. Replaces setImmediate
+// with a setTimeout(0) fallback. No-ops if setImmediate is absent.
+const LeatherCompatPatches = () => {
+  useEffect(() => {
+    try {
+      if (typeof window === "undefined") return;
+      const w = window as any;
+      if (typeof w.setImmediate === "function") {
+        if (!w.__bwaSetImmediatePatched) {
+          const timeouts = new Map<number, number>();
+          const patchedSetImmediate = (cb: (...args: any[]) => any, ...args: any[]) => {
+            const id = Math.floor(Math.random() * 1e9);
+            const tid = window.setTimeout(() => {
+              try {
+                cb(...args);
+              } catch {
+                // swallow to avoid unhandled errors in microtask replacement
+              }
+            }, 0);
+            timeouts.set(id, tid);
+            return id;
+          };
+          const patchedClearImmediate = (id: number) => {
+            const tid = timeouts.get(id);
+            if (tid != null) {
+              clearTimeout(tid);
+              timeouts.delete(id);
+            }
+          };
+          w.setImmediate = patchedSetImmediate;
+          w.clearImmediate = patchedClearImmediate;
+          w.__bwaSetImmediatePatched = true;
+        }
+      }
+      // Note: Avoid patching window.postMessage to prevent breaking wallet detection.
+      // Intercept setImmediate polyfill messages only (avoid interfering with wallet detection)
+      const handler = (event: MessageEvent) => {
+        try {
+          if (event.source !== window) return;
+          const data = (event as MessageEvent).data;
+          if (typeof data === "string") {
+            const trimmed = data.trim();
+            if (trimmed.startsWith("setImmediate$")) {
+              event.stopImmediatePropagation?.();
+              return;
+            }
+          }
+        } catch {
+          // ignore
+        }
+      };
+      window.addEventListener("message", handler, { capture: true });
+      return () => {
+        window.removeEventListener("message", handler, { capture: true } as any);
+      };
+    } catch {
+      // ignore
+    }
+  }, []);
+  return null;
+};
 
 const SetNetwork = ({ customAuthOptions }: any) => {
   const dispatch = useDispatch();

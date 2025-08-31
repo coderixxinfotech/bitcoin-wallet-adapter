@@ -4,6 +4,7 @@
 // - Applies initial network from `customAuthOptions.network` into Redux
 // - Automatically disconnects the connected wallet whenever the Redux `network` changes
 //   to prevent cross-network mismatches across all hooks and operations
+// - Removed Stacks Connect provider to avoid setImmediate postMessage conflicts with Leather inpage script
 "use client";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -37,10 +38,6 @@ const react_2 = require("@wallet-standard/react");
 const ConnectionStatus_1 = require("./ConnectionStatus");
 //mui
 const ThemeProvider_1 = __importDefault(require("./mui/ThemeProvider"));
-//Leather Wallet
-const connect_react_1 = require("@stacks/connect-react");
-const use_auth_1 = require("../common/stacks/use-auth");
-const context_1 = require("../common/stacks/context");
 // Redux
 const react_redux_1 = require("react-redux");
 const stores_1 = require("../stores");
@@ -48,17 +45,82 @@ const generalReducer_1 = require("../stores/reducers/generalReducer");
 const useDisconnect_1 = __importDefault(require("../hooks/useDisconnect"));
 const notificationReducers_1 = require("../stores/reducers/notificationReducers");
 function WalletProvider({ children, customAuthOptions }) {
-    const { authOptions, state } = (0, use_auth_1.useAuth)(customAuthOptions);
-    // console.log({ customAuthOptions });
     return (react_1.default.createElement(ThemeProvider_1.default, null,
         react_1.default.createElement(react_2.WalletStandardProvider, null,
             react_1.default.createElement(ConnectionStatus_1.ConnectionStatusProvider, null,
                 react_1.default.createElement(react_redux_1.Provider, { store: stores_1.bwaStore },
-                    react_1.default.createElement(connect_react_1.Connect, { authOptions: authOptions },
-                        react_1.default.createElement(context_1.AppContext.Provider, { value: state },
-                            react_1.default.createElement(SetNetwork, { customAuthOptions: customAuthOptions }),
-                            children)))))));
+                    react_1.default.createElement(LeatherCompatPatches, null),
+                    react_1.default.createElement(SetNetwork, { customAuthOptions: customAuthOptions }),
+                    children)))));
 }
+// Small, safe runtime patch to avoid postMessage-based setImmediate polyfills
+// interfering with Leather's inpage message parsing. Replaces setImmediate
+// with a setTimeout(0) fallback. No-ops if setImmediate is absent.
+const LeatherCompatPatches = () => {
+    (0, react_1.useEffect)(() => {
+        try {
+            if (typeof window === "undefined")
+                return;
+            const w = window;
+            if (typeof w.setImmediate === "function") {
+                if (!w.__bwaSetImmediatePatched) {
+                    const timeouts = new Map();
+                    const patchedSetImmediate = (cb, ...args) => {
+                        const id = Math.floor(Math.random() * 1e9);
+                        const tid = window.setTimeout(() => {
+                            try {
+                                cb(...args);
+                            }
+                            catch (_a) {
+                                // swallow to avoid unhandled errors in microtask replacement
+                            }
+                        }, 0);
+                        timeouts.set(id, tid);
+                        return id;
+                    };
+                    const patchedClearImmediate = (id) => {
+                        const tid = timeouts.get(id);
+                        if (tid != null) {
+                            clearTimeout(tid);
+                            timeouts.delete(id);
+                        }
+                    };
+                    w.setImmediate = patchedSetImmediate;
+                    w.clearImmediate = patchedClearImmediate;
+                    w.__bwaSetImmediatePatched = true;
+                }
+            }
+            // Note: Avoid patching window.postMessage to prevent breaking wallet detection.
+            // Intercept setImmediate polyfill messages only (avoid interfering with wallet detection)
+            const handler = (event) => {
+                var _a;
+                try {
+                    if (event.source !== window)
+                        return;
+                    const data = event.data;
+                    if (typeof data === "string") {
+                        const trimmed = data.trim();
+                        if (trimmed.startsWith("setImmediate$")) {
+                            (_a = event.stopImmediatePropagation) === null || _a === void 0 ? void 0 : _a.call(event);
+                            return;
+                        }
+                    }
+                }
+                catch (_b) {
+                    // ignore
+                }
+            };
+            window.addEventListener("message", handler, { capture: true });
+            return () => {
+                window.removeEventListener("message", handler, { capture: true });
+            };
+        }
+        catch (_a) {
+            // ignore
+        }
+    }, []);
+    return null;
+};
 const SetNetwork = ({ customAuthOptions }) => {
     const dispatch = (0, react_redux_1.useDispatch)();
     const network = (0, react_redux_1.useSelector)((s) => s.general.network);

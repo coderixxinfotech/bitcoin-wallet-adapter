@@ -1,3 +1,8 @@
-import { PsbtRequestOptions } from "@stacks/connect-react";
 import { CommonSignResponse } from "../types";
-export declare const useLeatherSign: (defaultOptions?: Partial<PsbtRequestOptions>) => CommonSignResponse;
+type LeatherPsbtRequestOptions = {
+    hex: string;
+    signAtIndex?: number[];
+    allowedSighash?: number[];
+};
+export declare const useLeatherSign: (defaultOptions?: Partial<LeatherPsbtRequestOptions>) => CommonSignResponse;
+export {};

@@ -362,6 +362,12 @@ interface AuthOptionsArgs {
 
 > 📝 Note: The `appDetails` field in `customAuthOptions` is primarily used by the Leather wallet.
 
+##### Leather integration update
+
+- The library no longer wraps `@stacks/connect-react` inside `WalletProvider`.
+- Leather operations use the injected `window.LeatherProvider.request(...)` directly.
+- No additional Stacks Connect provider is required in your app root. This avoids postMessage/setImmediate conflicts observed with some Leather extension versions.
+
 ### 🔗 ConnectMultiWallet
 
 Use the `ConnectMultiWallet` component to render a multi-wallet connect button:
