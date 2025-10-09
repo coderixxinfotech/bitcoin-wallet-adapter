@@ -41,7 +41,7 @@ function PayButton({
           }
         );
       }
-      if (lastWallet === "Leather") {
+      if (lastWallet?.toLowerCase() === "leather") {
         //@ts-ignore
         const resp = await window.btc?.request("sendTransfer", {
           address: receipient,
@@ -49,7 +49,7 @@ function PayButton({
         });
         const txid = resp?.id;
         return txid;
-      } else if (lastWallet === "Xverse") {
+      } else if (lastWallet?.toLowerCase() === "xverse") {
         const sendBtcOptions = {
           payload: {
             network: {
@@ -83,7 +83,7 @@ function PayButton({
         };
         //@ts-ignore
         return await sendBtcTransaction(sendBtcOptions);
-      } else if (lastWallet === "Unisat") {
+      } else if (lastWallet?.toLowerCase() === "unisat") {
         //@ts-ignore
         let txid = await window.unisat.sendBitcoin(receipient, amount);
 

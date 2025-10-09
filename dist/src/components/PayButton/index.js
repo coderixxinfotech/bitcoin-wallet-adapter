@@ -36,7 +36,7 @@ function PayButton({ amount, receipient, buttonClassname, }) {
                     }
                 });
             }
-            if (lastWallet === "Leather") {
+            if ((lastWallet === null || lastWallet === void 0 ? void 0 : lastWallet.toLowerCase()) === "leather") {
                 //@ts-ignore
                 const resp = yield ((_a = window.btc) === null || _a === void 0 ? void 0 : _a.request("sendTransfer", {
                     address: receipient,
@@ -45,7 +45,7 @@ function PayButton({ amount, receipient, buttonClassname, }) {
                 const txid = resp === null || resp === void 0 ? void 0 : resp.id;
                 return txid;
             }
-            else if (lastWallet === "Xverse") {
+            else if ((lastWallet === null || lastWallet === void 0 ? void 0 : lastWallet.toLowerCase()) === "xverse") {
                 const sendBtcOptions = {
                     payload: {
                         network: {
@@ -76,7 +76,7 @@ function PayButton({ amount, receipient, buttonClassname, }) {
                 //@ts-ignore
                 return yield (0, sats_connect_1.sendBtcTransaction)(sendBtcOptions);
             }
-            else if (lastWallet === "Unisat") {
+            else if ((lastWallet === null || lastWallet === void 0 ? void 0 : lastWallet.toLowerCase()) === "unisat") {
                 //@ts-ignore
                 let txid = yield window.unisat.sendBitcoin(receipient, amount);
                 return txid;

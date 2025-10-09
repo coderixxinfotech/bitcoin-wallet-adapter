@@ -50,6 +50,8 @@ const notificationReducers_1 = require("../../stores/reducers/notificationReduce
 const generalReducer_1 = require("../../stores/reducers/generalReducer");
 const WalletButton_1 = __importDefault(require("./WalletButton"));
 const WalletModal_1 = __importDefault(require("./WalletModal"));
+const bip322_js_1 = require("bip322-js");
+const network_1 = require("../../utils/network");
 // ME Wallet
 const SatsConnectNamespace = "sats-connect:";
 const react_2 = require("@wallet-standard/react");
@@ -74,18 +76,22 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     const [wallets, setWallets] = (0, react_1.useState)([]);
     const [tempWD, setTempWD] = (0, react_1.useState)(null); //hold wallet details till user signs the message
     const getMessage = (address) => {
-        const issuedAt = new Date().toISOString(); // Get the current date and time in ISO format
-        return `Ordinalnovus wants you to sign in with your Bitcoin account:
-
-${address}
-
-Welcome to Ordinalnovus. \n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Ordinalnovus permission to perform any transactions with your wallet.\n
-
-\nURI: https://ordinalnovus.com\n\n
-
-Version: 1\n\n
-
-Issued At: ${issuedAt}`;
+        const issuedAt = new Date().toISOString();
+        const origin = typeof window !== 'undefined' ? window.location.origin : 'unknown-origin';
+        return `Ordinalnovus wants you to sign in with your Bitcoin account:\n\n${address}\n\nNetwork: ${redux_network}\nOrigin: ${origin}\n\nWelcome to Ordinalnovus. \n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Ordinalnovus permission to perform any transactions with your wallet.\n\nURI: https://ordinalnovus.com\n\nVersion: 1\n\nIssued At: ${issuedAt}`;
+    };
+    const clearPersistedSession = () => {
+        try {
+            localStorage.removeItem("wallet-detail");
+            localStorage.removeItem("lastWallet");
+            localStorage.removeItem("wallet-signature");
+            localStorage.removeItem("wallet-message");
+        }
+        catch (_a) { }
+    };
+    const startNewConnect = () => {
+        clearPersistedSession();
+        setTempWD(null);
     };
     //redux wallet management
     const updateWalletDetails = (0, react_1.useCallback)((newWalletDetails) => __awaiter(this, void 0, void 0, function* () {
@@ -169,9 +175,32 @@ Issued At: ${issuedAt}`;
         let walletDetail = null;
         if (localWD)
             walletDetail = JSON.parse(localWD);
+        const savedSignature = localStorage.getItem("wallet-signature");
+        const savedMessage = localStorage.getItem("wallet-message");
         const lastWallet = localStorage.getItem("lastWallet");
         const normalized = (lastWallet || '').toLowerCase();
-        if (lastWallet) {
+        if (lastWallet && walletDetail && savedSignature && savedMessage) {
+            const addr = (walletDetail === null || walletDetail === void 0 ? void 0 : walletDetail.ordinal) || (walletDetail === null || walletDetail === void 0 ? void 0 : walletDetail.cardinal) || '';
+            const networkOk = (0, network_1.validateAddressesMatchNetwork)([addr], redux_network);
+            // TTL 24h
+            let freshEnough = true;
+            try {
+                const m = /Issued At:\s*(.*)$/m.exec(savedMessage || "");
+                if (m && m[1]) {
+                    const issued = Date.parse(m[1].trim());
+                    if (!Number.isNaN(issued)) {
+                        const ageMs = Date.now() - issued;
+                        const maxAgeMs = 24 * 60 * 60 * 1000;
+                        freshEnough = ageMs <= maxAgeMs;
+                    }
+                }
+            }
+            catch (_a) { }
+            const signatureOk = addr ? bip322_js_1.Verifier.verifySignature(addr, savedMessage, savedSignature) : false;
+            if (!(networkOk && signatureOk && freshEnough)) {
+                clearPersistedSession();
+                return;
+            }
             updateLastWallet(normalized);
             // console.log("wallet present");
             // If the last wallet is Leather
@@ -294,6 +323,7 @@ Issued At: ${issuedAt}`;
         },
     };
     const getUnisatAddress = () => __awaiter(this, void 0, void 0, function* () {
+        startNewConnect();
         let unisat = window.unisat;
         const accounts = yield unisat.requestAccounts();
         const publicKey = yield unisat.getPublicKey();
@@ -316,6 +346,7 @@ Issued At: ${issuedAt}`;
         }
     });
     const getLeatherAddress = () => __awaiter(this, void 0, void 0, function* () {
+        startNewConnect();
         // Directly using the btc object from the window, ensure it's correctly typed or casted.
         const btc = window.LeatherProvider;
         // Requesting addresses and awaiting the promise to resolve.
@@ -344,6 +375,7 @@ Issued At: ${issuedAt}`;
     });
     const getPhantomAddress = () => __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e;
+        startNewConnect();
         // Access the Phantom Bitcoin provider correctly from window
         const phantom = (_a = window.phantom) === null || _a === void 0 ? void 0 : _a.bitcoin;
         // Guard: Provider not available
@@ -394,6 +426,7 @@ Issued At: ${issuedAt}`;
         }
     });
     const getOkxAddress = () => __awaiter(this, void 0, void 0, function* () {
+        startNewConnect();
         const Okx = fractal
             ? window.okxwallet.fractalBitcoin
             : window.okxwallet.bitcoin;
@@ -425,6 +458,7 @@ Issued At: ${issuedAt}`;
     function connectOrDeselect() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                startNewConnect();
                 yield (0, sats_connect_1.getAddress)({
                     getProvider: () => __awaiter(this, void 0, void 0, function* () {
                         var _a;
@@ -475,6 +509,9 @@ Issued At: ${issuedAt}`;
         var _a;
         // console.log({ tempWD, result });
         if (tempWD && result) {
+            const msg = connectionMessage || getMessage(tempWD.ordinal);
+            localStorage.setItem("wallet-message", msg);
+            localStorage.setItem("wallet-signature", result);
             localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
             updateWalletDetails(tempWD);
             const lw = (tempWD.wallet || '').toLowerCase();

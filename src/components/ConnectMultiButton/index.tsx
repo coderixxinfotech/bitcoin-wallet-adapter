@@ -27,6 +27,8 @@ import { Account, WalletDetails } from "../../types";
 import WalletButton from "./WalletButton";
 import WalletModal from "./WalletModal";
 import { IInstalledWallets } from "../../types";
+import { Verifier } from "bip322-js";
+import { validateAddressesMatchNetwork } from "../../utils/network";
 
 // ME Wallet
 
@@ -130,18 +132,23 @@ function ConnectMultiWallet({
   const [tempWD, setTempWD] = useState<WalletDetails | null>(null); //hold wallet details till user signs the message
 
   const getMessage = (address: string) => {
-    const issuedAt = new Date().toISOString(); // Get the current date and time in ISO format
-    return `Ordinalnovus wants you to sign in with your Bitcoin account:
+    const issuedAt = new Date().toISOString();
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'unknown-origin';
+    return `Ordinalnovus wants you to sign in with your Bitcoin account:\n\n${address}\n\nNetwork: ${redux_network}\nOrigin: ${origin}\n\nWelcome to Ordinalnovus. \n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Ordinalnovus permission to perform any transactions with your wallet.\n\nURI: https://ordinalnovus.com\n\nVersion: 1\n\nIssued At: ${issuedAt}`;
+  };
 
-${address}
+  const clearPersistedSession = () => {
+    try {
+      localStorage.removeItem("wallet-detail");
+      localStorage.removeItem("lastWallet");
+      localStorage.removeItem("wallet-signature");
+      localStorage.removeItem("wallet-message");
+    } catch {}
+  };
 
-Welcome to Ordinalnovus. \n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Ordinalnovus permission to perform any transactions with your wallet.\n
-
-\nURI: https://ordinalnovus.com\n\n
-
-Version: 1\n\n
-
-Issued At: ${issuedAt}`;
+  const startNewConnect = () => {
+    clearPersistedSession();
+    setTempWD(null);
   };
 
   //redux wallet management
@@ -250,9 +257,33 @@ Issued At: ${issuedAt}`;
     let walletDetail: WalletDetails | null = null;
     if (localWD) walletDetail = JSON.parse(localWD);
 
+    const savedSignature = localStorage.getItem("wallet-signature");
+    const savedMessage = localStorage.getItem("wallet-message");
     const lastWallet = localStorage.getItem("lastWallet");
     const normalized = (lastWallet || '').toLowerCase();
-    if (lastWallet) {
+    if (lastWallet && walletDetail && savedSignature && savedMessage) {
+      const addr = walletDetail?.ordinal || walletDetail?.cardinal || '';
+      const networkOk = validateAddressesMatchNetwork([addr], redux_network as any);
+      // TTL 24h
+      let freshEnough = true;
+      try {
+        const m = /Issued At:\s*(.*)$/m.exec(savedMessage || "");
+        if (m && m[1]) {
+          const issued = Date.parse(m[1].trim());
+          if (!Number.isNaN(issued)) {
+            const ageMs = Date.now() - issued;
+            const maxAgeMs = 24 * 60 * 60 * 1000;
+            freshEnough = ageMs <= maxAgeMs;
+          }
+        }
+      } catch {}
+      const signatureOk = addr ? Verifier.verifySignature(addr, savedMessage, savedSignature) : false;
+
+      if (!(networkOk && signatureOk && freshEnough)) {
+        clearPersistedSession();
+        return;
+      }
+
       updateLastWallet(normalized);
       // console.log("wallet present");
       // If the last wallet is Leather
@@ -405,6 +436,7 @@ Issued At: ${issuedAt}`;
   };
 
   const getUnisatAddress = async () => {
+    startNewConnect();
     let unisat = (window as any).unisat;
     const accounts = await unisat.requestAccounts();
     const publicKey = await unisat.getPublicKey();
@@ -430,6 +462,7 @@ Issued At: ${issuedAt}`;
   };
 
   const getLeatherAddress = async () => {
+    startNewConnect();
     // Directly using the btc object from the window, ensure it's correctly typed or casted.
     const btc = (window as any).LeatherProvider;
 
@@ -469,6 +502,7 @@ Issued At: ${issuedAt}`;
   };
 
   const getPhantomAddress = async () => {
+    startNewConnect();
     // Access the Phantom Bitcoin provider correctly from window
     const phantom = (window as any).phantom?.bitcoin;
 
@@ -528,6 +562,7 @@ Issued At: ${issuedAt}`;
   };
 
   const getOkxAddress = async () => {
+    startNewConnect();
     const Okx = fractal
       ? (window as any).okxwallet.fractalBitcoin
       : (window as any).okxwallet.bitcoin;
@@ -562,6 +597,7 @@ Issued At: ${issuedAt}`;
 
   async function connectOrDeselect() {
     try {
+      startNewConnect();
       await getAddress({
         getProvider: async () =>
           (wallet as unknown as WalletWithFeatures<any>).features[
@@ -624,6 +660,9 @@ Issued At: ${issuedAt}`;
   useEffect(() => {
     // console.log({ tempWD, result });
     if (tempWD && result) {
+      const msg = connectionMessage || getMessage(tempWD.ordinal);
+      localStorage.setItem("wallet-message", msg);
+      localStorage.setItem("wallet-signature", result);
       localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
       updateWalletDetails(tempWD);
       const lw = (tempWD.wallet || '').toLowerCase();
