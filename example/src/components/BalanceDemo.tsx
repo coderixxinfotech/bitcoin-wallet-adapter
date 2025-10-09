@@ -1,5 +1,6 @@
+// Component: Demonstrates fetching and displaying wallet balance with BTC/USD and states
 import React from 'react';
-import { useWalletAddress, useWalletBalance } from "../../../dist";
+import { useWalletAddress, useWalletBalance } from "bitcoin-wallet-adapter";
 
 /**
  * BalanceDemo Component
@@ -126,7 +127,7 @@ const BalanceDemo: React.FC = () => {
                     <h4 className="text-lg font-semibold text-slate-700 mb-3">ℹ️ Information</h4>
                     <ul className="text-slate-600 space-y-2 text-sm">
                         <li>• <strong>Cardinal Address:</strong> Your main Bitcoin payment address</li>
-                        <li>• <strong>Balance Source:</strong> Wallet adapter's built-in balance fetching</li>
+                        <li>• <strong>Balance Source:</strong> Wallet adapter&apos;s built-in balance fetching</li>
                         <li>• <strong>Network:</strong> Depends on wallet configuration</li>
                         <li>• <strong>Precision:</strong> Balance shown with up to 8 decimal places</li>
                         <li>• <strong>USD Conversion:</strong> Uses live BTC price from Redux store when available</li>

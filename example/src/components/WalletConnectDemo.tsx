@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useWalletConnect, useWalletAddress } from '../../../dist';
+import { useWalletConnect, useWalletAddress } from 'bitcoin-wallet-adapter';
 
 /**
  * WalletConnectDemo Component

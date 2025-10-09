@@ -1,6 +1,6 @@
 "use client";
 import "./globals.css";
-import { WalletProvider, setupDevTools } from "../../../dist";
+import { WalletProvider, setupDevTools } from "bitcoin-wallet-adapter";
 import { useEffect } from "react";
 
 function DevToolsInitializer() {

@@ -1,5 +1,6 @@
+// Component: Demonstrates message signing and verification using wallet adapter hooks
 import React, { useState, useEffect } from 'react';
-import { useMessageSign, useWalletAddress } from '../../../dist';
+import { useMessageSign, useWalletAddress } from 'bitcoin-wallet-adapter';
 
 /**
  * MessageSignDemo Component

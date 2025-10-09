@@ -10,7 +10,7 @@ import {
   BWAError,
   addNotification,
   ConnectMultiButton,
-} from "../../../dist/src/index";
+} from "bitcoin-wallet-adapter";
 import { useState, useEffect, SetStateAction } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -328,7 +328,7 @@ function HomeContent() {
               </button>
             </div>
             <div className="space-y-3">
-              {errors.slice(-3).map((error, index) => (
+              {errors.slice(-3).map((error: unknown, index: number) => (
                 <div key={index} className="text-red-800 text-sm bg-red-100 p-4 rounded-xl border border-red-200">
                   <div className="font-semibold text-red-900 mb-1">
                     {(error as any).context?.walletType || 'Wallet'} Error:

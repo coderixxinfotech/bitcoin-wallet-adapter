@@ -6,7 +6,7 @@
 
 "use client";
 import React from "react";
-import { useNetwork } from "../../../dist";
+import { useNetwork } from "bitcoin-wallet-adapter";
 
 const NetworkSwitcher: React.FC = () => {
   const net = useNetwork();

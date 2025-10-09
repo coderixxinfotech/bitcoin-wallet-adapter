@@ -6,7 +6,7 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { useDevTools, addNotification, useBitcoinPrice } from '../../../dist';
+import { useDevTools, addNotification, useBitcoinPrice } from 'bitcoin-wallet-adapter';
 
 interface ErrorLog {
   id: string;
@@ -135,12 +135,12 @@ export default function DebugWindow({ isOpen, onToggle }: DebugWindowProps) {
         <h3 className="text-sm font-bold text-orange-400">🪙 BWA Debug Window</h3>
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => handleAutoRefreshToggle(!bitcoinPrice.autoRefresh)}
-            className={`text-xs px-2 py-1 rounded ${bitcoinPrice.autoRefresh ? 'bg-green-600 text-white' : 'bg-gray-600 text-gray-300'
+            onClick={() => handleAutoRefreshToggle(!bitcoinPrice.autoRefreshEnabled)}
+            className={`text-xs px-2 py-1 rounded ${bitcoinPrice.autoRefreshEnabled ? 'bg-green-600 text-white' : 'bg-gray-600 text-gray-300'
               }`}
             title="Toggle auto-refresh"
           >
-            {bitcoinPrice.autoRefresh ? '🔄' : '⏸️'}
+            {bitcoinPrice.autoRefreshEnabled ? '🔄' : '⏸️'}
           </button>
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}

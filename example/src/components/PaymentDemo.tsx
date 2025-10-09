@@ -1,5 +1,6 @@
+// Component: Demonstrates sending BTC payments with validation and result display
 import React, { useState, useEffect } from 'react';
-import { usePayBTC, useWalletAddress, useWalletBalance } from '../../../dist';
+import { usePayBTC, useWalletAddress, useWalletBalance, useNetwork } from 'bitcoin-wallet-adapter';
 
 /**
  * PaymentDemo Component
@@ -17,6 +18,7 @@ const PaymentDemo: React.FC = () => {
   const walletDetails = useWalletAddress();
   const { balance, isLoading: balanceLoading, error: balanceError, fetchBalance } = useWalletBalance();
   const { loading: paymentLoading, result: paymentResult, error: paymentError, payBTC } = usePayBTC();
+  const net = useNetwork();
 
   // Load recipient from localStorage or use default
   const [recipient, setRecipient] = useState(() => {
@@ -52,7 +54,7 @@ const PaymentDemo: React.FC = () => {
     }
     
     try {
-      await payBTC({ address: recipient, amount: amountSats });
+      await payBTC({ address: recipient, amount: amountSats, network: (net?.network as 'mainnet' | 'testnet') || 'mainnet' });
     } catch (error) {
       console.error('Payment failed:', error);
     }
@@ -101,7 +103,7 @@ const PaymentDemo: React.FC = () => {
 
           {balanceError && (
             <div className="text-red-600 text-sm mb-2">
-              Error loading balance: {balanceError}
+              Error loading balance: {String(balanceError)}
             </div>
           )}
 
@@ -193,7 +195,7 @@ const PaymentDemo: React.FC = () => {
         {paymentError && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
             <h4 className="font-semibold text-red-800 mb-2">Payment Error</h4>
-            <p className="text-red-700 text-sm">{paymentError}</p>
+            <p className="text-red-700 text-sm">{String(paymentError)}</p>
           </div>
         )}
 
@@ -285,8 +287,8 @@ const PaymentDemo: React.FC = () => {
           <li>Connect a wallet using the button at the top of the page</li>
           <li>Enter or select an amount to send (use small amounts for testing)</li>
           <li>Enter or select a recipient Bitcoin address</li>
-          <li>Click the "Pay" button to initiate the transaction</li>
-          <li>Click the green "Pay X BTC" button to initiate the transaction</li>
+          <li>Click the &quot;Pay&quot; button to initiate the transaction</li>
+          <li>Click the green &quot;Pay X BTC&quot; button to initiate the transaction</li>
           <li>Approve the transaction in your wallet popup</li>
           <li>The transaction will be broadcast to the Bitcoin network</li>
         </ol>

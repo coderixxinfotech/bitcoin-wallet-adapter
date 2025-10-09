@@ -6,7 +6,7 @@
  * - Does NOT pass any `network` parameter to hooks/components
  */
 import React, { useState, useEffect } from "react";
-import { usePayBTC, useWalletAddress } from "../../../dist";
+import { usePayBTC, useWalletAddress, useNetwork } from "bitcoin-wallet-adapter";
 import { useSelector } from "react-redux";
 
 const testnet_recipient = "2N8eAf15Vgwuki6vQkuWC3noBRVkVzAQ4h4";
@@ -17,6 +17,7 @@ function TestMintButton() {
   const { payBTC, loading, result, error } = usePayBTC();
   const [status, setStatus] = useState("");
   const walletDetails = useWalletAddress();
+  const net = useNetwork();
 
   // Read Redux-managed network directly from the wallet adapter store
   const network = useSelector((s: any) => s?.general?.network) as 'mainnet' | 'testnet' | undefined;
@@ -55,6 +56,7 @@ function TestMintButton() {
       await payBTC({
         address: network === 'testnet' ? testnet_recipient : mainnet_recipient,
         amount: 2_000,
+        network: (net?.network as 'mainnet' | 'testnet') || 'mainnet',
       });
     } catch (err) {
       console.error("Payment error:", err);
