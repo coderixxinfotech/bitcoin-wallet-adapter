@@ -591,6 +591,7 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
   // Persist only after successful signature
   useEffect(() => {
     if (tempWD && signatureResult) {
+      try { console.log('[BWA][persist] saving session for', tempWD.wallet, tempWD.ordinal || tempWD.cardinal); } catch {}
       if (pendingMessage) localStorage.setItem("wallet-message", pendingMessage);
       localStorage.setItem("wallet-signature", signatureResult);
       localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
@@ -638,9 +639,11 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
 
         const signatureOk = addressForVerification ? Verifier.verifySignature(addressForVerification, savedMessage, savedSignature) : false;
         if (networkOk && signatureOk && freshEnough) {
+          try { console.log('[BWA][restore] restored session for', savedWallet, addressForVerification); } catch {}
           dispatch(setWalletDetails(walletDetail));
           dispatch(setLastWallet(savedWallet));
         } else {
+          try { console.warn('[BWA][restore] skipped restore', { networkOk, signatureOk, freshEnough, savedWallet }); } catch {}
           localStorage.removeItem("lastWallet");
           localStorage.removeItem("wallet-detail");
           localStorage.removeItem("wallet-signature");

@@ -6,38 +6,19 @@
 // - Initiates address requests and message signing per wallet (Xverse, Unisat, Leather, OKX, Phantom, Magic Eden)
 // - Emits `onSignatureCapture` with signature, message, address, wallet, and redux network
 
-import React, { useState, useEffect, useCallback, useContext, useRef } from "react";
-//xverse
-import {
-  AddressPurpose,
-  BitcoinNetwork,
-  BitcoinNetworkType,
-  getAddress,
-} from "sats-connect";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+// Connections are delegated to the headless useWalletConnect hook
 
 //reducer
-import { useDispatch, useSelector } from "react-redux";
-import { addNotification } from "../../stores/reducers/notificationReducers";
+import { useSelector } from "react-redux";
+// Notifications are handled elsewhere; none needed here
 import { RootState } from "../../stores";
-import {
-  setLastWallet,
-  setWalletDetails,
-} from "../../stores/reducers/generalReducer";
-import { Account, WalletDetails } from "../../types";
 import WalletButton from "./WalletButton";
 import WalletModal from "./WalletModal";
 import { IInstalledWallets } from "../../types";
-import { Verifier } from "bip322-js";
-import { validateAddressesMatchNetwork } from "../../utils/network";
+// No local verification in this UI component
 
-// ME Wallet
-
-const SatsConnectNamespace = "sats-connect:";
-
-import type { WalletWithFeatures } from "@wallet-standard/base";
-import { useWallet, useWallets } from "@wallet-standard/react";
-import { ConnectionStatusContext } from "../../common/ConnectionStatus";
-import { useMessageSign } from "../../hooks";
+import { useWalletConnect } from "../../hooks";
 import useWalletEffect from "../../hooks/useWalletEffect";
 import useDisconnect from "../../hooks/useDisconnect";
 
@@ -52,7 +33,7 @@ interface CustomWindow extends Window {
 
 declare const window: CustomWindow;
 
-const purposes: string[] = ["ordinals", "payment"];
+// no local purposes; signing/flows are in the hook
 
 interface InnerMenuProps {
   anchorEl: HTMLElement | null;
@@ -114,10 +95,9 @@ function ConnectMultiWallet({
     onSignatureCaptureRef.current = onSignatureCapture;
   }, [onSignatureCapture]);
 
-  const { loading, result, error, signMessage } = useMessageSign();
+  // Signature is handled in the hook; this component does not sign directly
   //for notification
   const disconnectFunc = useDisconnect();
-  const dispatch = useDispatch();
   const walletDetails = useSelector(
     (state: RootState) => state.general.walletDetails
   );
@@ -129,42 +109,7 @@ function ConnectMultiWallet({
   );
 
   const [wallets, setWallets] = useState<IInstalledWallets[]>([]);
-  const [tempWD, setTempWD] = useState<WalletDetails | null>(null); //hold wallet details till user signs the message
-
-  const getMessage = (address: string) => {
-    const issuedAt = new Date().toISOString();
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'unknown-origin';
-    return `Ordinalnovus wants you to sign in with your Bitcoin account:\n\n${address}\n\nNetwork: ${redux_network}\nOrigin: ${origin}\n\nWelcome to Ordinalnovus. \n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Ordinalnovus permission to perform any transactions with your wallet.\n\nURI: https://ordinalnovus.com\n\nVersion: 1\n\nIssued At: ${issuedAt}`;
-  };
-
-  const clearPersistedSession = () => {
-    try {
-      localStorage.removeItem("wallet-detail");
-      localStorage.removeItem("lastWallet");
-      localStorage.removeItem("wallet-signature");
-      localStorage.removeItem("wallet-message");
-    } catch {}
-  };
-
-  const startNewConnect = () => {
-    clearPersistedSession();
-    setTempWD(null);
-  };
-
-  //redux wallet management
-  const updateWalletDetails = useCallback(
-    async (newWalletDetails: WalletDetails | null) => {
-      dispatch(setWalletDetails(newWalletDetails));
-    },
-    [dispatch]
-  );
-
-  const updateLastWallet = useCallback(
-    (newLastWallet: string) => {
-      dispatch(setLastWallet(newLastWallet));
-    },
-    [dispatch]
-  );
+  // All persistence is managed by the hook
 
   //connect-wallet modal
   const [open, setOpen] = useState(false);
@@ -173,14 +118,11 @@ function ConnectMultiWallet({
     setOpen(false);
   };
 
-  const { wallets: testWallets } = useWallets();
-  const { setWallet, wallet } = useWallet();
-  const connectionStatus = useContext(ConnectionStatusContext);
+  const testWallets: any[] = [];
+  const setWallet = (_: any) => {};
 
-  // ME
-  useEffect(() => {
-    connectOrDeselect();
-  }, [wallet]);
+  // ME: auto-connect disabled
+  useEffect(() => {}, []);
 
   // Function to check which wallets are installed
   function getInstalledWalletName() {
@@ -199,21 +141,13 @@ function ConnectMultiWallet({
       });
     }
 
-    if (
-      !fractal &&
-      window?.BitcoinProvider?.signTransaction?.toString()?.includes("Psbt")
-    ) {
-      checkWallets.push({
-        label: "Xverse",
-        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-xverse-logo.png",
-      });
-    }
+    // Always show Xverse option
+    checkWallets.push({
+      label: "Xverse",
+      logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-xverse-logo.png",
+    });
 
-    if (!fractal && typeof window.magicEden !== "undefined")
-      checkWallets.push({
-        label: "MagicEden",
-        logo: "https://raw.githubusercontent.com/coderixxinfotech/bitcoin-wallet-adapter/main/src/assets/btc-magiceden-logo.png",
-      });
+    // Exclude MagicEden until hook support is implemented
 
     if (!fractal && typeof window.phantom !== "undefined") {
       checkWallets.push({
@@ -249,112 +183,9 @@ function ConnectMultiWallet({
   useEffect(() => {
     getInstalledWalletName();
     // Bitcoin price is now managed centrally by the useBitcoinPrice hook
-  }, [dispatch, open, redux_network]);
+  }, [open, redux_network]);
 
-  // Use effect hook to check if last wallet is in local storage and set selected wallet accordingly
-  useEffect(() => {
-    const localWD = localStorage.getItem("wallet-detail") || "";
-    let walletDetail: WalletDetails | null = null;
-    if (localWD) walletDetail = JSON.parse(localWD);
-
-    const savedSignature = localStorage.getItem("wallet-signature");
-    const savedMessage = localStorage.getItem("wallet-message");
-    const lastWallet = localStorage.getItem("lastWallet");
-    const normalized = (lastWallet || '').toLowerCase();
-    if (lastWallet && walletDetail && savedSignature && savedMessage) {
-      const addr = walletDetail?.ordinal || walletDetail?.cardinal || '';
-      const networkOk = validateAddressesMatchNetwork([addr], redux_network as any);
-      // TTL 24h
-      let freshEnough = true;
-      try {
-        const m = /Issued At:\s*(.*)$/m.exec(savedMessage || "");
-        if (m && m[1]) {
-          const issued = Date.parse(m[1].trim());
-          if (!Number.isNaN(issued)) {
-            const ageMs = Date.now() - issued;
-            const maxAgeMs = 24 * 60 * 60 * 1000;
-            freshEnough = ageMs <= maxAgeMs;
-          }
-        }
-      } catch {}
-      const signatureOk = addr ? Verifier.verifySignature(addr, savedMessage, savedSignature) : false;
-
-      if (!(networkOk && signatureOk && freshEnough)) {
-        clearPersistedSession();
-        return;
-      }
-
-      updateLastWallet(normalized);
-      // console.log("wallet present");
-      // If the last wallet is Leather
-      if (
-        normalized === "leather" &&
-        walletDetail?.cardinal &&
-        walletDetail?.ordinal
-      ) {
-        // If the last wallet is leather and user data is present, set the wallet details
-        updateLastWallet(normalized);
-        updateWalletDetails(walletDetail);
-      } else if (
-        (normalized === "xverse" || normalized === "magiceden") &&
-        walletDetail &&
-        (!walletDetail?.cardinal || !walletDetail?.ordinal)
-      ) {
-        // If the last wallet is xverse and wallet detail is missing, set the wallet details to empty
-        updateLastWallet("");
-        updateWalletDetails(null);
-        localStorage.removeItem("lastWallet");
-        localStorage.removeItem("wallet-detail");
-        if (normalized === "magiceden") {
-          const wallet = testWallets.filter(
-            (a: any) => a.name === "Magic Eden"
-          )[0];
-          setWallet(wallet);
-        }
-      } else if (
-        (normalized === "xverse" || normalized === "magiceden") &&
-        walletDetail?.cardinal &&
-        walletDetail?.ordinal
-      ) {
-        // If the last wallet is xverse and user data is present, set the wallet details
-        updateLastWallet(normalized);
-        updateWalletDetails(walletDetail);
-        if (normalized === "magiceden") {
-          const wallet = testWallets.filter(
-            (a: any) => a.name === "Magic Eden"
-          )[0];
-          setWallet(wallet);
-        }
-      } else if (
-        normalized === "unisat" &&
-        walletDetail?.cardinal &&
-        walletDetail?.ordinal
-      ) {
-        // If the last wallet is unisat and user data is present, set the wallet details
-        updateLastWallet(normalized);
-        updateWalletDetails(walletDetail);
-      } else if (
-        normalized === "phantom" &&
-        walletDetail?.cardinal &&
-        walletDetail?.ordinal
-      ) {
-        // If the last wallet is unisat and user data is present, set the wallet details
-        updateLastWallet(normalized);
-        updateWalletDetails(walletDetail);
-      } else if (
-        normalized === "okx" &&
-        walletDetail?.cardinal &&
-        walletDetail?.ordinal
-      ) {
-        // If the last wallet is unisat and user data is present, set the wallet details
-        updateLastWallet(normalized);
-        updateWalletDetails(walletDetail);
-      } else {
-        // If the last wallet is not Leather or xverse, set selected wallet to last wallet
-        updateLastWallet(normalized);
-      }
-    }
-  }, [updateLastWallet, updateWalletDetails]);
+  // Auto-restore is handled in the headless hook
 
   //menu
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -377,315 +208,49 @@ function ConnectMultiWallet({
   // Use the custom hook
   useWalletEffect(walletDetails, disconnect, redux_network);
 
-  //xVerse
-
-  const getAddressOptions = {
-    payload: {
-      purposes: purposes.map((p) => p as AddressPurpose),
-      message: "Address for receiving Ordinals and payments",
-      network:
-        redux_network.toLowerCase() === "testnet"
-          ? ({ type: "Testnet" } as BitcoinNetwork)
-          : ({ type: "Mainnet" } as BitcoinNetwork),
-    },
-    onFinish: async (response: any) => {
-      // console.log(response, 'xverse wallet connect')
-      // If the last wallet is Leather and user data is present, set the wallet details
-      const cardinal = response.addresses.filter(
-        (a: any) => a.purpose === "payment"
-      )[0].address;
-      const cardinalPubkey = response.addresses.filter(
-        (a: any) => a.purpose === "payment"
-      )[0].publicKey;
-      const ordinal = response.addresses.filter(
-        (a: any) => a.purpose === "ordinals"
-      )[0].address;
-      const ordinalPubkey = response.addresses.filter(
-        (a: any) => a.purpose === "ordinals"
-      )[0].publicKey;
-
-      const wd = {
-        cardinal,
-        cardinalPubkey,
-        ordinal,
-        ordinalPubkey,
-        connected: true,
-        wallet: "Xverse",
-      };
-      setTempWD(wd);
-
-      await signMessage({
-        address: ordinal,
-        message: connectionMessage || getMessage(ordinal),
-        wallet: "Xverse",
-      });
-    },
-    onCancel: () => {
-      updateLastWallet("");
-      localStorage.removeItem("lastWallet");
-      localStorage.removeItem("wallet-detail");
-      dispatch(
-        addNotification({
-          id: new Date().valueOf(),
-          message: "User rejected the request",
-          open: true,
-          severity: "error",
-        })
-      );
-    },
+  // Delegate all connections to headless hook
+  const { connect: connectWallet } = useWalletConnect();
+  const connectXverseViaHook = async () => {
+    await connectWallet("xverse");
+    handleClose();
   };
 
   const getUnisatAddress = async () => {
-    startNewConnect();
-    let unisat = (window as any).unisat;
-    const accounts = await unisat.requestAccounts();
-    const publicKey = await unisat.getPublicKey();
-    if (accounts.length && publicKey) {
-      const wd = {
-        wallet: "Unisat",
-        ordinal: accounts[0],
-        cardinal: accounts[0],
-        ordinalPubkey: publicKey,
-        cardinalPubkey: publicKey,
-        connected: true,
-      };
-
-      // console.log("Sign MESSAGE");
-      await signMessage({
-        address: wd.ordinal,
-        message: connectionMessage || getMessage(wd.ordinal),
-        wallet: "Unisat",
-      });
-
-      setTempWD(wd);
-    }
+    await connectWallet("unisat");
+    handleClose();
   };
 
   const getLeatherAddress = async () => {
-    startNewConnect();
-    // Directly using the btc object from the window, ensure it's correctly typed or casted.
-    const btc = (window as any).LeatherProvider;
-
-    // Requesting addresses and awaiting the promise to resolve.
-    const response: any = await btc.request("getAddresses");
-
-    const userAddresses = response;
-
-    const addresses = userAddresses.result.addresses;
-
-    const ordinalsAddress = addresses.find(
-      (x: { type: string }) => x.type === "p2tr"
-    );
-    const paymentAddress = addresses.find(
-      (x: { type: string }) => x.type === "p2wpkh"
-    );
-
-    // console.log({ userAddresses });
-    if (userAddresses.result.addresses.length) {
-      const wd = {
-        wallet: "Leather",
-        ordinal: ordinalsAddress.address,
-        cardinal: paymentAddress.address,
-        ordinalPubkey: ordinalsAddress.publicKey,
-        cardinalPubkey: paymentAddress.publicKey,
-        connected: true,
-      };
-
-      await signMessage({
-        address: wd.ordinal,
-        message: connectionMessage || getMessage(wd.ordinal),
-        wallet: "Leather",
-      });
-
-      setTempWD(wd);
-    }
+    await connectWallet("leather");
+    handleClose();
   };
 
   const getPhantomAddress = async () => {
-    startNewConnect();
-    // Access the Phantom Bitcoin provider correctly from window
-    const phantom = (window as any).phantom?.bitcoin;
-
-    // Guard: Provider not available
-    if (!phantom) {
-      dispatch(
-        addNotification({
-          id: new Date().valueOf(),
-          message: "Phantom wallet not found. Please install or enable Phantom.",
-          open: true,
-          severity: "error",
-        })
-      );
-      return;
-    }
-
-    // Requesting accounts and awaiting the promise to resolve
-    const accounts = await phantom.requestAccounts();
-
-    const userAddresses = accounts;
-    const addresses = userAddresses?.[0];
-
-    if (addresses) {
-      const wd = {
-        wallet: "Phantom",
-        ordinal: addresses?.address ?? null,
-        cardinal: addresses?.address ?? null,
-        ordinalPubkey: addresses?.publicKey ?? null,
-        cardinalPubkey: addresses?.publicKey ?? null,
-        connected: true,
-      };
-
-      // Sign the message with the ordinal address if available
-      if (wd.ordinal) {
-        await signMessage({
-          address: wd.ordinal,
-          message: connectionMessage || getMessage(wd.ordinal),
-          wallet: "Phantom",
-        });
-      } else {
-        console.warn("No ordinal address found.");
-      }
-
-      // Store the wallet data
-      setTempWD(wd);
-    } else {
-      console.warn("No addresses found.");
-      dispatch(
-        addNotification({
-          id: new Date().valueOf(),
-          message: "No Phantom accounts returned.",
-          open: true,
-          severity: "warning",
-        })
-      );
-    }
+    await connectWallet("phantom");
+    handleClose();
   };
 
   const getOkxAddress = async () => {
-    startNewConnect();
-    const Okx = fractal
-      ? (window as any).okxwallet.fractalBitcoin
-      : (window as any).okxwallet.bitcoin;
-    let accounts = await Okx.requestAccounts();
-    let publicKey = await Okx.getPublicKey();
-
-    if (redux_network === "testnet") {
-      let result = await (window as any).okxwallet.bitcoinTestnet.connect();
-      accounts = [result.address];
-      publicKey = result.publicKey;
-    }
-
-    if (accounts.length && publicKey) {
-      const wd = {
-        wallet: "Okx",
-        ordinal: accounts[0],
-        cardinal: accounts[0],
-        ordinalPubkey: publicKey,
-        cardinalPubkey: publicKey,
-        connected: true,
-      };
-      await signMessage({
-        address: wd.ordinal,
-        message: connectionMessage || getMessage(wd.ordinal),
-        wallet: "Okx",
-        fractal,
-      });
-
-      setTempWD(wd);
-    }
+    await connectWallet("okx");
+    handleClose();
   };
 
-  async function connectOrDeselect() {
-    try {
-      startNewConnect();
-      await getAddress({
-        getProvider: async () =>
-          (wallet as unknown as WalletWithFeatures<any>).features[
-            SatsConnectNamespace
-          ]?.provider,
-        payload: {
-          purposes: [AddressPurpose.Ordinals, AddressPurpose.Payment],
-          message: "Address for receiving Ordinals and payments",
-          network: {
-            type:
-              redux_network?.toLowerCase() === "testnet"
-                ? BitcoinNetworkType.Testnet
-                : BitcoinNetworkType.Mainnet,
-          },
-        },
-        onFinish: async (response) => {
-          connectionStatus?.setAccounts(
-            response.addresses as unknown as Account[]
-          );
+  // MagicEden flow is not supported via hook at the moment; left out intentionally
 
-          const cardinal = response.addresses.filter(
-            (a: any) => a.purpose === "payment"
-          )[0].address;
-          const cardinalPubkey = response.addresses.filter(
-            (a: any) => a.purpose === "payment"
-          )[0].publicKey;
-          const ordinal = response.addresses.filter(
-            (a: any) => a.purpose === "ordinals"
-          )[0].address;
-          const ordinalPubkey = response.addresses.filter(
-            (a: any) => a.purpose === "ordinals"
-          )[0].publicKey;
-
-          const wd = {
-            cardinal,
-            cardinalPubkey,
-            ordinal,
-            ordinalPubkey,
-            connected: true,
-            wallet: "MagicEden",
-          };
-
-          await signMessage({
-            address: cardinal,
-            message: connectionMessage || getMessage(cardinal),
-            wallet: "MagicEden",
-          });
-          setTempWD(wd);
-        },
-        onCancel: () => {
-          alert("Request canceled");
-        },
-      });
-    } catch (err) {
-      console.log({ err }, "MEWALLETERROR");
-      setWallet(null);
-    }
-  }
-
+  // Bridge: surface signature via Redux + localStorage when hook completes
+  const signature = useSelector((s: RootState) => s.general.signature);
   useEffect(() => {
-    // console.log({ tempWD, result });
-    if (tempWD && result) {
-      const msg = connectionMessage || getMessage(tempWD.ordinal);
-      localStorage.setItem("wallet-message", msg);
-      localStorage.setItem("wallet-signature", result);
-      localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
-      updateWalletDetails(tempWD);
-      const lw = (tempWD.wallet || '').toLowerCase();
-      updateLastWallet(lw);
-      localStorage.setItem("lastWallet", lw);
-      
-      // Call the signature capture callback if provided
-      if (onSignatureCaptureRef.current) {
-        const signatureData = {
-          signature: result,
-          message: connectionMessage || getMessage(tempWD.ordinal),
-          address: tempWD.ordinal,
-          wallet: tempWD.wallet,
-          network: redux_network.toLowerCase()
-        };
-        onSignatureCaptureRef.current?.(signatureData);
-      }
-      
-      handleClose();
-      // Prevent re-invocation on future re-renders or network changes
-      setTempWD(null);
-    }
-  }, [tempWD, result, connectionMessage, redux_network]);
+    if (!onSignatureCaptureRef.current) return;
+    if (!signature || !walletDetails?.ordinal) return;
+    const msg = localStorage.getItem('wallet-message') || '';
+    onSignatureCaptureRef.current({
+      signature,
+      message: msg,
+      address: walletDetails.ordinal,
+      wallet: walletDetails.wallet || '',
+      network: redux_network.toLowerCase(),
+    });
+  }, [signature, walletDetails?.ordinal, walletDetails?.wallet, redux_network]);
 
   return (
     <>
@@ -714,8 +279,8 @@ function ConnectMultiWallet({
           getLeatherAddress={getLeatherAddress}
           getPhantomAddress={getPhantomAddress}
           getOkxAddress={getOkxAddress}
-          getAddress={getAddress}
-          getAddressOptions={getAddressOptions}
+          getAddress={connectXverseViaHook}
+          getAddressOptions={null}
           getUnisatAddress={getUnisatAddress}
           modalContainerClass={modalContainerClass}
           modalContentClass={modalContentClass}

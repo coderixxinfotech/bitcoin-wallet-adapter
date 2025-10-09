@@ -451,6 +451,10 @@ const useWalletConnect = () => {
     // Persist only after successful signature
     (0, react_1.useEffect)(() => {
         if (tempWD && signatureResult) {
+            try {
+                console.log('[BWA][persist] saving session for', tempWD.wallet, tempWD.ordinal || tempWD.cardinal);
+            }
+            catch (_a) { }
             if (pendingMessage)
                 localStorage.setItem("wallet-message", pendingMessage);
             localStorage.setItem("wallet-signature", signatureResult);
@@ -496,10 +500,18 @@ const useWalletConnect = () => {
                 catch (_a) { }
                 const signatureOk = addressForVerification ? bip322_js_1.Verifier.verifySignature(addressForVerification, savedMessage, savedSignature) : false;
                 if (networkOk && signatureOk && freshEnough) {
+                    try {
+                        console.log('[BWA][restore] restored session for', savedWallet, addressForVerification);
+                    }
+                    catch (_b) { }
                     dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
                     dispatch((0, generalReducer_1.setLastWallet)(savedWallet));
                 }
                 else {
+                    try {
+                        console.warn('[BWA][restore] skipped restore', { networkOk, signatureOk, freshEnough, savedWallet });
+                    }
+                    catch (_c) { }
                     localStorage.removeItem("lastWallet");
                     localStorage.removeItem("wallet-detail");
                     localStorage.removeItem("wallet-signature");
