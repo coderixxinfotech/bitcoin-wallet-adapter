@@ -1,3 +1,8 @@
+// What happens in this file:
+// - Headless hook to discover wallets, connect/disconnect, and expose wallet details via Redux
+// - Reads network from Redux (hooks internally rely on Redux, no props)
+// - Persists connection in localStorage using key 'wallet-detail' and 'lastWallet'
+// - Provides per-wallet connect methods (Leather, Unisat, Xverse, Phantom, OKX, Magic Eden placeholder)
 import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useWallets } from "@wallet-standard/react";
@@ -69,6 +74,7 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
   // State from Redux
   const walletDetails = useSelector((state: RootState) => state.general.walletDetails);
   const lastWallet = useSelector((state: RootState) => state.general.lastWallet);
+  const reduxNetwork = useSelector((state: RootState) => state.general.network?.toLowerCase?.() ?? "mainnet");
   
   // Local State
   const [isLoading, setIsLoading] = useState(false);
@@ -269,38 +275,35 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
     }
 
     const response = await window.LeatherProvider.request("getAddresses");
-    const btcAddress = response.result.addresses.find((addr: any) => 
-      addr.symbol === "BTC"
-    );
+    const addresses = response?.result?.addresses ?? [];
+    const ordinalsAddress = addresses.find((x: any) => x?.type === "p2tr");
+    const paymentAddress = addresses.find((x: any) => x?.type === "p2wpkh");
 
-    if (!btcAddress) {
+    if (!ordinalsAddress || !paymentAddress) {
       throwBWAError(
         BWAErrorCode.WALLET_NOT_FOUND,
-        "No Bitcoin address found in Leather wallet",
+        "Required Leather addresses not found (p2tr/p2wpkh)",
         {
           severity: BWAErrorSeverity.HIGH,
-          context: { 
+          context: {
             operation: 'wallet_connection',
-            additionalData: { 
-              walletType: 'Leather',
-              addressType: 'BTC'
-            }
+            additionalData: { walletType: 'Leather', haveP2tr: !!ordinalsAddress, haveP2wpkh: !!paymentAddress }
           }
         }
       );
     }
 
     const walletDetail: WalletDetails = {
-      cardinal: btcAddress.address,
-      cardinalPubkey: btcAddress.publicKey || '',
-      ordinal: btcAddress.address,
-      ordinalPubkey: btcAddress.publicKey || '',
+      cardinal: paymentAddress.address,
+      cardinalPubkey: paymentAddress.publicKey || '',
+      ordinal: ordinalsAddress.address,
+      ordinalPubkey: ordinalsAddress.publicKey || '',
       connected: true,
       wallet: "Leather",
     };
 
     dispatch(setWalletDetails(walletDetail));
-    localStorage.setItem("walletDetails", JSON.stringify(walletDetail));
+    localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
   };
 
   const connectUnisat = async () => {
@@ -355,7 +358,7 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
     };
 
     dispatch(setWalletDetails(walletDetail));
-    localStorage.setItem("walletDetails", JSON.stringify(walletDetail));
+    localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
   };
 
   const connectXverse = async (options: any = {}) => {
@@ -364,7 +367,7 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
         purposes: purposes as any,
         message: "Address for receiving Ordinals and payments",
         network: {
-          type: options.network || BitcoinNetworkType.Mainnet,
+          type: reduxNetwork === 'testnet' ? BitcoinNetworkType.Testnet : BitcoinNetworkType.Mainnet,
         },
       },
       onFinish: (response: any) => {
@@ -382,7 +385,7 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
         };
 
         dispatch(setWalletDetails(walletDetail));
-        localStorage.setItem("walletDetails", JSON.stringify(walletDetail));
+        localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
       },
       onCancel: () => {
         throwBWAError(

@@ -10,6 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useWalletConnect = void 0;
+// What happens in this file:
+// - Headless hook to discover wallets, connect/disconnect, and expose wallet details via Redux
+// - Reads network from Redux (hooks internally rely on Redux, no props)
+// - Persists connection in localStorage using key 'wallet-detail' and 'lastWallet'
+// - Provides per-wallet connect methods (Leather, Unisat, Xverse, Phantom, OKX, Magic Eden placeholder)
 const react_1 = require("react");
 const react_redux_1 = require("react-redux");
 const react_2 = require("@wallet-standard/react");
@@ -28,6 +33,7 @@ const useWalletConnect = () => {
     // State from Redux
     const walletDetails = (0, react_redux_1.useSelector)((state) => state.general.walletDetails);
     const lastWallet = (0, react_redux_1.useSelector)((state) => state.general.lastWallet);
+    const reduxNetwork = (0, react_redux_1.useSelector)((state) => { var _a, _b, _c; return (_c = (_b = (_a = state.general.network) === null || _a === void 0 ? void 0 : _a.toLowerCase) === null || _b === void 0 ? void 0 : _b.call(_a)) !== null && _c !== void 0 ? _c : "mainnet"; });
     // Local State
     const [isLoading, setIsLoading] = (0, react_1.useState)(false);
     const [error, setError] = (0, react_1.useState)(null);
@@ -188,6 +194,7 @@ const useWalletConnect = () => {
     }), [walletDetails === null || walletDetails === void 0 ? void 0 : walletDetails.cardinal, walletDetails === null || walletDetails === void 0 ? void 0 : walletDetails.ordinal, lastWallet, dispatch]);
     // Wallet-specific connection methods
     const connectLeather = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b;
         if (!window.LeatherProvider) {
             (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "Leather wallet is not available or not installed", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
@@ -198,29 +205,28 @@ const useWalletConnect = () => {
             });
         }
         const response = yield window.LeatherProvider.request("getAddresses");
-        const btcAddress = response.result.addresses.find((addr) => addr.symbol === "BTC");
-        if (!btcAddress) {
-            (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "No Bitcoin address found in Leather wallet", {
+        const addresses = (_b = (_a = response === null || response === void 0 ? void 0 : response.result) === null || _a === void 0 ? void 0 : _a.addresses) !== null && _b !== void 0 ? _b : [];
+        const ordinalsAddress = addresses.find((x) => (x === null || x === void 0 ? void 0 : x.type) === "p2tr");
+        const paymentAddress = addresses.find((x) => (x === null || x === void 0 ? void 0 : x.type) === "p2wpkh");
+        if (!ordinalsAddress || !paymentAddress) {
+            (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "Required Leather addresses not found (p2tr/p2wpkh)", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
                 context: {
                     operation: 'wallet_connection',
-                    additionalData: {
-                        walletType: 'Leather',
-                        addressType: 'BTC'
-                    }
+                    additionalData: { walletType: 'Leather', haveP2tr: !!ordinalsAddress, haveP2wpkh: !!paymentAddress }
                 }
             });
         }
         const walletDetail = {
-            cardinal: btcAddress.address,
-            cardinalPubkey: btcAddress.publicKey || '',
-            ordinal: btcAddress.address,
-            ordinalPubkey: btcAddress.publicKey || '',
+            cardinal: paymentAddress.address,
+            cardinalPubkey: paymentAddress.publicKey || '',
+            ordinal: ordinalsAddress.address,
+            ordinalPubkey: ordinalsAddress.publicKey || '',
             connected: true,
             wallet: "Leather",
         };
         dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
-        localStorage.setItem("walletDetails", JSON.stringify(walletDetail));
+        localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
     });
     const connectUnisat = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!window.unisat) {
@@ -263,7 +269,7 @@ const useWalletConnect = () => {
             wallet: "Unisat",
         };
         dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
-        localStorage.setItem("walletDetails", JSON.stringify(walletDetail));
+        localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
     });
     const connectXverse = (options = {}) => __awaiter(void 0, void 0, void 0, function* () {
         const getAddressOptions = {
@@ -271,7 +277,7 @@ const useWalletConnect = () => {
                 purposes: purposes,
                 message: "Address for receiving Ordinals and payments",
                 network: {
-                    type: options.network || sats_connect_1.BitcoinNetworkType.Mainnet,
+                    type: reduxNetwork === 'testnet' ? sats_connect_1.BitcoinNetworkType.Testnet : sats_connect_1.BitcoinNetworkType.Mainnet,
                 },
             },
             onFinish: (response) => {
@@ -287,7 +293,7 @@ const useWalletConnect = () => {
                     wallet: 'Xverse'
                 };
                 dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
-                localStorage.setItem("walletDetails", JSON.stringify(walletDetail));
+                localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
             },
             onCancel: () => {
                 (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.USER_REJECTED, "User canceled Xverse wallet connection", {
@@ -302,8 +308,8 @@ const useWalletConnect = () => {
         yield (0, sats_connect_1.getAddress)(getAddressOptions);
     });
     const connectPhantom = () => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
-        if (!((_a = window.phantom) === null || _a === void 0 ? void 0 : _a.bitcoin)) {
+        var _c;
+        if (!((_c = window.phantom) === null || _c === void 0 ? void 0 : _c.bitcoin)) {
             (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "Phantom wallet is not available or not installed", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
                 context: {
@@ -338,8 +344,8 @@ const useWalletConnect = () => {
         localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
     });
     const connectOKX = () => __awaiter(void 0, void 0, void 0, function* () {
-        var _b;
-        if (!((_b = window.okxwallet) === null || _b === void 0 ? void 0 : _b.bitcoin)) {
+        var _d;
+        if (!((_d = window.okxwallet) === null || _d === void 0 ? void 0 : _d.bitcoin)) {
             (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.WALLET_NOT_FOUND, "OKX wallet is not available or not installed", {
                 severity: errorHandler_1.BWAErrorSeverity.HIGH,
                 context: {
