@@ -113,9 +113,11 @@ export const useWalletBalance = (): UseWalletBalanceReturn => {
    */
   const refreshPrice = useCallback(async () => {
     try {
-      // The bitcoin price is now managed centrally by the useBitcoinPrice hook
-      // This function is kept for backward compatibility but doesn't need to do anything
-      console.log("Bitcoin price is now managed by the centralized Redux state");
+      // price is centralized; no-op
+      if (process.env.NODE_ENV !== 'production') {
+        // dev hint only
+        // console.log("Bitcoin price is now managed by the centralized Redux state");
+      }
     } catch (err) {
       console.error("Failed to refresh BTC price:", err);
     }
@@ -210,17 +212,23 @@ export const useWalletBalance = (): UseWalletBalanceReturn => {
           }
         }
       } catch (balanceError) {
-        console.warn("Leather getBalance method failed, trying fallback:", balanceError);
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn("Leather getBalance method failed, trying fallback:", balanceError);
+        }
       }
 
       // Fallback: Use generic balance fetching with the wallet address
       if (walletDetails?.cardinal) {
-        console.log("Using fallback balance fetch for Leather wallet");
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Using fallback balance fetch for Leather wallet");
+        }
         return await fetchGenericBalance();
       }
 
       // If all else fails, return zero balance instead of throwing an error
-      console.warn("Could not fetch Leather wallet balance, returning zero");
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn("Could not fetch Leather wallet balance, returning zero");
+      }
       return {
         btc: 0,
         total: 0,
@@ -363,7 +371,9 @@ export const useWalletBalance = (): UseWalletBalanceReturn => {
       };
     } catch (err) {
       // Fallback: return zero balance rather than failing completely
-      console.warn("Failed to fetch balance from blockchain API:", err);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn("Failed to fetch balance from blockchain API:", err);
+      }
       return {
         btc: 0,
         confirmed: 0,

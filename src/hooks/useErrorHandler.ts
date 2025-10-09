@@ -74,24 +74,34 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}): UseErrorH
   }, [filterCodes, filterSeverity]);
 
   const handleError: ErrorHandler = useCallback((error: BWAError) => {
-    console.log('🔥 useErrorHandler - handleError called with:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🔥 useErrorHandler - handleError called with:', error);
+    }
     
     if (!shouldHandleError(error)) {
-      console.log('🚫 useErrorHandler - Error filtered out by shouldHandleError');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('🚫 useErrorHandler - Error filtered out by shouldHandleError');
+      }
       return;
     }
 
-    console.log('✅ useErrorHandler - Processing error');
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('✅ useErrorHandler - Processing error');
+    }
 
     // Add error to state
     setErrors(prevErrors => {
       const newErrors = [error, ...prevErrors];
-      console.log('📋 useErrorHandler - Updated errors state:', newErrors);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('📋 useErrorHandler - Updated errors state:', newErrors);
+      }
       return newErrors.slice(0, maxErrors);
     });
 
     // Call user-provided error handler
-    console.log('🎯 useErrorHandler - Calling onError callback');
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🎯 useErrorHandler - Calling onError callback');
+    }
     onError?.(error);
 
     // Auto-clear if timeout is specified

@@ -44,7 +44,9 @@ const usePayBTC = () => {
                 }
             });
         }
-        console.log({ options });
+        if (process.env.NODE_ENV !== 'production') {
+            // console.log({ options });
+        }
         try {
             let txid;
             switch (walletDetails.wallet) {
@@ -111,7 +113,9 @@ const usePayBTC = () => {
                             },
                         ],
                     });
-                    console.log({ response });
+                    if (process.env.NODE_ENV !== 'production') {
+                        console.log({ response });
+                    }
                     txid = response.result.txid;
                     setResult(txid);
                     break;
@@ -161,7 +165,9 @@ const usePayBTC = () => {
                                 });
                             }
                         }, onCancel: () => {
-                            console.log("Cancelled ");
+                            if (process.env.NODE_ENV !== 'production') {
+                                console.log("Cancelled");
+                            }
                         } });
                     (yield (0, sats_connect_1.sendBtcTransaction)(sendBtcOptions));
                     break;

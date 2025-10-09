@@ -3,6 +3,7 @@ export interface UseWalletConnectReturn {
     isConnected: boolean;
     isLoading: boolean;
     error: Error | null;
+    signature: string | null;
     currentWallet: WalletDetails | null;
     lastWallet: string;
     availableWallets: IAvailableWallet[];

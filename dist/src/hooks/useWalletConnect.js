@@ -24,7 +24,6 @@ const bip322_js_1 = require("bip322-js");
 const network_1 = require("../utils/network");
 const sats_connect_1 = require("sats-connect");
 const generalReducer_1 = require("../stores/reducers/generalReducer");
-const SatsConnectNamespace = "sats-connect:";
 const purposes = ["ordinals", "payment"];
 /**
  * Headless hook for wallet connection and management
@@ -37,6 +36,7 @@ const useWalletConnect = () => {
     const walletDetails = (0, react_redux_1.useSelector)((state) => state.general.walletDetails);
     const lastWallet = (0, react_redux_1.useSelector)((state) => state.general.lastWallet);
     const reduxNetwork = (0, react_redux_1.useSelector)((state) => state.general.network);
+    const signature = (0, react_redux_1.useSelector)((state) => state.general.signature || null);
     // Local State
     const [isLoading, setIsLoading] = (0, react_1.useState)(false);
     const [error, setError] = (0, react_1.useState)(null);
@@ -200,16 +200,8 @@ const useWalletConnect = () => {
      * Note: Bitcoin price is now managed centrally by the useBitcoinPrice hook
      */
     const refreshBalance = (0, react_1.useCallback)(() => __awaiter(void 0, void 0, void 0, function* () {
-        if (((walletDetails === null || walletDetails === void 0 ? void 0 : walletDetails.cardinal) || (walletDetails === null || walletDetails === void 0 ? void 0 : walletDetails.ordinal)) && lastWallet) {
-            try {
-                // Bitcoin price fetching is now handled centrally
-                console.log("Bitcoin price is managed centrally by the Redux state");
-            }
-            catch (err) {
-                console.error("Failed to refresh balance:", err);
-            }
-        }
-    }), [walletDetails === null || walletDetails === void 0 ? void 0 : walletDetails.cardinal, walletDetails === null || walletDetails === void 0 ? void 0 : walletDetails.ordinal, lastWallet, dispatch]);
+        // Intentionally no-op: Bitcoin price is managed centrally by useBitcoinPrice
+    }), []);
     // Wallet-specific connection methods
     const connectLeather = () => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b;
@@ -279,7 +271,9 @@ const useWalletConnect = () => {
             publicKey = yield window.unisat.getPublicKey();
         }
         catch (err) {
-            console.warn("Could not get public key from Unisat:", err);
+            if (process.env.NODE_ENV !== 'production') {
+                console.warn("Could not get public key from Unisat:", err);
+            }
         }
         const walletDetail = {
             cardinal: address,
@@ -451,10 +445,6 @@ const useWalletConnect = () => {
     // Persist only after successful signature
     (0, react_1.useEffect)(() => {
         if (tempWD && signatureResult) {
-            try {
-                console.log('[BWA][persist] saving session for', tempWD.wallet, tempWD.ordinal || tempWD.cardinal);
-            }
-            catch (_a) { }
             if (pendingMessage)
                 localStorage.setItem("wallet-message", pendingMessage);
             localStorage.setItem("wallet-signature", signatureResult);
@@ -500,18 +490,10 @@ const useWalletConnect = () => {
                 catch (_a) { }
                 const signatureOk = addressForVerification ? bip322_js_1.Verifier.verifySignature(addressForVerification, savedMessage, savedSignature) : false;
                 if (networkOk && signatureOk && freshEnough) {
-                    try {
-                        console.log('[BWA][restore] restored session for', savedWallet, addressForVerification);
-                    }
-                    catch (_b) { }
                     dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
                     dispatch((0, generalReducer_1.setLastWallet)(savedWallet));
                 }
                 else {
-                    try {
-                        console.warn('[BWA][restore] skipped restore', { networkOk, signatureOk, freshEnough, savedWallet });
-                    }
-                    catch (_c) { }
                     localStorage.removeItem("lastWallet");
                     localStorage.removeItem("wallet-detail");
                     localStorage.removeItem("wallet-signature");
@@ -532,6 +514,7 @@ const useWalletConnect = () => {
         isConnected,
         isLoading,
         error,
+        signature,
         // Wallet Information
         currentWallet: walletDetails,
         lastWallet,

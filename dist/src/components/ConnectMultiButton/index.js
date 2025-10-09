@@ -142,8 +142,8 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
     }, []);
     // Use the custom hook
     (0, useWalletEffect_1.default)(walletDetails, disconnect, redux_network);
-    // Delegate all connections to headless hook
-    const { connect: connectWallet } = (0, hooks_1.useWalletConnect)();
+    // Delegate all connections to headless hook and get signature
+    const { connect: connectWallet, signature } = (0, hooks_1.useWalletConnect)();
     const connectXverseViaHook = () => __awaiter(this, void 0, void 0, function* () {
         yield connectWallet("xverse");
         handleClose();
@@ -165,8 +165,7 @@ function ConnectMultiWallet({ buttonClassname, modalContainerClass, modalContent
         handleClose();
     });
     // MagicEden flow is not supported via hook at the moment; left out intentionally
-    // Bridge: surface signature via Redux + localStorage when hook completes
-    const signature = (0, react_redux_1.useSelector)((s) => s.general.signature);
+    // Bridge: surface signature via hook + localStorage when hook completes
     (0, react_1.useEffect)(() => {
         if (!onSignatureCaptureRef.current)
             return;

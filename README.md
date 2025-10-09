@@ -16,6 +16,7 @@ A **production-ready** React library for Bitcoin wallet integration with profess
 - 📱 **6+ Wallet Support** - Unisat, Xverse, Leather, MagicEden, Phantom, OKX
 - 🌐 **Mainnet Ready** - Optimized for production Bitcoin mainnet usage
 - 🔌 **Auto-disconnect on Network Change** - When you switch between mainnet/testnet, any connected wallet is automatically disconnected to prevent cross-network mismatches
+- 🖊️ **Sign-before-persist Sessions** - Wallet connections are only persisted after a successful BIP-322 signature. Sessions are verified on restore (signature + network + TTL)
 
 ## 🧙‍♂️ Tech Stack
 
@@ -566,9 +567,25 @@ export default function App() {
 }
 ```
 
-### 🔐 Signature Capture Callback
+### 🔐 Signature Handling & Capture
 
-The `onSignatureCapture` prop allows you to capture wallet signature data after successful wallet connection and authentication. This is useful for applications that need to store or process the signature for additional verification or backend authentication.
+Wallet connections require a BIP-322 signature. After a successful sign-in:
+- The library persists the session only after signature verification.
+- The signature is stored in Redux and exposed in the headless hook return.
+
+`useWalletConnect()` now returns `signature` so you can access it anywhere:
+
+```ts
+import { useWalletConnect } from 'bitcoin-wallet-adapter';
+
+const { isConnected, signature, currentWallet } = useWalletConnect();
+
+if (isConnected && signature) {
+  // send signature to your backend for auth, etc.
+}
+```
+
+`ConnectMultiButton` delegates connection logic to `useWalletConnect()` and uses the hook’s `signature` to invoke `onSignatureCapture`.
 
 #### Signature Capture Example
 ```jsx
@@ -593,6 +610,16 @@ interface SignatureData {
   network: string;      // Network used ("mainnet" or "testnet")
 }
 ```
+
+### 🔐 Session Security
+- Sessions are saved only after successful signature.
+- On restore, the adapter verifies:
+  - Signature matches the saved message and address
+  - Address matches the active Redux network
+  - Message TTL is fresh (≤ 24h)
+
+### 🧼 Production Logging
+- Non-error logs are disabled in production throughout the library. Dev-only logs are gated by `NODE_ENV !== 'production'`.
 
 #### Security Notes
 - The signature is only captured after successful BIP-322 verification

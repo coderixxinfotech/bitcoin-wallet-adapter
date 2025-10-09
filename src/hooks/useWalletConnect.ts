@@ -24,12 +24,9 @@ import {
 import { 
   setLastWallet,
   setWalletDetails,
-  setNetwork,
 } from "../stores/reducers/generalReducer";
-import { addNotification } from "../stores/reducers/notificationReducers";
 import { RootState } from "../stores";
 import { WalletDetails, IAvailableWallet, Account } from "../types";
-import { getBTCPriceInDollars } from "../utils";
 
 interface CustomWindow extends Window {
   LeatherProvider?: any;
@@ -41,8 +38,6 @@ interface CustomWindow extends Window {
 }
 
 declare const window: CustomWindow;
-
-const SatsConnectNamespace = "sats-connect:";
 const purposes: string[] = ["ordinals", "payment"];
 
 export interface UseWalletConnectReturn {
@@ -50,6 +45,7 @@ export interface UseWalletConnectReturn {
   isConnected: boolean;
   isLoading: boolean;
   error: Error | null;
+  signature: string | null;
   
   // Wallet Information
   currentWallet: WalletDetails | null;
@@ -78,6 +74,7 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
   const walletDetails = useSelector((state: RootState) => state.general.walletDetails);
   const lastWallet = useSelector((state: RootState) => state.general.lastWallet);
   const reduxNetwork = useSelector((state: RootState) => state.general.network);
+  const signature = useSelector((state: RootState) => state.general.signature || null);
   
   // Local State
   const [isLoading, setIsLoading] = useState(false);
@@ -267,15 +264,8 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
    * Note: Bitcoin price is now managed centrally by the useBitcoinPrice hook
    */
   const refreshBalance = useCallback(async () => {
-    if ((walletDetails?.cardinal || walletDetails?.ordinal) && lastWallet) {
-      try {
-        // Bitcoin price fetching is now handled centrally
-        console.log("Bitcoin price is managed centrally by the Redux state");
-      } catch (err) {
-        console.error("Failed to refresh balance:", err);
-      }
-    }
-  }, [walletDetails?.cardinal, walletDetails?.ordinal, lastWallet, dispatch]);
+    // Intentionally no-op: Bitcoin price is managed centrally by useBitcoinPrice
+  }, []);
 
   // Wallet-specific connection methods
   const connectLeather = async () => {
@@ -367,7 +357,9 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
     try {
       publicKey = await window.unisat.getPublicKey();
     } catch (err) {
-      console.warn("Could not get public key from Unisat:", err);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn("Could not get public key from Unisat:", err);
+      }
     }
     
     const walletDetail: WalletDetails = {
@@ -398,7 +390,7 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
         const accounts = response.addresses;
         const paymentAccount = accounts.find((acc: Account) => acc.purpose === 'payment');
         const ordinalsAccount = accounts.find((acc: Account) => acc.purpose === 'ordinals');
-        
+
         const walletDetail: WalletDetails = {
           cardinal: paymentAccount?.address || '',
           cardinalPubkey: paymentAccount?.publicKey || '',
@@ -591,7 +583,6 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
   // Persist only after successful signature
   useEffect(() => {
     if (tempWD && signatureResult) {
-      try { console.log('[BWA][persist] saving session for', tempWD.wallet, tempWD.ordinal || tempWD.cardinal); } catch {}
       if (pendingMessage) localStorage.setItem("wallet-message", pendingMessage);
       localStorage.setItem("wallet-signature", signatureResult);
       localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
@@ -639,11 +630,9 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
 
         const signatureOk = addressForVerification ? Verifier.verifySignature(addressForVerification, savedMessage, savedSignature) : false;
         if (networkOk && signatureOk && freshEnough) {
-          try { console.log('[BWA][restore] restored session for', savedWallet, addressForVerification); } catch {}
           dispatch(setWalletDetails(walletDetail));
           dispatch(setLastWallet(savedWallet));
         } else {
-          try { console.warn('[BWA][restore] skipped restore', { networkOk, signatureOk, freshEnough, savedWallet }); } catch {}
           localStorage.removeItem("lastWallet");
           localStorage.removeItem("wallet-detail");
           localStorage.removeItem("wallet-signature");
@@ -664,6 +653,7 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
     isConnected,
     isLoading,
     error,
+    signature,
     
     // Wallet Information
     currentWallet: walletDetails,
