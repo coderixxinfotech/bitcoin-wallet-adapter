@@ -251,20 +251,21 @@ Issued At: ${issuedAt}`;
     if (localWD) walletDetail = JSON.parse(localWD);
 
     const lastWallet = localStorage.getItem("lastWallet");
+    const normalized = (lastWallet || '').toLowerCase();
     if (lastWallet) {
-      updateLastWallet(lastWallet);
+      updateLastWallet(normalized);
       // console.log("wallet present");
       // If the last wallet is Leather
       if (
-        lastWallet === "Leather" &&
+        normalized === "leather" &&
         walletDetail?.cardinal &&
         walletDetail?.ordinal
       ) {
         // If the last wallet is leather and user data is present, set the wallet details
-        updateLastWallet(lastWallet);
+        updateLastWallet(normalized);
         updateWalletDetails(walletDetail);
       } else if (
-        (lastWallet === "Xverse" || lastWallet === "MagicEden") &&
+        (normalized === "xverse" || normalized === "magiceden") &&
         walletDetail &&
         (!walletDetail?.cardinal || !walletDetail?.ordinal)
       ) {
@@ -273,53 +274,53 @@ Issued At: ${issuedAt}`;
         updateWalletDetails(null);
         localStorage.removeItem("lastWallet");
         localStorage.removeItem("wallet-detail");
-        if (lastWallet === "MagicEden") {
+        if (normalized === "magiceden") {
           const wallet = testWallets.filter(
             (a: any) => a.name === "Magic Eden"
           )[0];
           setWallet(wallet);
         }
       } else if (
-        (lastWallet === "Xverse" || lastWallet === "MagicEden") &&
+        (normalized === "xverse" || normalized === "magiceden") &&
         walletDetail?.cardinal &&
         walletDetail?.ordinal
       ) {
         // If the last wallet is xverse and user data is present, set the wallet details
-        updateLastWallet(lastWallet);
+        updateLastWallet(normalized);
         updateWalletDetails(walletDetail);
-        if (lastWallet === "MagicEden") {
+        if (normalized === "magiceden") {
           const wallet = testWallets.filter(
             (a: any) => a.name === "Magic Eden"
           )[0];
           setWallet(wallet);
         }
       } else if (
-        lastWallet === "Unisat" &&
+        normalized === "unisat" &&
         walletDetail?.cardinal &&
         walletDetail?.ordinal
       ) {
         // If the last wallet is unisat and user data is present, set the wallet details
-        updateLastWallet(lastWallet);
+        updateLastWallet(normalized);
         updateWalletDetails(walletDetail);
       } else if (
-        lastWallet === "Phantom" &&
+        normalized === "phantom" &&
         walletDetail?.cardinal &&
         walletDetail?.ordinal
       ) {
         // If the last wallet is unisat and user data is present, set the wallet details
-        updateLastWallet(lastWallet);
+        updateLastWallet(normalized);
         updateWalletDetails(walletDetail);
       } else if (
-        lastWallet === "Okx" &&
+        normalized === "okx" &&
         walletDetail?.cardinal &&
         walletDetail?.ordinal
       ) {
         // If the last wallet is unisat and user data is present, set the wallet details
-        updateLastWallet(lastWallet);
+        updateLastWallet(normalized);
         updateWalletDetails(walletDetail);
       } else {
         // If the last wallet is not Leather or xverse, set selected wallet to last wallet
-        updateLastWallet(lastWallet);
+        updateLastWallet(normalized);
       }
     }
   }, [updateLastWallet, updateWalletDetails]);
@@ -625,8 +626,9 @@ Issued At: ${issuedAt}`;
     if (tempWD && result) {
       localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
       updateWalletDetails(tempWD);
-      updateLastWallet(tempWD.wallet);
-      localStorage.setItem("lastWallet", tempWD.wallet);
+      const lw = (tempWD.wallet || '').toLowerCase();
+      updateLastWallet(lw);
+      localStorage.setItem("lastWallet", lw);
       
       // Call the signature capture callback if provided
       if (onSignatureCaptureRef.current) {
