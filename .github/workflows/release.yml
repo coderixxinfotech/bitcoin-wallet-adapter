@@ -27,8 +27,14 @@ jobs:
           node-version: '20'
           cache: 'yarn'
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Activate project Yarn version
+        run: corepack prepare yarn@4.10.3 --activate
+
+      - name: Install dependencies (Yarn 4)
+        run: yarn install --immutable
 
       - name: Build package
         run: yarn build
