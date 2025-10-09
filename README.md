@@ -362,11 +362,6 @@ interface AuthOptionsArgs {
 
 > 📝 Note: The `appDetails` field in `customAuthOptions` is primarily used by the Leather wallet.
 
-##### Leather integration update
-
-- The library no longer wraps `@stacks/connect-react` inside `WalletProvider`.
-- Leather operations use the injected `window.LeatherProvider.request(...)` directly.
-- No additional Stacks Connect provider is required in your app root. This avoids postMessage/setImmediate conflicts observed with some Leather extension versions.
 
 ### 🔗 ConnectMultiButton
 
@@ -426,6 +421,150 @@ supportedWallets={["unisat", "xverse", "leather"]}
 ```
 
 This will only show the Unisat, Xverse, and Leather wallet options in the connect modal, even if other wallets are installed in the user's browser.
+
+### 🧩 Build a Custom Connect Button (Headless)
+
+Use the headless hook `useWalletConnect()` to design your own connect UI while using our logic.
+
+```tsx
+// What happens in this file:
+// - Implements a fully custom connect button using the headless `useWalletConnect` hook
+// - Lists available wallets, connects/disconnects, shows basic errors
+// - Uses Tailwind classes and includes null checks per best practices
+
+import React from 'react';
+import {
+  WalletProvider,
+  useWalletConnect,
+  useWalletAddress,
+  useNetwork,
+  Notification,
+} from 'bitcoin-wallet-adapter';
+
+function CustomConnectButton() {
+  const {
+    isConnected,
+    isLoading,
+    error,
+    currentWallet,
+    availableWallets,
+    connect,
+    disconnect,
+    checkAvailableWallets,
+  } = useWalletConnect();
+
+  const walletAddr = useWalletAddress();
+
+  React.useEffect(() => {
+    checkAvailableWallets();
+  }, [checkAvailableWallets]);
+
+  if (isConnected) {
+    return (
+      <div className="inline-flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2 shadow-sm">
+        <div className="text-sm">
+          <div className="font-semibold text-slate-800">
+            {currentWallet?.wallet || 'Wallet'}
+          </div>
+          <div className="font-mono text-xs text-slate-500 max-w-[220px] truncate">
+            {walletAddr?.cardinal ?? '—'}
+          </div>
+        </div>
+        <button
+          onClick={disconnect}
+          className="bg-slate-800 hover:bg-slate-900 text-white text-sm font-semibold px-3 py-2 rounded-lg disabled:opacity-50"
+        >
+          Disconnect
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative inline-block">
+      <button
+        onClick={checkAvailableWallets}
+        disabled={isLoading}
+        className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow disabled:opacity-50"
+      >
+        {isLoading ? 'Checking wallets…' : 'Connect Wallet'}
+      </button>
+
+      <div className="mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow p-2">
+        {(availableWallets?.length ?? 0) > 0 ? (
+          <ul className="space-y-1">
+            {availableWallets!.map((w) => (
+              <li key={w.connector}>
+                <button
+                  onClick={() => connect(w.connector)}
+                  disabled={isLoading}
+                  className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 disabled:opacity-50"
+                >
+                  {w.logo && <img src={w.logo} alt={w.label} className="h-5 w-5" />}
+                  <span className="text-sm text-slate-800">{w.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="text-sm text-slate-500 px-3 py-2">No supported wallets detected.</div>
+        )}
+        {error && (
+          <div className="mt-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            {error.message}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NetworkSwitcher() {
+  const { network, setNetwork, toggle } = useNetwork();
+  return (
+    <div className="inline-flex rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
+      <button
+        onClick={() => setNetwork('mainnet')}
+        className={`px-3 py-2 text-sm font-semibold ${
+          network === 'mainnet' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-700'
+        }`}
+      >
+        Mainnet
+      </button>
+      <button
+        onClick={() => setNetwork('testnet')}
+        className={`px-3 py-2 text-sm font-semibold border-l border-slate-200 ${
+          network === 'testnet' ? 'bg-blue-600 text-white' : 'bg-white text-slate-700'
+        }`}
+      >
+        Testnet
+      </button>
+      <button onClick={toggle} className="px-3 py-2 text-xs text-blue-600 underline">
+        Toggle
+      </button>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <WalletProvider
+      customAuthOptions={{
+        network: 'mainnet',
+        appDetails: { name: 'My App', icon: '/logo.png' },
+      }}
+    >
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6 space-y-6">
+        <div className="flex items-center gap-4">
+          <CustomConnectButton />
+          <NetworkSwitcher />
+        </div>
+        <Notification />
+      </div>
+    </WalletProvider>
+  );
+}
+```
 
 ### 🔐 Signature Capture Callback
 
@@ -523,8 +662,7 @@ Recommended placement: near the wallet connect UI so users can switch before con
 - This prevents accidental cross-network actions (e.g., signing on testnet with a mainnet session) and ensures a clean, explicit reconnection on the new network.
 
 #### Testnet Wallet Availability
-- On `testnet`, the Connect modal will hide wallets that are not supported in our testnet flow: **MagicEden**, **Phantom**, and **OKX**. 
-- Testnet usage is currently supported via the UI for: **Unisat**, **Xverse**, and **Leather**.
+- The Connect modal only shows wallets compatible with the active network and detected in the browser. Availability may vary by extension and version.
 
 
 ### 🔔 Notification
