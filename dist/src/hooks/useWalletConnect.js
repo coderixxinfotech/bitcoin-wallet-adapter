@@ -19,6 +19,7 @@ const react_1 = require("react");
 const react_redux_1 = require("react-redux");
 const react_2 = require("@wallet-standard/react");
 const errorHandler_1 = require("../utils/errorHandler");
+const useMessageSign_1 = require("./useMessageSign");
 const sats_connect_1 = require("sats-connect");
 const generalReducer_1 = require("../stores/reducers/generalReducer");
 const SatsConnectNamespace = "sats-connect:";
@@ -38,6 +39,13 @@ const useWalletConnect = () => {
     const [isLoading, setIsLoading] = (0, react_1.useState)(false);
     const [error, setError] = (0, react_1.useState)(null);
     const [availableWallets, setAvailableWallets] = (0, react_1.useState)([]);
+    const [tempWD, setTempWD] = (0, react_1.useState)(null); // hold wallet details until message is signed
+    // Message signing
+    const { signMessage, result: signatureResult, error: signingError } = (0, useMessageSign_1.useMessageSign)();
+    const getMessage = (0, react_1.useCallback)((address) => {
+        const issuedAt = new Date().toISOString();
+        return `Sign in to confirm wallet ownership for this session.\n\nAddress:\n${address}\n\nThis does not grant spending permissions.\nIssued At: ${issuedAt}`;
+    }, []);
     // Derived State
     const isConnected = !!((walletDetails === null || walletDetails === void 0 ? void 0 : walletDetails.cardinal) || (walletDetails === null || walletDetails === void 0 ? void 0 : walletDetails.ordinal));
     /**
@@ -143,9 +151,6 @@ const useWalletConnect = () => {
                         recoverable: true
                     });
             }
-            // Store the last connected wallet
-            localStorage.setItem("lastWallet", walletType);
-            dispatch((0, generalReducer_1.setLastWallet)(walletType));
         }
         catch (err) {
             (0, errorHandler_1.wrapAndThrowError)(err, errorHandler_1.BWAErrorCode.WALLET_CONNECTION_FAILED, `Failed to connect to ${walletType} wallet`, {
@@ -164,7 +169,8 @@ const useWalletConnect = () => {
     const disconnect = (0, react_1.useCallback)(() => {
         // Clear localStorage
         localStorage.removeItem("lastWallet");
-        localStorage.removeItem("walletDetails");
+        localStorage.removeItem("wallet-details");
+        localStorage.removeItem("wallet-detail");
         // Clear wallet-related items from localStorage
         for (let i = localStorage.length - 1; i >= 0; i--) {
             const key = localStorage.key(i);
@@ -225,8 +231,9 @@ const useWalletConnect = () => {
             connected: true,
             wallet: "Leather",
         };
-        dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
-        localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
+        // Require signing before persisting
+        setTempWD(walletDetail);
+        yield signMessage({ address: walletDetail.ordinal, message: getMessage(walletDetail.ordinal), wallet: "Leather" });
     });
     const connectUnisat = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!window.unisat) {
@@ -268,8 +275,8 @@ const useWalletConnect = () => {
             connected: true,
             wallet: "Unisat",
         };
-        dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
-        localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
+        setTempWD(walletDetail);
+        yield signMessage({ address: walletDetail.ordinal, message: getMessage(walletDetail.ordinal), wallet: "Unisat" });
     });
     const connectXverse = (options = {}) => __awaiter(void 0, void 0, void 0, function* () {
         const getAddressOptions = {
@@ -280,7 +287,7 @@ const useWalletConnect = () => {
                     type: reduxNetwork === 'testnet' ? sats_connect_1.BitcoinNetworkType.Testnet : sats_connect_1.BitcoinNetworkType.Mainnet,
                 },
             },
-            onFinish: (response) => {
+            onFinish: (response) => __awaiter(void 0, void 0, void 0, function* () {
                 const accounts = response.addresses;
                 const paymentAccount = accounts.find((acc) => acc.purpose === 'payment');
                 const ordinalsAccount = accounts.find((acc) => acc.purpose === 'ordinals');
@@ -292,9 +299,11 @@ const useWalletConnect = () => {
                     connected: true,
                     wallet: 'Xverse'
                 };
-                dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
-                localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
-            },
+                setTempWD(walletDetail);
+                if (walletDetail.ordinal) {
+                    yield signMessage({ address: walletDetail.ordinal, message: getMessage(walletDetail.ordinal), wallet: "Xverse" });
+                }
+            }),
             onCancel: () => {
                 (0, errorHandler_1.throwBWAError)(errorHandler_1.BWAErrorCode.USER_REJECTED, "User canceled Xverse wallet connection", {
                     severity: errorHandler_1.BWAErrorSeverity.MEDIUM,
@@ -340,8 +349,8 @@ const useWalletConnect = () => {
             connected: true,
             wallet: "Phantom",
         };
-        dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
-        localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
+        setTempWD(walletDetail);
+        yield signMessage({ address: walletDetail.ordinal, message: getMessage(walletDetail.ordinal), wallet: "Phantom" });
     });
     const connectOKX = () => __awaiter(void 0, void 0, void 0, function* () {
         var _d;
@@ -376,8 +385,8 @@ const useWalletConnect = () => {
             connected: true,
             wallet: "OKX",
         };
-        dispatch((0, generalReducer_1.setWalletDetails)(walletDetail));
-        localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
+        setTempWD(walletDetail);
+        yield signMessage({ address: walletDetail.ordinal, message: getMessage(walletDetail.ordinal), wallet: "Okx" });
     });
     const connectMagicEden = (wallet) => __awaiter(void 0, void 0, void 0, function* () {
         const wallets = [...(meWallets || [])];
@@ -417,6 +426,22 @@ const useWalletConnect = () => {
     (0, react_1.useEffect)(() => {
         setAvailableWallets(checkAvailableWallets());
     }, []);
+    // Persist only after successful signature
+    (0, react_1.useEffect)(() => {
+        if (tempWD && signatureResult) {
+            localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
+            localStorage.setItem("lastWallet", tempWD.wallet);
+            dispatch((0, generalReducer_1.setWalletDetails)(tempWD));
+            dispatch((0, generalReducer_1.setLastWallet)(tempWD.wallet));
+            setTempWD(null);
+        }
+    }, [tempWD, signatureResult, dispatch]);
+    // Clear pending state on signing error
+    (0, react_1.useEffect)(() => {
+        if (signingError) {
+            setTempWD(null);
+        }
+    }, [signingError]);
     // Auto-reconnect on page load if there was a previous connection
     (0, react_1.useEffect)(() => {
         const savedWallet = localStorage.getItem("lastWallet");

@@ -13,6 +13,7 @@ import {
   BWAErrorCode,
   BWAErrorSeverity 
 } from "../utils/errorHandler";
+import { useMessageSign } from "./useMessageSign";
 import {
   BitcoinNetworkType,
   getAddress,
@@ -80,6 +81,15 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [availableWallets, setAvailableWallets] = useState<IAvailableWallet[]>([]);
+  const [tempWD, setTempWD] = useState<WalletDetails | null>(null); // hold wallet details until message is signed
+
+  // Message signing
+  const { signMessage, result: signatureResult, error: signingError } = useMessageSign();
+
+  const getMessage = useCallback((address: string) => {
+    const issuedAt = new Date().toISOString();
+    return `Sign in to confirm wallet ownership for this session.\n\nAddress:\n${address}\n\nThis does not grant spending permissions.\nIssued At: ${issuedAt}`;
+  }, []);
 
   // Derived State
   const isConnected = !!(walletDetails?.cardinal || walletDetails?.ordinal);
@@ -200,10 +210,6 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
           );
       }
 
-      // Store the last connected wallet
-      localStorage.setItem("lastWallet", walletType);
-      dispatch(setLastWallet(walletType));
-
     } catch (err) {
       wrapAndThrowError(
         err as Error,
@@ -226,7 +232,8 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
   const disconnect = useCallback(() => {
     // Clear localStorage
     localStorage.removeItem("lastWallet");
-    localStorage.removeItem("walletDetails");
+    localStorage.removeItem("wallet-details");
+    localStorage.removeItem("wallet-detail");
     
     // Clear wallet-related items from localStorage
     for (let i = localStorage.length - 1; i >= 0; i--) {
@@ -302,8 +309,9 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
       wallet: "Leather",
     };
 
-    dispatch(setWalletDetails(walletDetail));
-    localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
+    // Require signing before persisting
+    setTempWD(walletDetail);
+    await signMessage({ address: walletDetail.ordinal, message: getMessage(walletDetail.ordinal), wallet: "Leather" });
   };
 
   const connectUnisat = async () => {
@@ -357,8 +365,8 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
       wallet: "Unisat",
     };
 
-    dispatch(setWalletDetails(walletDetail));
-    localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
+    setTempWD(walletDetail);
+    await signMessage({ address: walletDetail.ordinal, message: getMessage(walletDetail.ordinal), wallet: "Unisat" });
   };
 
   const connectXverse = async (options: any = {}) => {
@@ -370,7 +378,7 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
           type: reduxNetwork === 'testnet' ? BitcoinNetworkType.Testnet : BitcoinNetworkType.Mainnet,
         },
       },
-      onFinish: (response: any) => {
+      onFinish: async (response: any) => {
         const accounts = response.addresses;
         const paymentAccount = accounts.find((acc: Account) => acc.purpose === 'payment');
         const ordinalsAccount = accounts.find((acc: Account) => acc.purpose === 'ordinals');
@@ -384,8 +392,10 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
           wallet: 'Xverse'
         };
 
-        dispatch(setWalletDetails(walletDetail));
-        localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
+        setTempWD(walletDetail);
+        if (walletDetail.ordinal) {
+          await signMessage({ address: walletDetail.ordinal, message: getMessage(walletDetail.ordinal), wallet: "Xverse" });
+        }
       },
       onCancel: () => {
         throwBWAError(
@@ -448,8 +458,8 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
       wallet: "Phantom",
     };
 
-    dispatch(setWalletDetails(walletDetail));
-    localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
+    setTempWD(walletDetail);
+    await signMessage({ address: walletDetail.ordinal, message: getMessage(walletDetail.ordinal), wallet: "Phantom" });
   };
 
   const connectOKX = async () => {
@@ -495,8 +505,8 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
       wallet: "OKX",
     };
 
-    dispatch(setWalletDetails(walletDetail));
-    localStorage.setItem("wallet-detail", JSON.stringify(walletDetail));
+    setTempWD(walletDetail);
+    await signMessage({ address: walletDetail.ordinal, message: getMessage(walletDetail.ordinal), wallet: "Okx" });
   };
 
   const connectMagicEden = async (wallet?: WalletWithFeatures<any>) => {
@@ -555,6 +565,24 @@ export const useWalletConnect = (): UseWalletConnectReturn => {
   useEffect(() => {
     setAvailableWallets(checkAvailableWallets());
   }, []);
+
+  // Persist only after successful signature
+  useEffect(() => {
+    if (tempWD && signatureResult) {
+      localStorage.setItem("wallet-detail", JSON.stringify(tempWD));
+      localStorage.setItem("lastWallet", tempWD.wallet);
+      dispatch(setWalletDetails(tempWD));
+      dispatch(setLastWallet(tempWD.wallet));
+      setTempWD(null);
+    }
+  }, [tempWD, signatureResult, dispatch]);
+
+  // Clear pending state on signing error
+  useEffect(() => {
+    if (signingError) {
+      setTempWD(null);
+    }
+  }, [signingError]);
 
   // Auto-reconnect on page load if there was a previous connection
   useEffect(() => {
