@@ -25,7 +25,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'yarn'
+          # Do not use setup-node yarn cache; it calls `yarn cache dir` with global Yarn 1
+          # and fails when packageManager enforces Yarn 4 via Corepack.
 
       - name: Enable Corepack
         run: corepack enable
