@@ -368,16 +368,16 @@ interface AuthOptionsArgs {
 - Leather operations use the injected `window.LeatherProvider.request(...)` directly.
 - No additional Stacks Connect provider is required in your app root. This avoids postMessage/setImmediate conflicts observed with some Leather extension versions.
 
-### 🔗 ConnectMultiWallet
+### 🔗 ConnectMultiButton
 
-Use the `ConnectMultiWallet` component to render a multi-wallet connect button:
+Use the `ConnectMultiButton` component to render a multi-wallet connect button:
 
 ```jsx
-import { ConnectMultiWallet } from "bitcoin-wallet-adapter";
+import { ConnectMultiButton } from "bitcoin-wallet-adapter";
 
 function WalletConnect() {
   return (
-    <ConnectMultiWallet
+    <ConnectMultiButton
       buttonClassname="custom-button-class"
       modalContainerClass="custom-modal-container"
       modalContentClass="custom-modal-content"
@@ -398,7 +398,7 @@ function WalletConnect() {
 }
 ```
 
-#### ConnectMultiWallet Props
+#### ConnectMultiButton Props
 
 | Prop                | Type                                           | Description                                                  |
 | ------------------- | ---------------------------------------------- | ------------------------------------------------------------ |
@@ -433,7 +433,7 @@ The `onSignatureCapture` prop allows you to capture wallet signature data after 
 
 #### Signature Capture Example
 ```jsx
-<ConnectMultiWallet
+<ConnectMultiButton
   onSignatureCapture={(signatureData) => {
     console.log('Signature captured:', signatureData);
     // Process signature data for your application
@@ -473,7 +473,7 @@ If no `connectionMessage` is provided, a default message is generated that inclu
 
 #### Custom Message Example
 ```jsx
-<ConnectMultiWallet
+<ConnectMultiButton
   connectionMessage="Welcome to MyApp! Please sign this message to verify wallet ownership and authenticate your session."
 />
 ```
